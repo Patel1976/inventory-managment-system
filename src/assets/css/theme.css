@@ -1,0 +1,648 @@
+/* ============================================
+   Theme System - CSS Variables
+   ============================================ */
+
+:root {
+  /* Default Primary Color (Green) */
+  --primary-color: #22c55e;
+  --primary-hover: #16a34a;
+  --primary-gradient: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
+  --primary-light: rgba(34, 197, 94, 0.1);
+  
+  /* Light Mode Colors */
+  --sidebar-bg: linear-gradient(180deg, #2e3192 0%, #1bbbce 100%);
+  --header-bg: #ffffff;
+  --body-bg: #f5f6fa;
+  --card-bg: #ffffff;
+  --text-primary: #333333;
+  --text-secondary: #888888;
+  --text-muted: #6b7280;
+  --border-color: #eeeeee;
+  --input-bg: #ffffff;
+  --input-border: #dddddd;
+  --dropdown-bg: #ffffff;
+  --shadow-color: rgba(0, 0, 0, 0.1);
+  --table-hover: #f8f9fa;
+  --table-header-bg: #f8f9fa;
+}
+
+/* Dark Mode */
+[data-theme="dark"] {
+  --sidebar-bg: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+  --header-bg: #1a1a2e;
+  --body-bg: #0f0f23;
+  --card-bg: #1a1a2e;
+  --text-primary: #e5e5e5;
+  --text-secondary: #a0a0a0;
+  --text-muted: #6b7280;
+  --border-color: #2d2d44;
+  --input-bg: #16213e;
+  --input-border: #2d2d44;
+  --dropdown-bg: #1a1a2e;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+  --table-hover: #16213e;
+  --table-header-bg: #16213e;
+}
+
+/* Primary Color Themes */
+[data-primary="green"] {
+  --primary-color: #22c55e;
+  --primary-hover: #16a34a;
+  --primary-gradient: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
+  --primary-light: rgba(34, 197, 94, 0.1);
+}
+
+[data-primary="purple"] {
+  --primary-color: #8b5cf6;
+  --primary-hover: #7c3aed;
+  --primary-gradient: linear-gradient(180deg, #8b5cf6 0%, #7c3aed 100%);
+  --primary-light: rgba(139, 92, 246, 0.1);
+}
+
+[data-primary="orange"] {
+  --primary-color: #f59e0b;
+  --primary-hover: #d97706;
+  --primary-gradient: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
+  --primary-light: rgba(245, 158, 11, 0.1);
+}
+
+[data-primary="blue"] {
+  --primary-color: #3b82f6;
+  --primary-hover: #2563eb;
+  --primary-gradient: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+  --primary-light: rgba(59, 130, 246, 0.1);
+}
+
+/* ============================================
+   Apply Theme Variables
+   ============================================ */
+
+/* Body */
+body {
+  background-color: var(--body-bg);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Sidebar Theme Override */
+.sidebar {
+  background: var(--sidebar-bg);
+}
+
+/* Header */
+.main-header {
+  background: var(--header-bg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.toggle-btn {
+  color: var(--text-secondary);
+}
+
+.toggle-btn:hover {
+  color: var(--primary-color);
+}
+
+/* Cards */
+.stat-card,
+.data-card,
+.form-card {
+  background: var(--card-bg);
+  border: 1px solid var(--border-color);
+}
+
+.data-card-header {
+  border-bottom-color: var(--border-color);
+}
+
+.data-card-header h5,
+.stat-card .stat-content h3,
+.form-card h5 {
+  color: var(--text-primary);
+}
+
+.stat-card .stat-content p {
+  color: var(--text-secondary);
+}
+
+/* Tables */
+.data-table th {
+  background: var(--table-header-bg);
+  color: var(--text-secondary);
+  border-bottom-color: var(--border-color);
+}
+
+.data-table td {
+  color: var(--text-primary);
+  border-bottom-color: var(--border-color);
+}
+
+.data-table tr:hover {
+  background: var(--table-hover);
+}
+
+/* Forms */
+.form-control,
+.form-select {
+  background-color: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--text-primary);
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.form-group label {
+  color: var(--text-primary);
+}
+
+/* Primary Button */
+.btn-primary-custom {
+  background: var(--primary-gradient);
+  color: #fff;
+}
+
+.btn-primary-custom:hover {
+  opacity: 0.9;
+}
+
+.btn-outline-primary {
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  color: #fff;
+}
+
+/* Dropdown Menu */
+.dropdown-menu {
+  background-color: var(--dropdown-bg);
+  border-color: var(--border-color);
+}
+
+.dropdown-item {
+  color: var(--text-primary);
+}
+
+.dropdown-item:hover {
+  background-color: var(--table-hover);
+}
+
+.dropdown-divider {
+  border-color: var(--border-color);
+}
+
+/* User Info */
+.user-dropdown .user-name {
+  color: var(--text-primary);
+}
+
+.user-dropdown .user-role {
+  color: var(--text-secondary);
+}
+
+.user-dropdown:hover {
+  background: var(--table-hover);
+}
+
+/* Page Header */
+.page-header h4 {
+  color: var(--text-primary);
+}
+
+.breadcrumb-wrapper a {
+  color: var(--primary-color);
+}
+
+.breadcrumb-wrapper span {
+  color: var(--text-secondary);
+}
+
+/* Footer */
+.main-footer {
+  background: var(--card-bg);
+  border-top-color: var(--border-color);
+  color: var(--text-secondary);
+}
+
+/* Icon Buttons */
+.header-icons .icon-btn {
+  background: var(--table-hover);
+  color: var(--text-secondary);
+}
+
+.header-icons .icon-btn:hover {
+  background: var(--primary-light);
+  color: var(--primary-color);
+}
+
+/* Quick Actions */
+.quick-action-btn {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+.quick-action-btn:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 5px 15px var(--shadow-color);
+}
+
+.quick-action-btn span {
+  color: var(--text-secondary);
+}
+
+/* Input Group */
+.input-group-text {
+  background-color: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--text-secondary);
+}
+
+/* Pagination */
+.page-link {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.page-item.active .page-link {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.page-item.disabled .page-link {
+  background-color: var(--table-hover);
+  color: var(--text-muted);
+}
+
+/* Charts */
+.chart-container {
+  background: var(--table-hover);
+}
+
+/* Low Stock Alert Box */
+.low-stock-item {
+  background: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+/* Form Check */
+.form-check-input:checked {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+/* Search Input */
+.search-box input {
+  background-color: var(--input-bg);
+  border-color: var(--input-border);
+  color: var(--text-primary);
+}
+
+/* ============================================
+   Theme Toggle Button
+   ============================================ */
+
+.theme-toggle-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.theme-toggle-btn {
+  background: var(--table-hover);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--primary-light);
+  color: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.theme-toggle-btn.active {
+  background: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+}
+
+/* Color Selector */
+.color-selector {
+  display: flex;
+  gap: 8px;
+  margin-left: 15px;
+  padding-left: 15px;
+  border-left: 1px solid var(--border-color);
+}
+
+.color-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.color-btn:hover {
+  transform: scale(1.1);
+}
+
+.color-btn.active {
+  border-color: var(--text-primary);
+  box-shadow: 0 0 0 3px var(--shadow-color);
+}
+
+.color-btn.green { background-color: #22c55e; }
+.color-btn.purple { background-color: #8b5cf6; }
+.color-btn.orange { background-color: #f59e0b; }
+.color-btn.blue { background-color: #3b82f6; }
+
+/* ============================================
+   Notification Dropdown
+   ============================================ */
+
+.notification-dropdown {
+  position: relative;
+}
+
+.notification-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  width: 320px;
+  background: var(--dropdown-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 10px 40px var(--shadow-color);
+  z-index: 1000;
+  display: none;
+}
+
+.notification-menu.show {
+  display: block;
+}
+
+.notification-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.notification-header h6 {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.notification-list {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 15px;
+  border-bottom: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.notification-item:hover {
+  background: var(--table-hover);
+}
+
+.notification-item.unread {
+  background: var(--primary-light);
+}
+
+.notification-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.notification-icon.warning {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.notification-icon.success {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.notification-icon.danger {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.notification-icon.info {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-content p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-primary);
+  line-height: 1.4;
+}
+
+.notification-content small {
+  color: var(--text-secondary);
+  font-size: 11px;
+}
+
+.notification-footer {
+  padding: 12px 15px;
+  text-align: center;
+}
+
+.notification-footer a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+/* ============================================
+   Login Page
+   ============================================ */
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--body-bg);
+  padding: 20px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--card-bg);
+  border-radius: 16px;
+  padding: 40px;
+  box-shadow: 0 10px 40px var(--shadow-color);
+}
+
+.login-logo {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.login-logo h2 {
+  color: var(--text-primary);
+  margin: 10px 0 0 0;
+}
+
+.login-logo span {
+  font-size: 48px;
+}
+
+.login-title {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.login-title h4 {
+  color: var(--text-primary);
+  margin: 0 0 8px 0;
+}
+
+.login-title p {
+  color: var(--text-secondary);
+  margin: 0;
+  font-size: 14px;
+}
+
+.login-form .form-group {
+  margin-bottom: 20px;
+}
+
+.login-form .btn-primary-custom {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+}
+
+.login-error {
+  background: #fee2e2;
+  color: #dc2626;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-size: 14px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+/* ============================================
+   Activity Log
+   ============================================ */
+
+.activity-badge {
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.activity-badge.add {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.activity-badge.edit {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.activity-badge.delete {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.activity-badge.view {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+/* ============================================
+   Settings Cards
+   ============================================ */
+
+.settings-section {
+  margin-bottom: 30px;
+}
+
+.settings-section h5 {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  color: var(--text-primary);
+}
+
+.settings-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+/* Filters */
+.filter-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.filter-item {
+  flex: 1;
+  min-width: 150px;
+}
+
+.date-range-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.date-range-filter input {
+  flex: 1;
+}
+
+.date-range-filter span {
+  color: var(--text-secondary);
+}

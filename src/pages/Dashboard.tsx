@@ -1,40 +1,52 @@
 import { Link } from 'react-router-dom';
 import { 
   FiBox, FiShoppingCart, FiDollarSign, FiUsers, 
-  FiTrendingUp, FiTrendingDown, FiPackage, FiAlertTriangle,
-  FiPlus, FiEye, FiEdit, FiTrash2
+  FiTrendingUp, FiTrendingDown, FiAlertTriangle,
+  FiPlus, FiEye, FiEdit, FiTrash2, FiPercent
 } from 'react-icons/fi';
+import { useAuth } from '../contexts/AuthContext';
+import { useSettings } from '../contexts/SettingsContext';
 
 const Dashboard = () => {
-  // Mock data for dashboard
+  const { isAdmin } = useAuth();
+  const { currencySymbol, stockAlertThreshold } = useSettings();
+
+  // Mock data for dashboard with extended stats
   const stats = [
-    { title: 'Total Products', value: '248', icon: <FiBox />, color: 'bg-primary', trend: '+12%' },
-    { title: 'Total Purchase', value: '$45,230', icon: <FiShoppingCart />, color: 'bg-success', trend: '+8%' },
-    { title: 'Total Sales', value: '$67,890', icon: <FiDollarSign />, color: 'bg-info', trend: '+15%' },
-    { title: 'Total Customers', value: '156', icon: <FiUsers />, color: 'bg-warning', trend: '+5%' },
+    { title: 'Total Products', value: '248', icon: <FiBox />, color: 'bg-primary', trend: '+12%', trendUp: true },
+    { title: 'Total Purchase', value: `${currencySymbol}45,230`, icon: <FiShoppingCart />, color: 'bg-success', trend: '+8%', trendUp: true },
+    { title: 'Total Sales', value: `${currencySymbol}67,890`, icon: <FiDollarSign />, color: 'bg-info', trend: '+15%', trendUp: true },
+    { title: 'Total Customers', value: '156', icon: <FiUsers />, color: 'bg-warning', trend: '+5%', trendUp: true },
+  ];
+
+  // Additional advanced widgets
+  const advancedStats = [
+    { title: 'Net Profit', value: `${currencySymbol}22,660`, icon: <FiTrendingUp />, color: 'bg-success', subtitle: 'This Month' },
+    { title: 'Gross Loss', value: `${currencySymbol}3,450`, icon: <FiTrendingDown />, color: 'bg-danger', subtitle: 'This Month' },
+    { title: 'Tax Collected', value: `${currencySymbol}6,789`, icon: <FiPercent />, color: 'bg-info', subtitle: 'This Month' },
   ];
 
   const recentSales = [
-    { id: 'INV-001', customer: 'John Doe', date: '2024-01-15', amount: '$250.00', status: 'Completed' },
-    { id: 'INV-002', customer: 'Jane Smith', date: '2024-01-14', amount: '$180.00', status: 'Pending' },
-    { id: 'INV-003', customer: 'Bob Wilson', date: '2024-01-14', amount: '$320.00', status: 'Completed' },
-    { id: 'INV-004', customer: 'Alice Brown', date: '2024-01-13', amount: '$150.00', status: 'Completed' },
-    { id: 'INV-005', customer: 'Charlie Davis', date: '2024-01-13', amount: '$450.00', status: 'Pending' },
+    { id: 'INV-001', customer: 'John Doe', date: '2024-01-15', amount: 250.00, status: 'Completed' },
+    { id: 'INV-002', customer: 'Jane Smith', date: '2024-01-14', amount: 180.00, status: 'Pending' },
+    { id: 'INV-003', customer: 'Bob Wilson', date: '2024-01-14', amount: 320.00, status: 'Completed' },
+    { id: 'INV-004', customer: 'Alice Brown', date: '2024-01-13', amount: 150.00, status: 'Completed' },
+    { id: 'INV-005', customer: 'Charlie Davis', date: '2024-01-13', amount: 450.00, status: 'Pending' },
   ];
 
   const topProducts = [
-    { name: 'iPhone 14 Pro', category: 'Electronics', sold: 45, stock: 120, image: 'https://via.placeholder.com/40' },
-    { name: 'Samsung Galaxy S23', category: 'Electronics', sold: 38, stock: 85, image: 'https://via.placeholder.com/40' },
-    { name: 'MacBook Pro M2', category: 'Laptops', sold: 32, stock: 42, image: 'https://via.placeholder.com/40' },
-    { name: 'Sony Headphones', category: 'Audio', sold: 28, stock: 156, image: 'https://via.placeholder.com/40' },
-    { name: 'Apple Watch Series 8', category: 'Wearables', sold: 25, stock: 68, image: 'https://via.placeholder.com/40' },
+    { name: 'iPhone 14 Pro', category: 'Electronics', sold: 45, revenue: 44955, image: 'https://via.placeholder.com/40' },
+    { name: 'Samsung Galaxy S23', category: 'Electronics', sold: 38, revenue: 34162, image: 'https://via.placeholder.com/40' },
+    { name: 'MacBook Pro M2', category: 'Laptops', sold: 32, revenue: 63968, image: 'https://via.placeholder.com/40' },
+    { name: 'Sony Headphones', category: 'Audio', sold: 28, revenue: 9772, image: 'https://via.placeholder.com/40' },
+    { name: 'Apple Watch Series 8', category: 'Wearables', sold: 25, revenue: 9975, image: 'https://via.placeholder.com/40' },
   ];
 
   const lowStockProducts = [
-    { name: 'Dell Monitor 27"', category: 'Electronics', stock: 5, minStock: 10 },
-    { name: 'Logitech Mouse', category: 'Accessories', stock: 8, minStock: 15 },
-    { name: 'USB-C Hub', category: 'Accessories', stock: 3, minStock: 20 },
-    { name: 'Wireless Charger', category: 'Accessories', stock: 7, minStock: 25 },
+    { name: 'Dell Monitor 27"', category: 'Electronics', stock: 5, minStock: stockAlertThreshold },
+    { name: 'Logitech Mouse', category: 'Accessories', stock: 8, minStock: stockAlertThreshold + 5 },
+    { name: 'USB-C Hub', category: 'Accessories', stock: 3, minStock: stockAlertThreshold + 10 },
+    { name: 'Wireless Charger', category: 'Accessories', stock: 7, minStock: stockAlertThreshold + 15 },
   ];
 
   return (
@@ -49,7 +61,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Main Stats Cards */}
       <div className="row g-4 mb-4">
         {stats.map((stat, index) => (
           <div key={index} className="col-12 col-sm-6 col-xl-3">
@@ -62,10 +74,28 @@ const Dashboard = () => {
                 <p>{stat.title}</p>
               </div>
               <div className="stat-trend" style={{ marginLeft: 'auto' }}>
-                <span style={{ color: '#22c55e', fontSize: '12px', fontWeight: '500' }}>
-                  <FiTrendingUp style={{ marginRight: '4px' }} />
+                <span style={{ color: stat.trendUp ? '#22c55e' : '#ef4444', fontSize: '12px', fontWeight: '500' }}>
+                  {stat.trendUp ? <FiTrendingUp style={{ marginRight: '4px' }} /> : <FiTrendingDown style={{ marginRight: '4px' }} />}
                   {stat.trend}
                 </span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Advanced Stats Row */}
+      <div className="row g-4 mb-4">
+        {advancedStats.map((stat, index) => (
+          <div key={index} className="col-12 col-md-4">
+            <div className="stat-card">
+              <div className={`icon-wrapper ${stat.color}`}>
+                {stat.icon}
+              </div>
+              <div className="stat-content">
+                <h3>{stat.value}</h3>
+                <p>{stat.title}</p>
+                <small style={{ color: 'var(--text-muted)', fontSize: '11px' }}>{stat.subtitle}</small>
               </div>
             </div>
           </div>
@@ -147,7 +177,7 @@ const Dashboard = () => {
                         <td><strong>{sale.id}</strong></td>
                         <td>{sale.customer}</td>
                         <td>{sale.date}</td>
-                        <td>{sale.amount}</td>
+                        <td>{currencySymbol}{sale.amount.toFixed(2)}</td>
                         <td>
                           <span className={`badge ${sale.status === 'Completed' ? 'badge-success' : 'badge-warning'}`}>
                             {sale.status}
@@ -155,8 +185,12 @@ const Dashboard = () => {
                         </td>
                         <td>
                           <button className="btn-action view me-1"><FiEye /></button>
-                          <button className="btn-action edit me-1"><FiEdit /></button>
-                          <button className="btn-action delete"><FiTrash2 /></button>
+                          {isAdmin && (
+                            <>
+                              <button className="btn-action edit me-1"><FiEdit /></button>
+                              <button className="btn-action delete"><FiTrash2 /></button>
+                            </>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -178,15 +212,15 @@ const Dashboard = () => {
                 <div 
                   key={index} 
                   className="d-flex align-items-center justify-content-between p-3 mb-2"
-                  style={{ background: '#fff8f0', borderRadius: '8px', border: '1px solid #fef3c7' }}
+                  style={{ background: 'var(--primary-light)', borderRadius: '8px', border: '1px solid var(--border-color)' }}
                 >
                   <div>
-                    <div style={{ fontWeight: '600', color: '#333' }}>{product.name}</div>
-                    <div style={{ fontSize: '12px', color: '#888' }}>{product.category}</div>
+                    <div style={{ fontWeight: '600', color: 'var(--text-primary)' }}>{product.name}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{product.category}</div>
                   </div>
                   <div style={{ textAlign: 'right' }}>
                     <div style={{ fontWeight: '600', color: '#dc2626' }}>{product.stock} left</div>
-                    <div style={{ fontSize: '12px', color: '#888' }}>Min: {product.minStock}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>Min: {product.minStock}</div>
                   </div>
                 </div>
               ))}
@@ -211,7 +245,7 @@ const Dashboard = () => {
                       <th>Product</th>
                       <th>Category</th>
                       <th>Sold</th>
-                      <th>Stock</th>
+                      <th>Revenue</th>
                       <th>Status</th>
                     </tr>
                   </thead>
@@ -230,10 +264,10 @@ const Dashboard = () => {
                         </td>
                         <td>{product.category}</td>
                         <td><strong>{product.sold}</strong> units</td>
-                        <td>{product.stock}</td>
+                        <td><strong>{currencySymbol}{product.revenue.toLocaleString()}</strong></td>
                         <td>
-                          <span className={`badge ${product.stock > 50 ? 'badge-success' : product.stock > 20 ? 'badge-warning' : 'badge-danger'}`}>
-                            {product.stock > 50 ? 'In Stock' : product.stock > 20 ? 'Low Stock' : 'Critical'}
+                          <span className="badge badge-success">
+                            <FiTrendingUp className="me-1" />Top Seller
                           </span>
                         </td>
                       </tr>
