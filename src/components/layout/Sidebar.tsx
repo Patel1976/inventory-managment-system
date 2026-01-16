@@ -3,8 +3,9 @@ import { Link, useLocation } from 'react-router-dom';
 import { 
   FiHome, FiBox, FiShoppingCart, FiUsers, FiTruck, 
   FiDollarSign, FiBarChart2, FiSettings, FiChevronDown,
-  FiChevronRight, FiLayers, FiFileText, FiClipboard
+  FiChevronRight, FiLayers, FiFileText, FiActivity
 } from 'react-icons/fi';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -15,11 +16,13 @@ interface MenuItem {
   icon: React.ReactNode;
   path?: string;
   submenu?: { title: string; path: string }[];
+  adminOnly?: boolean;
 }
 
 const Sidebar = ({ isCollapsed }: SidebarProps) => {
   const location = useLocation();
   const [openMenus, setOpenMenus] = useState<string[]>(['Products']);
+  const { isAdmin } = useAuth();
 
   const menuItems: MenuItem[] = [
     { title: 'Dashboard', icon: <FiHome />, path: '/' },
@@ -86,8 +89,12 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
         { title: 'Customer Report', path: '/reports/customer' },
       ]
     },
+    { title: 'Activity Log', icon: <FiActivity />, path: '/activity-log', adminOnly: true },
     { title: 'Settings', icon: <FiSettings />, path: '/settings' },
   ];
+
+  // Filter menu items based on user role
+  const filteredMenuItems = menuItems.filter(item => !item.adminOnly || isAdmin);
 
   const toggleMenu = (title: string) => {
     setOpenMenus(prev => 
@@ -112,7 +119,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
 
       <nav className="sidebar-nav">
         <ul className="nav flex-column">
-          {menuItems.map((item) => (
+          {filteredMenuItems.map((item) => (
             <li key={item.title} className="nav-item">
               {item.submenu ? (
                 <>

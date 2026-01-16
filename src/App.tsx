@@ -4,10 +4,18 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-// Layout
+// Providers
+import { AuthProvider } from "./contexts/AuthContext";
+import { ThemeProvider } from "./contexts/ThemeContext";
+import { SettingsProvider } from "./contexts/SettingsContext";
+import { NotificationProvider } from "./contexts/NotificationContext";
+
+// Layout & Protection
 import AdminLayout from "./components/layout/AdminLayout";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 // Pages
+import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import ProductList from "./pages/products/ProductList";
 import AddProduct from "./pages/products/AddProduct";
@@ -28,46 +36,68 @@ import AddAdjustment from "./pages/adjustments/AddAdjustment";
 import SalesReport from "./pages/reports/SalesReport";
 import InventoryReport from "./pages/reports/InventoryReport";
 import Settings from "./pages/Settings";
+import ActivityLog from "./pages/ActivityLog";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<AdminLayout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="products" element={<ProductList />} />
-            <Route path="products/add" element={<AddProduct />} />
-            <Route path="products/categories" element={<Categories />} />
-            <Route path="products/brands" element={<Brands />} />
-            <Route path="sales" element={<SalesList />} />
-            <Route path="sales/add" element={<AddSale />} />
-            <Route path="purchases" element={<PurchaseList />} />
-            <Route path="purchases/add" element={<AddPurchase />} />
-            <Route path="customers" element={<CustomerList />} />
-            <Route path="suppliers" element={<SupplierList />} />
-            <Route path="stores" element={<StoreList />} />
-            <Route path="expenses" element={<ExpenseList />} />
-            <Route path="expenses/add" element={<AddExpense />} />
-            <Route path="expenses/categories" element={<ExpenseCategories />} />
-            <Route path="adjustments" element={<AdjustmentList />} />
-            <Route path="adjustments/add" element={<AddAdjustment />} />
-            <Route path="reports/sales" element={<SalesReport />} />
-            <Route path="reports/inventory" element={<InventoryReport />} />
-            <Route path="reports/purchase" element={<SalesReport />} />
-            <Route path="reports/supplier" element={<SalesReport />} />
-            <Route path="reports/customer" element={<SalesReport />} />
-            <Route path="settings" element={<Settings />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <SettingsProvider>
+          <NotificationProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  {/* Public Route */}
+                  <Route path="/login" element={<Login />} />
+                  
+                  {/* Protected Routes */}
+                  <Route path="/" element={
+                    <ProtectedRoute>
+                      <AdminLayout />
+                    </ProtectedRoute>
+                  }>
+                    <Route index element={<Dashboard />} />
+                    <Route path="products" element={<ProductList />} />
+                    <Route path="products/add" element={<AddProduct />} />
+                    <Route path="products/categories" element={<Categories />} />
+                    <Route path="products/brands" element={<Brands />} />
+                    <Route path="sales" element={<SalesList />} />
+                    <Route path="sales/add" element={<AddSale />} />
+                    <Route path="purchases" element={<PurchaseList />} />
+                    <Route path="purchases/add" element={<AddPurchase />} />
+                    <Route path="customers" element={<CustomerList />} />
+                    <Route path="suppliers" element={<SupplierList />} />
+                    <Route path="stores" element={<StoreList />} />
+                    <Route path="expenses" element={<ExpenseList />} />
+                    <Route path="expenses/add" element={<AddExpense />} />
+                    <Route path="expenses/categories" element={<ExpenseCategories />} />
+                    <Route path="adjustments" element={<AdjustmentList />} />
+                    <Route path="adjustments/add" element={<AddAdjustment />} />
+                    <Route path="reports/sales" element={<SalesReport />} />
+                    <Route path="reports/inventory" element={<InventoryReport />} />
+                    <Route path="reports/purchase" element={<SalesReport />} />
+                    <Route path="reports/supplier" element={<SalesReport />} />
+                    <Route path="reports/customer" element={<SalesReport />} />
+                    <Route path="settings" element={<Settings />} />
+                    <Route path="activity-log" element={
+                      <ProtectedRoute adminOnly>
+                        <ActivityLog />
+                      </ProtectedRoute>
+                    } />
+                  </Route>
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </TooltipProvider>
+          </NotificationProvider>
+        </SettingsProvider>
+      </AuthProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 
