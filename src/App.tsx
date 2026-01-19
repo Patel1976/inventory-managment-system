@@ -35,6 +35,9 @@ import AdjustmentList from "./pages/adjustments/AdjustmentList";
 import AddAdjustment from "./pages/adjustments/AddAdjustment";
 import SalesReport from "./pages/reports/SalesReport";
 import InventoryReport from "./pages/reports/InventoryReport";
+import PurchaseReport from "./pages/reports/PurchaseReport";
+import CustomerReport from "./pages/reports/CustomerReport";
+import SupplierReport from "./pages/reports/SupplierReport";
 import Settings from "./pages/Settings";
 import ActivityLog from "./pages/ActivityLog";
 import NotFound from "./pages/NotFound";
@@ -80,9 +83,9 @@ const App = () => (
                     <Route path="adjustments/add" element={<AddAdjustment />} />
                     <Route path="reports/sales" element={<SalesReport />} />
                     <Route path="reports/inventory" element={<InventoryReport />} />
-                    <Route path="reports/purchase" element={<SalesReport />} />
-                    <Route path="reports/supplier" element={<SalesReport />} />
-                    <Route path="reports/customer" element={<SalesReport />} />
+                    <Route path="reports/purchase" element={<PurchaseReport />} />
+                    <Route path="reports/supplier" element={<SupplierReport />} />
+                    <Route path="reports/customer" element={<CustomerReport />} />
                     <Route path="settings" element={<Settings />} />
                     <Route path="activity-log" element={
                       <ProtectedRoute adminOnly>
