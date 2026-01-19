@@ -13,6 +13,19 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+// Apply theme immediately before React renders
+const initializeTheme = () => {
+  const storedMode = localStorage.getItem('inventory_theme_mode') as ThemeMode;
+  const storedColor = localStorage.getItem('inventory_primary_color') as PrimaryColor;
+  
+  // Apply immediately to prevent flash
+  document.documentElement.setAttribute('data-theme', storedMode || 'light');
+  document.documentElement.setAttribute('data-primary', storedColor || 'blue');
+};
+
+// Run immediately
+initializeTheme();
+
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [mode, setModeState] = useState<ThemeMode>(() => {
     const stored = localStorage.getItem('inventory_theme_mode');
@@ -21,7 +34,8 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   
   const [primaryColor, setPrimaryColorState] = useState<PrimaryColor>(() => {
     const stored = localStorage.getItem('inventory_primary_color');
-    return (stored as PrimaryColor) || 'green';
+    // Default to 'blue' for light mode to match original PHP design
+    return (stored as PrimaryColor) || 'blue';
   });
 
   useEffect(() => {
