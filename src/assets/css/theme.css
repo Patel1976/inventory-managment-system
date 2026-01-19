@@ -3,11 +3,11 @@
    ============================================ */
 
 :root {
-  /* Default Primary Color (Green) */
-  --primary-color: #22c55e;
-  --primary-hover: #16a34a;
-  --primary-gradient: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
-  --primary-light: rgba(34, 197, 94, 0.1);
+  /* Light Mode - Original PHP Blue Theme */
+  --primary-color: #2e3192;
+  --primary-hover: #1d1f5c;
+  --primary-gradient: linear-gradient(180deg, #2e3192 0%, #1bbbce 100%);
+  --primary-light: rgba(46, 49, 146, 0.1);
   
   /* Light Mode Colors */
   --sidebar-bg: linear-gradient(180deg, #2e3192 0%, #1bbbce 100%);
@@ -24,10 +24,24 @@
   --shadow-color: rgba(0, 0, 0, 0.1);
   --table-hover: #f8f9fa;
   --table-header-bg: #f8f9fa;
+  --table-stripe: #f8f9fa;
+  
+  /* Bootstrap Override Colors */
+  --bs-primary: #2e3192;
+  --bs-primary-rgb: 46, 49, 146;
+  --bs-body-bg: #f5f6fa;
+  --bs-body-color: #333333;
 }
 
 /* Dark Mode */
 [data-theme="dark"] {
+  /* Dark Mode - Green Primary */
+  --primary-color: #22c55e;
+  --primary-hover: #16a34a;
+  --primary-gradient: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
+  --primary-light: rgba(34, 197, 94, 0.15);
+  
+  /* Dark Mode Colors */
   --sidebar-bg: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
   --header-bg: #1a1a2e;
   --body-bg: #0f0f23;
@@ -39,9 +53,16 @@
   --input-bg: #16213e;
   --input-border: #2d2d44;
   --dropdown-bg: #1a1a2e;
-  --shadow-color: rgba(0, 0, 0, 0.3);
+  --shadow-color: rgba(0, 0, 0, 0.4);
   --table-hover: #16213e;
   --table-header-bg: #16213e;
+  --table-stripe: #16213e;
+  
+  /* Bootstrap Override Colors for Dark */
+  --bs-primary: #22c55e;
+  --bs-primary-rgb: 34, 197, 94;
+  --bs-body-bg: #0f0f23;
+  --bs-body-color: #e5e5e5;
 }
 
 /* Primary Color Themes */
@@ -50,6 +71,8 @@
   --primary-hover: #16a34a;
   --primary-gradient: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
   --primary-light: rgba(34, 197, 94, 0.1);
+  --bs-primary: #22c55e;
+  --bs-primary-rgb: 34, 197, 94;
 }
 
 [data-primary="purple"] {
@@ -57,6 +80,8 @@
   --primary-hover: #7c3aed;
   --primary-gradient: linear-gradient(180deg, #8b5cf6 0%, #7c3aed 100%);
   --primary-light: rgba(139, 92, 246, 0.1);
+  --bs-primary: #8b5cf6;
+  --bs-primary-rgb: 139, 92, 246;
 }
 
 [data-primary="orange"] {
@@ -64,249 +89,462 @@
   --primary-hover: #d97706;
   --primary-gradient: linear-gradient(180deg, #f59e0b 0%, #d97706 100%);
   --primary-light: rgba(245, 158, 11, 0.1);
+  --bs-primary: #f59e0b;
+  --bs-primary-rgb: 245, 158, 11;
 }
 
 [data-primary="blue"] {
-  --primary-color: #3b82f6;
-  --primary-hover: #2563eb;
-  --primary-gradient: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
-  --primary-light: rgba(59, 130, 246, 0.1);
+  --primary-color: #2e3192;
+  --primary-hover: #1d1f5c;
+  --primary-gradient: linear-gradient(180deg, #2e3192 0%, #1bbbce 100%);
+  --primary-light: rgba(46, 49, 146, 0.1);
+  --bs-primary: #2e3192;
+  --bs-primary-rgb: 46, 49, 146;
 }
 
 /* ============================================
-   Apply Theme Variables
+   BOOTSTRAP OVERRIDES (CRITICAL)
+   Must use !important to override Bootstrap
    ============================================ */
 
 /* Body */
 body {
-  background-color: var(--body-bg);
-  color: var(--text-primary);
+  background-color: var(--body-bg) !important;
+  color: var(--text-primary) !important;
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Sidebar Theme Override */
-.sidebar {
-  background: var(--sidebar-bg);
+/* Bootstrap Primary Classes */
+.btn-primary {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: #fff !important;
 }
 
-/* Header */
-.main-header {
-  background: var(--header-bg);
-  border-bottom: 1px solid var(--border-color);
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+  background-color: var(--primary-hover) !important;
+  border-color: var(--primary-hover) !important;
+  color: #fff !important;
 }
 
-.toggle-btn {
-  color: var(--text-secondary);
+.bg-primary {
+  background-color: var(--primary-color) !important;
 }
 
-.toggle-btn:hover {
+.text-primary {
+  color: var(--primary-color) !important;
+}
+
+.border-primary {
+  border-color: var(--primary-color) !important;
+}
+
+.btn-outline-primary {
+  color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  background-color: transparent !important;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: #fff !important;
+}
+
+/* Link Colors */
+a {
   color: var(--primary-color);
 }
 
-/* Cards */
+a:hover {
+  color: var(--primary-hover);
+}
+
+/* ============================================
+   SIDEBAR OVERRIDES
+   ============================================ */
+
+.sidebar {
+  background: var(--sidebar-bg) !important;
+}
+
+.sidebar-brand h4 {
+  color: #fff !important;
+}
+
+.sidebar-nav .nav-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+}
+
+.sidebar-nav .nav-link:hover,
+.sidebar-nav .nav-link.active {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: #fff !important;
+}
+
+/* ============================================
+   HEADER OVERRIDES
+   ============================================ */
+
+.main-header {
+  background: var(--header-bg) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  box-shadow: 0 2px 10px var(--shadow-color) !important;
+}
+
+.toggle-btn {
+  color: var(--text-secondary) !important;
+}
+
+.toggle-btn:hover {
+  color: var(--primary-color) !important;
+}
+
+.header-icons .icon-btn {
+  background: var(--table-hover) !important;
+  color: var(--text-secondary) !important;
+}
+
+.header-icons .icon-btn:hover {
+  background: var(--primary-light) !important;
+  color: var(--primary-color) !important;
+}
+
+.user-dropdown {
+  color: var(--text-primary) !important;
+}
+
+.user-dropdown:hover {
+  background: var(--table-hover) !important;
+}
+
+.user-dropdown .user-name {
+  color: var(--text-primary) !important;
+}
+
+.user-dropdown .user-role {
+  color: var(--text-secondary) !important;
+}
+
+/* ============================================
+   CARD OVERRIDES
+   ============================================ */
+
+.card,
 .stat-card,
 .data-card,
 .form-card {
-  background: var(--card-bg);
-  border: 1px solid var(--border-color);
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+  box-shadow: 0 2px 10px var(--shadow-color) !important;
 }
 
+.card-header,
 .data-card-header {
-  border-bottom-color: var(--border-color);
+  background: var(--card-bg) !important;
+  border-bottom-color: var(--border-color) !important;
 }
 
+.card-body,
+.data-card-body {
+  background: var(--card-bg) !important;
+  color: var(--text-primary) !important;
+}
+
+.card-title,
 .data-card-header h5,
 .stat-card .stat-content h3,
 .form-card h5 {
-  color: var(--text-primary);
+  color: var(--text-primary) !important;
 }
 
-.stat-card .stat-content p {
-  color: var(--text-secondary);
+.stat-card .stat-content p,
+.card-text {
+  color: var(--text-secondary) !important;
 }
 
-/* Tables */
+/* ============================================
+   TABLE OVERRIDES
+   ============================================ */
+
+.table {
+  color: var(--text-primary) !important;
+  --bs-table-bg: var(--card-bg);
+  --bs-table-striped-bg: var(--table-stripe);
+  --bs-table-hover-bg: var(--table-hover);
+}
+
+.table thead th,
 .data-table th {
-  background: var(--table-header-bg);
-  color: var(--text-secondary);
-  border-bottom-color: var(--border-color);
+  background: var(--table-header-bg) !important;
+  color: var(--text-secondary) !important;
+  border-bottom-color: var(--border-color) !important;
+  border-color: var(--border-color) !important;
 }
 
+.table td,
+.table th,
 .data-table td {
-  color: var(--text-primary);
-  border-bottom-color: var(--border-color);
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+  border-bottom-color: var(--border-color) !important;
 }
 
+.table tbody tr:hover,
 .data-table tr:hover {
-  background: var(--table-hover);
+  background: var(--table-hover) !important;
 }
 
-/* Forms */
+.table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: var(--table-stripe) !important;
+}
+
+.table-bordered {
+  border-color: var(--border-color) !important;
+}
+
+/* ============================================
+   FORM OVERRIDES
+   ============================================ */
+
 .form-control,
 .form-select {
-  background-color: var(--input-bg);
-  border-color: var(--input-border);
-  color: var(--text-primary);
+  background-color: var(--input-bg) !important;
+  border-color: var(--input-border) !important;
+  color: var(--text-primary) !important;
 }
 
 .form-control:focus,
 .form-select:focus {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px var(--primary-light);
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 0 3px var(--primary-light) !important;
+  background-color: var(--input-bg) !important;
+  color: var(--text-primary) !important;
 }
 
-.form-group label {
-  color: var(--text-primary);
+.form-control::placeholder {
+  color: var(--text-muted) !important;
 }
 
-/* Primary Button */
+.form-group label,
+.form-label {
+  color: var(--text-primary) !important;
+}
+
+.form-text {
+  color: var(--text-secondary) !important;
+}
+
+.input-group-text {
+  background-color: var(--table-hover) !important;
+  border-color: var(--input-border) !important;
+  color: var(--text-secondary) !important;
+}
+
+.form-check-input:checked {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+}
+
+/* ============================================
+   DROPDOWN OVERRIDES
+   ============================================ */
+
+.dropdown-menu {
+  background-color: var(--dropdown-bg) !important;
+  border-color: var(--border-color) !important;
+  box-shadow: 0 10px 40px var(--shadow-color) !important;
+}
+
+.dropdown-item {
+  color: var(--text-primary) !important;
+}
+
+.dropdown-item:hover,
+.dropdown-item:focus {
+  background-color: var(--table-hover) !important;
+  color: var(--text-primary) !important;
+}
+
+.dropdown-divider {
+  border-color: var(--border-color) !important;
+}
+
+/* ============================================
+   PAGINATION OVERRIDES
+   ============================================ */
+
+.page-link {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+.page-link:hover {
+  background-color: var(--table-hover) !important;
+  color: var(--primary-color) !important;
+}
+
+.page-item.active .page-link {
+  background-color: var(--primary-color) !important;
+  border-color: var(--primary-color) !important;
+  color: #fff !important;
+}
+
+.page-item.disabled .page-link {
+  background-color: var(--table-hover) !important;
+  color: var(--text-muted) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* ============================================
+   MODAL OVERRIDES
+   ============================================ */
+
+.modal-content {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+.modal-header {
+  border-bottom-color: var(--border-color) !important;
+}
+
+.modal-footer {
+  border-top-color: var(--border-color) !important;
+}
+
+.modal-title {
+  color: var(--text-primary) !important;
+}
+
+.btn-close {
+  filter: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .btn-close {
+  filter: invert(1) !important;
+}
+
+/* ============================================
+   LIST GROUP OVERRIDES
+   ============================================ */
+
+.list-group-item {
+  background-color: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+.list-group-item:hover {
+  background-color: var(--table-hover) !important;
+}
+
+/* ============================================
+   ALERT OVERRIDES
+   ============================================ */
+
+.alert {
+  border-color: var(--border-color) !important;
+}
+
+/* ============================================
+   MAIN CONTENT & FOOTER OVERRIDES
+   ============================================ */
+
+.main-content {
+  background: var(--body-bg) !important;
+}
+
+.content-wrapper {
+  background: var(--body-bg) !important;
+}
+
+.main-footer {
+  background: var(--card-bg) !important;
+  border-top: 1px solid var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}
+
+/* ============================================
+   PAGE HEADER OVERRIDES
+   ============================================ */
+
+.page-header h4 {
+  color: var(--text-primary) !important;
+}
+
+.breadcrumb-wrapper a {
+  color: var(--primary-color) !important;
+}
+
+.breadcrumb-wrapper span {
+  color: var(--text-secondary) !important;
+}
+
+/* ============================================
+   QUICK ACTIONS OVERRIDES
+   ============================================ */
+
+.quick-action-btn {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+.quick-action-btn:hover {
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 5px 15px var(--shadow-color) !important;
+}
+
+.quick-action-btn span {
+  color: var(--text-secondary) !important;
+}
+
+/* ============================================
+   CHART CONTAINER OVERRIDES
+   ============================================ */
+
+.chart-container {
+  background: var(--table-hover) !important;
+}
+
+/* ============================================
+   SEARCH BOX OVERRIDES
+   ============================================ */
+
+.search-box input {
+  background-color: var(--input-bg) !important;
+  border-color: var(--input-border) !important;
+  color: var(--text-primary) !important;
+}
+
+/* ============================================
+   CUSTOM BUTTONS
+   ============================================ */
+
 .btn-primary-custom {
-  background: var(--primary-gradient);
-  color: #fff;
+  background: var(--primary-gradient) !important;
+  color: #fff !important;
+  border: none !important;
 }
 
 .btn-primary-custom:hover {
   opacity: 0.9;
 }
 
-.btn-outline-primary {
-  color: var(--primary-color);
-  border-color: var(--primary-color);
-}
-
-.btn-outline-primary:hover {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-  color: #fff;
-}
-
-/* Dropdown Menu */
-.dropdown-menu {
-  background-color: var(--dropdown-bg);
-  border-color: var(--border-color);
-}
-
-.dropdown-item {
-  color: var(--text-primary);
-}
-
-.dropdown-item:hover {
-  background-color: var(--table-hover);
-}
-
-.dropdown-divider {
-  border-color: var(--border-color);
-}
-
-/* User Info */
-.user-dropdown .user-name {
-  color: var(--text-primary);
-}
-
-.user-dropdown .user-role {
-  color: var(--text-secondary);
-}
-
-.user-dropdown:hover {
-  background: var(--table-hover);
-}
-
-/* Page Header */
-.page-header h4 {
-  color: var(--text-primary);
-}
-
-.breadcrumb-wrapper a {
-  color: var(--primary-color);
-}
-
-.breadcrumb-wrapper span {
-  color: var(--text-secondary);
-}
-
-/* Footer */
-.main-footer {
-  background: var(--card-bg);
-  border-top-color: var(--border-color);
-  color: var(--text-secondary);
-}
-
-/* Icon Buttons */
-.header-icons .icon-btn {
-  background: var(--table-hover);
-  color: var(--text-secondary);
-}
-
-.header-icons .icon-btn:hover {
-  background: var(--primary-light);
-  color: var(--primary-color);
-}
-
-/* Quick Actions */
-.quick-action-btn {
-  background: var(--card-bg);
-  border-color: var(--border-color);
-}
-
-.quick-action-btn:hover {
-  border-color: var(--primary-color);
-  box-shadow: 0 5px 15px var(--shadow-color);
-}
-
-.quick-action-btn span {
-  color: var(--text-secondary);
-}
-
-/* Input Group */
-.input-group-text {
-  background-color: var(--input-bg);
-  border-color: var(--input-border);
-  color: var(--text-secondary);
-}
-
-/* Pagination */
-.page-link {
-  background-color: var(--card-bg);
-  border-color: var(--border-color);
-  color: var(--text-primary);
-}
-
-.page-item.active .page-link {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-}
-
-.page-item.disabled .page-link {
-  background-color: var(--table-hover);
-  color: var(--text-muted);
-}
-
-/* Charts */
-.chart-container {
-  background: var(--table-hover);
-}
-
-/* Low Stock Alert Box */
-.low-stock-item {
-  background: var(--card-bg);
-  border-color: var(--border-color);
-}
-
-/* Form Check */
-.form-check-input:checked {
-  background-color: var(--primary-color);
-  border-color: var(--primary-color);
-}
-
-/* Search Input */
-.search-box input {
-  background-color: var(--input-bg);
-  border-color: var(--input-border);
-  color: var(--text-primary);
+.btn-secondary-custom {
+  background: var(--table-hover) !important;
+  color: var(--text-secondary) !important;
+  border: 1px solid var(--border-color) !important;
 }
 
 /* ============================================
-   Theme Toggle Button
+   THEME TOGGLE BUTTON
    ============================================ */
 
 .theme-toggle-wrapper {
@@ -371,10 +609,10 @@ body {
 .color-btn.green { background-color: #22c55e; }
 .color-btn.purple { background-color: #8b5cf6; }
 .color-btn.orange { background-color: #f59e0b; }
-.color-btn.blue { background-color: #3b82f6; }
+.color-btn.blue { background-color: #2e3192; }
 
 /* ============================================
-   Notification Dropdown
+   NOTIFICATION DROPDOWN
    ============================================ */
 
 .notification-dropdown {
@@ -495,7 +733,7 @@ body {
 }
 
 /* ============================================
-   Login Page
+   LOGIN PAGE
    ============================================ */
 
 .login-page {
@@ -567,7 +805,7 @@ body {
 }
 
 /* ============================================
-   Activity Log
+   ACTIVITY LOG
    ============================================ */
 
 .activity-badge {
@@ -599,7 +837,7 @@ body {
 }
 
 /* ============================================
-   Settings Cards
+   SETTINGS CARDS
    ============================================ */
 
 .settings-section {
@@ -645,4 +883,103 @@ body {
 
 .date-range-filter span {
   color: var(--text-secondary);
+}
+
+/* ============================================
+   LOW STOCK ITEM
+   ============================================ */
+
+.low-stock-item {
+  background: var(--card-bg) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* ============================================
+   NAV TABS OVERRIDES
+   ============================================ */
+
+.nav-tabs {
+  border-bottom-color: var(--border-color) !important;
+}
+
+.nav-tabs .nav-link {
+  color: var(--text-secondary) !important;
+  border-color: transparent !important;
+}
+
+.nav-tabs .nav-link:hover {
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+.nav-tabs .nav-link.active {
+  background-color: var(--card-bg) !important;
+  color: var(--primary-color) !important;
+  border-color: var(--border-color) var(--border-color) var(--card-bg) !important;
+}
+
+/* ============================================
+   BREADCRUMB OVERRIDES
+   ============================================ */
+
+.breadcrumb {
+  background-color: transparent !important;
+}
+
+.breadcrumb-item a {
+  color: var(--primary-color) !important;
+}
+
+.breadcrumb-item.active {
+  color: var(--text-secondary) !important;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+  color: var(--text-muted) !important;
+}
+
+/* ============================================
+   SCROLL BAR STYLING FOR DARK MODE
+   ============================================ */
+
+[data-theme="dark"] ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: var(--body-bg);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* ============================================
+   TRANSITIONS
+   ============================================ */
+
+body,
+.sidebar,
+.main-header,
+.main-content,
+.card,
+.stat-card,
+.data-card,
+.form-card,
+.table,
+.form-control,
+.form-select,
+.dropdown-menu,
+.btn,
+.main-footer {
+  transition: background-color 0.3s ease, 
+              color 0.3s ease, 
+              border-color 0.3s ease,
+              box-shadow 0.3s ease;
 }
