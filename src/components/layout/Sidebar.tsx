@@ -42,6 +42,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
       submenu: [
         { title: 'Purchase List', path: '/purchases' },
         { title: 'Add Purchase', path: '/purchases/add' },
+        { title: 'Purchase Returns', path: '/purchases/returns' },
       ]
     },
     {
@@ -50,6 +51,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
       submenu: [
         { title: 'Sales List', path: '/sales' },
         { title: 'Add Sale', path: '/sales/add' },
+        { title: 'Sale Returns', path: '/sales/returns' },
       ]
     },
     {
@@ -89,6 +91,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
         { title: 'Customer Report', path: '/reports/customer' },
       ]
     },
+    { title: 'Users', icon: <FiUsers />, path: '/users', adminOnly: true },
     { title: 'Activity Log', icon: <FiActivity />, path: '/activity-log', adminOnly: true },
     { title: 'Settings', icon: <FiSettings />, path: '/settings' },
   ];
