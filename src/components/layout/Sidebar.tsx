@@ -91,6 +91,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
         { title: 'Customer Report', path: '/reports/customer' },
       ]
     },
+    { title: 'Users', icon: <FiUsers />, path: '/users', adminOnly: true },
     { title: 'Activity Log', icon: <FiActivity />, path: '/activity-log', adminOnly: true },
     { title: 'Settings', icon: <FiSettings />, path: '/settings' },
   ];
