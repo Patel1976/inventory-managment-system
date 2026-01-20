@@ -38,6 +38,9 @@ import InventoryReport from "./pages/reports/InventoryReport";
 import PurchaseReport from "./pages/reports/PurchaseReport";
 import CustomerReport from "./pages/reports/CustomerReport";
 import SupplierReport from "./pages/reports/SupplierReport";
+import PurchaseReturn from "./pages/returns/PurchaseReturn";
+import SaleReturn from "./pages/returns/SaleReturn";
+import UserProfile from "./pages/UserProfile";
 import Settings from "./pages/Settings";
 import ActivityLog from "./pages/ActivityLog";
 import NotFound from "./pages/NotFound";
@@ -86,6 +89,9 @@ const App = () => (
                     <Route path="reports/purchase" element={<PurchaseReport />} />
                     <Route path="reports/supplier" element={<SupplierReport />} />
                     <Route path="reports/customer" element={<CustomerReport />} />
+                    <Route path="purchases/returns" element={<PurchaseReturn />} />
+                    <Route path="sales/returns" element={<SaleReturn />} />
+                    <Route path="profile" element={<UserProfile />} />
                     <Route path="settings" element={<Settings />} />
                     <Route path="activity-log" element={
                       <ProtectedRoute adminOnly>
