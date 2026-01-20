@@ -205,7 +205,7 @@ const Dashboard = () => {
         <div className="col-12 col-xl-4">
           <div className="data-card">
             <div className="data-card-header">
-              <h5><FiAlertTriangle style={{ color: '#f59e0b', marginRight: '8px' }} />Low Stock Alert</h5>
+              <h5 className='d-flex align-items-center'><FiAlertTriangle style={{ color: '#f59e0b', marginRight: '8px' }} />Low Stock Alert</h5>
             </div>
             <div className="data-card-body">
               {lowStockProducts.map((product, index) => (
@@ -266,7 +266,7 @@ const Dashboard = () => {
                         <td><strong>{product.sold}</strong> units</td>
                         <td><strong>{currencySymbol}{product.revenue.toLocaleString()}</strong></td>
                         <td>
-                          <span className="badge badge-success">
+                          <span className="badge badge-success d-inline-flex align-items-center">
                             <FiTrendingUp className="me-1" />Top Seller
                           </span>
                         </td>

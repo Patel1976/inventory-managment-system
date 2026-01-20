@@ -10,7 +10,8 @@
   --primary-light: rgba(46, 49, 146, 0.1);
   
   /* Light Mode Colors */
-  --sidebar-bg: linear-gradient(180deg, #2e3192 0%, #1bbbce 100%);
+  --sidebar-brand-bg: #111827;
+  --sidebar-nav-bg: #1f2937;
   --header-bg: #ffffff;
   --body-bg: #f5f6fa;
   --card-bg: #ffffff;
@@ -168,8 +169,12 @@ a:hover {
    SIDEBAR OVERRIDES
    ============================================ */
 
-.sidebar {
-  background: var(--sidebar-bg) !important;
+.sidebar .sidebar-brand {
+  background: var(--sidebar-brand-bg) !important;
+}
+
+.sidebar .sidebar-nav {
+  background: var(--sidebar-nav-bg) !important;
 }
 
 .sidebar-brand h4 {
@@ -358,10 +363,18 @@ a:hover {
   background-color: var(--dropdown-bg) !important;
   border-color: var(--border-color) !important;
   box-shadow: 0 10px 40px var(--shadow-color) !important;
+  position: absolute;
+  right: 15px;
+  top: calc(100% + 5px);
+  width: 160px;
+  border-radius: 8px;
+  z-index: 1000;
 }
 
 .dropdown-item {
   color: var(--text-primary) !important;
+  display: flex;
+  align-items: center;
 }
 
 .dropdown-item:hover,

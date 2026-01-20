@@ -5,12 +5,13 @@
   position: fixed;
   top: 0;
   left: 0;
-  height: 100vh;
-  width: 250px;
+  bottom: 0;
+  width: 260px;
   background: linear-gradient(180deg, #2e3192 0%, #1bbbce 100%);
   z-index: 1000;
   transition: all 0.3s ease;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar.collapsed {
@@ -18,7 +19,7 @@
 }
 
 .sidebar-brand {
-  padding: 20px;
+  padding: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -35,8 +36,24 @@
   font-weight: 600;
 }
 
+/* Sidebar scrollbar */
+.sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background-color: #727272;
+  border-radius: 10px;
+}
+
 .sidebar-nav {
   padding: 15px 0;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .sidebar-nav .nav-item {
@@ -102,7 +119,7 @@
   transition: all 0.3s ease;
 }
 
-.sidebar.collapsed + .main-content .main-header {
+.sidebar.collapsed+.main-content .main-header {
   left: 70px;
 }
 
@@ -145,6 +162,11 @@
   position: relative;
 }
 
+.header-icons.icon-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
 .header-icons .icon-btn:hover {
   background: #e9ecf5;
   color: #2e3192;
@@ -152,19 +174,17 @@
 
 .header-icons .badge {
   position: absolute;
-  top: -2px;
-  right: -2px;
+  top: -4px;
   background: #ff4757;
   color: #fff;
   font-size: 10px;
-  padding: 2px 6px;
+  padding: 2px 4px;
   border-radius: 10px;
 }
 
 .user-dropdown {
-  display: flex;
+  display: block;
   align-items: center;
-  gap: 10px;
   cursor: pointer;
   padding: 5px 10px;
   border-radius: 8px;
@@ -205,7 +225,7 @@
   transition: all 0.3s ease;
 }
 
-.sidebar.collapsed + .main-content {
+.sidebar.collapsed+.main-content {
   margin-left: 70px;
 }
 
@@ -562,15 +582,15 @@
   .sidebar {
     transform: translateX(-100%);
   }
-  
+
   .sidebar.show {
     transform: translateX(0);
   }
-  
+
   .main-content {
     margin-left: 0;
   }
-  
+
   .main-header {
     left: 0;
   }
@@ -580,13 +600,13 @@
   .stat-card {
     margin-bottom: 15px;
   }
-  
+
   .page-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
-  
+
   .user-dropdown .user-info {
     display: none;
   }

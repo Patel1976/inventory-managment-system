@@ -108,7 +108,7 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
         {/* Notifications */}
         <div className="notification-dropdown" ref={notifRef}>
           <button 
-            className="icon-btn"
+            className="icon-btn header-icons"
             onClick={() => setShowNotifications(!showNotifications)}
           >
             <FiBell />

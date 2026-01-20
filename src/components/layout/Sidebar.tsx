@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  FiHome, FiBox, FiShoppingCart, FiUsers, FiTruck, 
+import {
+  FiHome, FiBox, FiShoppingCart, FiUsers,
   FiDollarSign, FiBarChart2, FiSettings, FiChevronDown,
   FiChevronRight, FiLayers, FiFileText, FiActivity
 } from 'react-icons/fi';
@@ -21,13 +21,13 @@ interface MenuItem {
 
 const Sidebar = ({ isCollapsed }: SidebarProps) => {
   const location = useLocation();
-  const [openMenus, setOpenMenus] = useState<string[]>(['Products']);
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
   const { isAdmin } = useAuth();
 
   const menuItems: MenuItem[] = [
     { title: 'Dashboard', icon: <FiHome />, path: '/' },
-    { 
-      title: 'Products', 
+    {
+      title: 'Products',
       icon: <FiBox />,
       submenu: [
         { title: 'Product List', path: '/products' },
@@ -36,24 +36,24 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
         { title: 'Brands', path: '/products/brands' },
       ]
     },
-    { 
-      title: 'Purchase', 
+    {
+      title: 'Purchase',
       icon: <FiShoppingCart />,
       submenu: [
         { title: 'Purchase List', path: '/purchases' },
         { title: 'Add Purchase', path: '/purchases/add' },
       ]
     },
-    { 
-      title: 'Sales', 
+    {
+      title: 'Sales',
       icon: <FiDollarSign />,
       submenu: [
         { title: 'Sales List', path: '/sales' },
         { title: 'Add Sale', path: '/sales/add' },
       ]
     },
-    { 
-      title: 'People', 
+    {
+      title: 'People',
       icon: <FiUsers />,
       submenu: [
         { title: 'Customers', path: '/customers' },
@@ -61,8 +61,8 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
         { title: 'Stores', path: '/stores' },
       ]
     },
-    { 
-      title: 'Expense', 
+    {
+      title: 'Expense',
       icon: <FiFileText />,
       submenu: [
         { title: 'Expense List', path: '/expenses' },
@@ -70,16 +70,16 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
         { title: 'Categories', path: '/expenses/categories' },
       ]
     },
-    { 
-      title: 'Stock Adjustment', 
+    {
+      title: 'Stock Adjustment',
       icon: <FiLayers />,
       submenu: [
         { title: 'Adjustment List', path: '/adjustments' },
         { title: 'Add Adjustment', path: '/adjustments/add' },
       ]
     },
-    { 
-      title: 'Reports', 
+    {
+      title: 'Reports',
       icon: <FiBarChart2 />,
       submenu: [
         { title: 'Sales Report', path: '/reports/sales' },
@@ -97,23 +97,34 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
   const filteredMenuItems = menuItems.filter(item => !item.adminOnly || isAdmin);
 
   const toggleMenu = (title: string) => {
-    setOpenMenus(prev => 
-      prev.includes(title) 
-        ? prev.filter(m => m !== title)
-        : [...prev, title]
-    );
+    setOpenMenu(prev => (prev === title ? null : title));
   };
 
   const isActiveLink = (path: string) => location.pathname === path;
-  const isMenuOpen = (title: string) => openMenus.includes(title);
+  const isMenuOpen = (title: string) => openMenu === title;
+
+  useEffect(() => {
+    if (location.pathname === '/') {
+      setOpenMenu(null);
+      return;
+    }
+    const activeMenu = menuItems.find(item =>
+      item.submenu?.some(sub => location.pathname.startsWith(sub.path))
+    );
+    if (activeMenu) {
+      setOpenMenu(activeMenu.title);
+    } else {
+      setOpenMenu(null);
+    }
+  }, [location.pathname]);
 
   return (
     <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
       <div className="sidebar-brand">
         {!isCollapsed ? (
-          <h4>📦 Inventory</h4>
+          <img src="public/image/inventory-logo.png" alt="Logo" />
         ) : (
-          <span style={{ fontSize: '24px' }}>📦</span>
+          <img src="public/image/favicon.png" alt="Logo" />
         )}
       </div>
 
@@ -145,8 +156,8 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
                     <ul className={`submenu ${isMenuOpen(item.title) ? 'show' : ''}`}>
                       {item.submenu.map((sub) => (
                         <li key={sub.path} className="nav-item">
-                          <Link 
-                            to={sub.path} 
+                          <Link
+                            to={sub.path}
                             className={`nav-link ${isActiveLink(sub.path) ? 'active' : ''}`}
                           >
                             <span className="nav-text">{sub.title}</span>
@@ -157,8 +168,8 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
                   )}
                 </>
               ) : (
-                <Link 
-                  to={item.path!} 
+                <Link
+                  to={item.path!}
                   className={`nav-link ${isActiveLink(item.path!) ? 'active' : ''}`}
                 >
                   <i>{item.icon}</i>
