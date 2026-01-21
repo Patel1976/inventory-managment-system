@@ -16,6 +16,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 // Pages
 import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import ProductList from "./pages/products/ProductList";
 import AddProduct from "./pages/products/AddProduct";
@@ -59,8 +61,10 @@ const App = () => (
               <Sonner />
               <BrowserRouter>
                 <Routes>
-                  {/* Public Route */}
+                {/* Public Routes */}
                   <Route path="/login" element={<Login />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
                   
                   {/* Protected Routes */}
                   <Route path="/" element={
