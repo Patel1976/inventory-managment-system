@@ -594,6 +594,14 @@
   .main-header {
     left: 0;
   }
+
+  .login-card {
+    width: 100%;
+  }
+
+  .login-image {
+    display: none;
+  }
 }
 
 @media (max-width: 768px) {
