@@ -97,8 +97,9 @@ const Login = () => {
 
         <div className="mt-4 text-center" style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
           <p className="mb-1"><strong>Demo Accounts:</strong></p>
-          <p className="mb-0">Admin: admin@inventory.com / admin123</p>
-          <p className="mb-0">Staff: staff@inventory.com / staff123</p>
+          <p className="mb-0"><span className="badge bg-danger me-1" style={{ fontSize: '10px' }}>Admin</span> admin@inventory.com / admin123</p>
+          <p className="mb-0"><span className="badge bg-warning text-dark me-1" style={{ fontSize: '10px' }}>Manager</span> manager@inventory.com / manager123</p>
+          <p className="mb-0"><span className="badge bg-info me-1" style={{ fontSize: '10px' }}>Staff</span> staff@inventory.com / staff123</p>
         </div>
       </div>
     </div>
