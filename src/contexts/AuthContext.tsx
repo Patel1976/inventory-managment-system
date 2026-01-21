@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { UserRole, Permission, hasPermission as checkPermission, getPermissions } from '../config/permissions';
 
-export type UserRole = 'admin' | 'staff';
+export type { UserRole } from '../config/permissions';
 
 export interface User {
   id: string;
@@ -14,8 +15,12 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  isManager: boolean;
+  isStaff: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
+  hasPermission: (permission: Permission) => boolean;
+  getPermissions: () => Permission[];
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,19 +34,30 @@ const mockUsers: { email: string; password: string; user: User }[] = [
       id: '1',
       name: 'Admin User',
       email: 'admin@inventory.com',
-      role: 'admin',
-      avatar: 'https://ui-avatars.com/api/?name=Admin+User&background=2e3192&color=fff'
+      role: 'Admin',
+      avatar: 'https://ui-avatars.com/api/?name=Admin+User&background=dc3545&color=fff'
+    }
+  },
+  {
+    email: 'manager@inventory.com',
+    password: 'manager123',
+    user: {
+      id: '2',
+      name: 'Manager User',
+      email: 'manager@inventory.com',
+      role: 'Manager',
+      avatar: 'https://ui-avatars.com/api/?name=Manager+User&background=ffc107&color=000'
     }
   },
   {
     email: 'staff@inventory.com',
     password: 'staff123',
     user: {
-      id: '2',
+      id: '3',
       name: 'Staff Member',
       email: 'staff@inventory.com',
-      role: 'staff',
-      avatar: 'https://ui-avatars.com/api/?name=Staff+Member&background=22c55e&color=fff'
+      role: 'Staff',
+      avatar: 'https://ui-avatars.com/api/?name=Staff+Member&background=0dcaf0&color=fff'
     }
   }
 ];
@@ -83,14 +99,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('inventory_user');
   };
 
+  const hasPermissionForUser = (permission: Permission): boolean => {
+    if (!user) return false;
+    return checkPermission(user.role, permission);
+  };
+
+  const getPermissionsForUser = (): Permission[] => {
+    if (!user) return [];
+    return getPermissions(user.role);
+  };
+
   return (
     <AuthContext.Provider 
       value={{ 
         user, 
         isAuthenticated: !!user, 
-        isAdmin: user?.role === 'admin',
+        isAdmin: user?.role === 'Admin',
+        isManager: user?.role === 'Manager',
+        isStaff: user?.role === 'Staff',
         login, 
-        logout 
+        logout,
+        hasPermission: hasPermissionForUser,
+        getPermissions: getPermissionsForUser,
       }}
     >
       {children}

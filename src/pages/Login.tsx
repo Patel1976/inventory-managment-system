@@ -1,5 +1,5 @@
 import { useState, FormEvent } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { FiMail, FiLock, FiLogIn } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -82,6 +82,11 @@ const Login = () => {
                 {showPassword ? '🙈' : '👁'}
               </span>
             </div>
+            <div className="text-end mt-1">
+              <Link to="/forgot-password" className="forgot-password-link">
+                Forgot Password?
+              </Link>
+            </div>
           </div>
 
           <button
@@ -101,8 +106,9 @@ const Login = () => {
 
         <div className="mt-4" style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
           <p className="mb-1"><strong>Demo Accounts:</strong></p>
-          <p className="mb-0">Admin: admin@inventory.com / admin123</p>
-          <p className="mb-0">Staff: staff@inventory.com / staff123</p>
+          <p className="mb-0"><span className="fw-bold me-1" style={{ fontSize: '14px' }}>Admin :</span> admin@inventory.com / admin123</p>
+          <p className="mb-0"><span className="fw-bold me-1" style={{ fontSize: '14px' }}>Manager :</span> manager@inventory.com / manager123</p>
+          <p className="mb-0"><span className="fw-bold me-1" style={{ fontSize: '14px' }}>Staff :</span> staff@inventory.com / staff123</p>
         </div>
       </div>
       <div className="login-image">

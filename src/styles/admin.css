@@ -619,3 +619,124 @@
     display: none;
   }
 }
+
+.forgot-password-link {
+  color: #2e3192;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+}
+
+.forgot-password-link:hover {
+  text-decoration: underline;
+  color: #1bbbce;
+}
+
+/* Forgot Password Success */
+.forgot-password-success {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.forgot-password-success .success-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.forgot-password-success h5 {
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.forgot-password-success p {
+  color: #555;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+/* Password Input Wrapper */
+.password-input-wrapper {
+  position: relative;
+}
+
+.password-input-wrapper .form-control {
+  padding-right: 45px;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.password-toggle-btn:hover {
+  color: #2e3192;
+}
+
+/* Password Strength */
+.password-strength {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.strength-bars {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+
+.strength-bar {
+  height: 4px;
+  flex: 1;
+  border-radius: 2px;
+  transition: background-color 0.3s ease;
+}
+
+.strength-label {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Password Requirements */
+.password-requirements ul {
+  list-style: none;
+  padding-left: 0;
+  margin-top: 5px;
+}
+
+.password-requirements li {
+  font-size: 12px;
+  color: #888;
+  margin-bottom: 2px;
+}
+
+.password-requirements li.text-success {
+  color: #16a34a !important;
+}
+
+.password-requirements li::before {
+  content: "○ ";
+}
+
+.password-requirements li.text-success::before {
+  content: "● ";
+}

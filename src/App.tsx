@@ -16,6 +16,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 
 // Pages
 import Login from "./pages/Login";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import ProductList from "./pages/products/ProductList";
 import AddProduct from "./pages/products/AddProduct";
@@ -59,8 +61,10 @@ const App = () => (
               <Sonner />
               <BrowserRouter>
                 <Routes>
-                  {/* Public Route */}
+                {/* Public Routes */}
                   <Route path="/login" element={<Login />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
                   
                   {/* Protected Routes */}
                   <Route path="/" element={
@@ -85,22 +89,46 @@ const App = () => (
                     <Route path="expenses/categories" element={<ExpenseCategories />} />
                     <Route path="adjustments" element={<AdjustmentList />} />
                     <Route path="adjustments/add" element={<AddAdjustment />} />
-                    <Route path="reports/sales" element={<SalesReport />} />
-                    <Route path="reports/inventory" element={<InventoryReport />} />
-                    <Route path="reports/purchase" element={<PurchaseReport />} />
-                    <Route path="reports/supplier" element={<SupplierReport />} />
-                    <Route path="reports/customer" element={<CustomerReport />} />
+                    <Route path="reports/sales" element={
+                      <ProtectedRoute requiredPermission="reports.view">
+                        <SalesReport />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="reports/inventory" element={
+                      <ProtectedRoute requiredPermission="reports.view">
+                        <InventoryReport />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="reports/purchase" element={
+                      <ProtectedRoute requiredPermission="reports.view">
+                        <PurchaseReport />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="reports/supplier" element={
+                      <ProtectedRoute requiredPermission="reports.view">
+                        <SupplierReport />
+                      </ProtectedRoute>
+                    } />
+                    <Route path="reports/customer" element={
+                      <ProtectedRoute requiredPermission="reports.view">
+                        <CustomerReport />
+                      </ProtectedRoute>
+                    } />
                     <Route path="purchases/returns" element={<PurchaseReturn />} />
                     <Route path="sales/returns" element={<SaleReturn />} />
                     <Route path="profile" element={<UserProfile />} />
                     <Route path="users" element={
-                      <ProtectedRoute adminOnly>
+                      <ProtectedRoute requiredPermission="users.view">
                         <ManageUsers />
                       </ProtectedRoute>
                     } />
-                    <Route path="settings" element={<Settings />} />
+                    <Route path="settings" element={
+                      <ProtectedRoute requiredPermission="settings.view">
+                        <Settings />
+                      </ProtectedRoute>
+                    } />
                     <Route path="activity-log" element={
-                      <ProtectedRoute adminOnly>
+                      <ProtectedRoute requiredPermission="activity.view">
                         <ActivityLog />
                       </ProtectedRoute>
                     } />

@@ -1,27 +1,40 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiMail, FiX, FiCheck } from 'react-icons/fi';
+import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiMail, FiX, FiCheck, FiShield } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
+import { 
+  UserRole, 
+  rolePermissions, 
+  roleDescriptions, 
+  roleBadgeColors,
+  permissionCategories,
+  permissionDescriptions,
+  Permission
+} from '../../config/permissions';
 
 interface User {
   id: number;
   name: string;
   username: string;
   email: string;
-  role: 'Admin' | 'Manager' | 'Staff';
+  role: UserRole;
   status: 'Active' | 'Inactive';
   createdDate: string;
 }
 
 const ManageUsers = () => {
-  const { isAdmin } = useAuth();
+  const { hasPermission } = useAuth();
+  const canManageUsers = hasPermission('users.manage');
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
+  const [showPermissionsModal, setShowPermissionsModal] = useState(false);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [viewingUser, setViewingUser] = useState<User | null>(null);
+  const [viewingRole, setViewingRole] = useState<UserRole | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
@@ -30,7 +43,7 @@ const ManageUsers = () => {
     name: '',
     username: '',
     email: '',
-    role: 'Staff' as 'Admin' | 'Manager' | 'Staff',
+    role: 'Staff' as UserRole,
     password: '',
     confirmPassword: '',
     status: 'Active' as 'Active' | 'Inactive'
@@ -205,7 +218,7 @@ const ManageUsers = () => {
               </select>
             </div>
             <div className="col-12 col-md-5 text-end">
-              {isAdmin && (
+              {canManageUsers && (
                 <button className="btn btn-primary-custom" onClick={() => handleOpenModal()}>
                   <FiPlus className="me-1" /> Add User
                 </button>
@@ -245,11 +258,13 @@ const ManageUsers = () => {
                       </div>
                     </td>
                     <td>
-                      <span className={`badge ${
-                        user.role === 'Admin' ? 'bg-danger' : 
-                        user.role === 'Manager' ? 'bg-warning text-dark' : 
-                        'bg-info'
-                      }`}>
+                      <span 
+                        className={`badge ${roleBadgeColors[user.role]} cursor-pointer`}
+                        style={{ cursor: 'pointer' }}
+                        onClick={() => { setViewingRole(user.role); setShowPermissionsModal(true); }}
+                        title="Click to view permissions"
+                      >
+                        <FiShield size={10} className="me-1" />
                         {user.role}
                       </span>
                     </td>
@@ -263,7 +278,7 @@ const ManageUsers = () => {
                       <button className="btn-action view me-1" onClick={() => handleViewUser(user)}>
                         <FiEye />
                       </button>
-                      {isAdmin && (
+                      {canManageUsers && (
                         <>
                           <button className="btn-action edit me-1" onClick={() => handleOpenModal(user)}>
                             <FiEdit />
@@ -448,13 +463,11 @@ const ManageUsers = () => {
                     {viewingUser.name.charAt(0).toUpperCase()}
                   </div>
                   <h5 className="mb-1">{viewingUser.name}</h5>
-                  <span className={`badge ${
-                    viewingUser.role === 'Admin' ? 'bg-danger' : 
-                    viewingUser.role === 'Manager' ? 'bg-warning text-dark' : 
-                    'bg-info'
-                  }`}>
+                  <span className={`badge ${roleBadgeColors[viewingUser.role]}`}>
+                    <FiShield size={10} className="me-1" />
                     {viewingUser.role}
                   </span>
+                  <p className="text-muted small mt-1 mb-0">{roleDescriptions[viewingUser.role]}</p>
                 </div>
                 <table className="table table-borderless">
                   <tbody>
@@ -480,9 +493,94 @@ const ManageUsers = () => {
                     </tr>
                   </tbody>
                 </table>
+                
+                {/* Permission Badges */}
+                <div className="mt-3">
+                  <h6 className="mb-2"><FiShield className="me-1" /> Role Permissions</h6>
+                  <div className="d-flex flex-wrap gap-1">
+                    {rolePermissions[viewingUser.role].slice(0, 8).map((perm) => (
+                      <span key={perm} className="badge bg-light text-dark border" style={{ fontSize: '11px' }}>
+                        {permissionDescriptions[perm]}
+                      </span>
+                    ))}
+                    {rolePermissions[viewingUser.role].length > 8 && (
+                      <span 
+                        className="badge bg-primary cursor-pointer" 
+                        style={{ fontSize: '11px', cursor: 'pointer' }}
+                        onClick={() => { setViewingRole(viewingUser.role); setShowPermissionsModal(true); setShowViewModal(false); }}
+                      >
+                        +{rolePermissions[viewingUser.role].length - 8} more
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
               <div className="modal-footer">
+                <button 
+                  type="button" 
+                  className="btn btn-outline-primary me-2" 
+                  onClick={() => { setViewingRole(viewingUser.role); setShowPermissionsModal(true); setShowViewModal(false); }}
+                >
+                  <FiShield className="me-1" /> View All Permissions
+                </button>
                 <button type="button" className="btn btn-secondary" onClick={() => setShowViewModal(false)}>
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Permissions Modal */}
+      {showPermissionsModal && viewingRole && (
+        <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
+          <div className="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">
+                  <FiShield className="me-2" />
+                  <span className={`badge ${roleBadgeColors[viewingRole]} me-2`}>{viewingRole}</span>
+                  Role Permissions
+                </h5>
+                <button type="button" className="btn-close" onClick={() => setShowPermissionsModal(false)}></button>
+              </div>
+              <div className="modal-body">
+                <p className="text-muted mb-4">{roleDescriptions[viewingRole]}</p>
+                
+                {Object.entries(permissionCategories).map(([category, permissions]) => {
+                  const categoryPermissions = permissions.filter(p => rolePermissions[viewingRole].includes(p as Permission));
+                  if (categoryPermissions.length === 0) return null;
+                  
+                  return (
+                    <div key={category} className="mb-4">
+                      <h6 className="border-bottom pb-2 mb-3">{category}</h6>
+                      <div className="row g-2">
+                        {(permissions as readonly string[]).map((perm) => {
+                          const hasAccess = rolePermissions[viewingRole].includes(perm as Permission);
+                          return (
+                            <div key={perm} className="col-md-6">
+                              <div className={`d-flex align-items-center p-2 rounded ${hasAccess ? 'bg-success bg-opacity-10' : 'bg-light'}`}>
+                                <span className={`badge ${hasAccess ? 'bg-success' : 'bg-secondary'} me-2`} style={{ width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                  {hasAccess ? <FiCheck size={12} /> : <FiX size={12} />}
+                                </span>
+                                <span className={hasAccess ? '' : 'text-muted'}>
+                                  {permissionDescriptions[perm as Permission]}
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="modal-footer">
+                <div className="me-auto text-muted small">
+                  Total: {rolePermissions[viewingRole].length} permissions
+                </div>
+                <button type="button" className="btn btn-secondary" onClick={() => setShowPermissionsModal(false)}>
                   Close
                 </button>
               </div>

@@ -6,6 +6,7 @@ import {
   FiChevronRight, FiLayers, FiFileText, FiActivity
 } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
+import { Permission } from '../../config/permissions';
 
 interface SidebarProps {
   isCollapsed: boolean;
@@ -15,89 +16,114 @@ interface MenuItem {
   title: string;
   icon: React.ReactNode;
   path?: string;
-  submenu?: { title: string; path: string }[];
+  submenu?: { title: string; path: string; permission?: Permission }[];
   adminOnly?: boolean;
+  permission?: Permission;
 }
 
 const Sidebar = ({ isCollapsed }: SidebarProps) => {
   const location = useLocation();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
-  const { isAdmin } = useAuth();
+  const { isAdmin, hasPermission } = useAuth();
 
   const menuItems: MenuItem[] = [
-    { title: 'Dashboard', icon: <FiHome />, path: '/' },
-    {
-      title: 'Products',
+    { title: 'Dashboard', icon: <FiHome />, path: '/', permission: 'dashboard.view' },
+    { 
+      title: 'Products', 
       icon: <FiBox />,
+      permission: 'products.view',
       submenu: [
-        { title: 'Product List', path: '/products' },
-        { title: 'Add Product', path: '/products/add' },
-        { title: 'Categories', path: '/products/categories' },
-        { title: 'Brands', path: '/products/brands' },
+        { title: 'Product List', path: '/products', permission: 'products.view' },
+        { title: 'Add Product', path: '/products/add', permission: 'products.create' },
+        { title: 'Categories', path: '/products/categories', permission: 'categories.manage' },
+        { title: 'Brands', path: '/products/brands', permission: 'brands.manage' },
       ]
     },
     {
       title: 'Purchase',
       icon: <FiShoppingCart />,
+      permission: 'purchases.view',
       submenu: [
-        { title: 'Purchase List', path: '/purchases' },
-        { title: 'Add Purchase', path: '/purchases/add' },
-        { title: 'Purchase Returns', path: '/purchases/returns' },
+        { title: 'Purchase List', path: '/purchases', permission: 'purchases.view' },
+        { title: 'Add Purchase', path: '/purchases/add', permission: 'purchases.create' },
+        { title: 'Purchase Returns', path: '/purchases/returns', permission: 'purchases.view' },
       ]
     },
     {
       title: 'Sales',
       icon: <FiDollarSign />,
+      permission: 'sales.view',
       submenu: [
-        { title: 'Sales List', path: '/sales' },
-        { title: 'Add Sale', path: '/sales/add' },
-        { title: 'Sale Returns', path: '/sales/returns' },
+        { title: 'Sales List', path: '/sales', permission: 'sales.view' },
+        { title: 'Add Sale', path: '/sales/add', permission: 'sales.create' },
+        { title: 'Sale Returns', path: '/sales/returns', permission: 'sales.view' },
       ]
     },
     {
       title: 'People',
       icon: <FiUsers />,
+      permission: 'customers.view',
       submenu: [
-        { title: 'Customers', path: '/customers' },
-        { title: 'Suppliers', path: '/suppliers' },
-        { title: 'Stores', path: '/stores' },
+        { title: 'Customers', path: '/customers', permission: 'customers.view' },
+        { title: 'Suppliers', path: '/suppliers', permission: 'suppliers.view' },
+        { title: 'Stores', path: '/stores', permission: 'stores.view' },
       ]
     },
     {
       title: 'Expense',
       icon: <FiFileText />,
+      permission: 'expenses.view',
       submenu: [
-        { title: 'Expense List', path: '/expenses' },
-        { title: 'Add Expense', path: '/expenses/add' },
-        { title: 'Categories', path: '/expenses/categories' },
+        { title: 'Expense List', path: '/expenses', permission: 'expenses.view' },
+        { title: 'Add Expense', path: '/expenses/add', permission: 'expenses.create' },
+        { title: 'Categories', path: '/expenses/categories', permission: 'expenses.manage' },
       ]
     },
     {
       title: 'Stock Adjustment',
       icon: <FiLayers />,
+      permission: 'adjustments.view',
       submenu: [
-        { title: 'Adjustment List', path: '/adjustments' },
-        { title: 'Add Adjustment', path: '/adjustments/add' },
+        { title: 'Adjustment List', path: '/adjustments', permission: 'adjustments.view' },
+        { title: 'Add Adjustment', path: '/adjustments/add', permission: 'adjustments.create' },
       ]
     },
     {
       title: 'Reports',
       icon: <FiBarChart2 />,
+      permission: 'reports.view',
       submenu: [
-        { title: 'Sales Report', path: '/reports/sales' },
-        { title: 'Purchase Report', path: '/reports/purchase' },
-        { title: 'Inventory Report', path: '/reports/inventory' },
-        { title: 'Supplier Report', path: '/reports/supplier' },
-        { title: 'Customer Report', path: '/reports/customer' },
+        { title: 'Sales Report', path: '/reports/sales', permission: 'reports.view' },
+        { title: 'Purchase Report', path: '/reports/purchase', permission: 'reports.view' },
+        { title: 'Inventory Report', path: '/reports/inventory', permission: 'reports.view' },
+        { title: 'Supplier Report', path: '/reports/supplier', permission: 'reports.view' },
+        { title: 'Customer Report', path: '/reports/customer', permission: 'reports.view' },
       ]
     },
-    { title: 'Users', icon: <FiUsers />, path: '/users', adminOnly: true },
-    { title: 'Activity Log', icon: <FiActivity />, path: '/activity-log', adminOnly: true },
-    { title: 'Settings', icon: <FiSettings />, path: '/settings' },
+    { title: 'Users', icon: <FiUsers />, path: '/users', permission: 'users.view' },
+    { title: 'Activity Log', icon: <FiActivity />, path: '/activity-log', permission: 'activity.view' },
+    { title: 'Settings', icon: <FiSettings />, path: '/settings', permission: 'settings.view' },
   ];
 
-  // Filter menu items based on user role
-  const filteredMenuItems = menuItems.filter(item => !item.adminOnly || isAdmin);
+  // Filter menu items based on permissions
+  const filteredMenuItems = menuItems.filter(item => {
+    // Check main permission
+    if (item.permission && !hasPermission(item.permission)) return false;
+    return true;
+  }).map(item => {
+    // Filter submenu items based on permissions
+    if (item.submenu) {
+      return {
+        ...item,
+        submenu: item.submenu.filter(sub => !sub.permission || hasPermission(sub.permission))
+      };
+    }
+    return item;
+  }).filter(item => {
+    // Remove parent items with empty submenus
+    if (item.submenu && item.submenu.length === 0) return false;
+    return true;
+  });
 
   const toggleMenu = (title: string) => {
     setOpenMenu(prev => (prev === title ? null : title));
@@ -125,9 +151,9 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
     <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
       <div className="sidebar-brand">
         {!isCollapsed ? (
-          <img src="public/image/inventory-logo.png" alt="Logo" />
+          <img src="image/inventory-logo.png" alt="Logo" />
         ) : (
-          <img src="public/image/favicon.png" alt="Logo" />
+          <img src="image/favicon.png" alt="Logo" />
         )}
       </div>
 
