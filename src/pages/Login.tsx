@@ -39,7 +39,7 @@ const Login = () => {
     <div className="login-page">
       <div className="login-card">
         <div className="login-title">
-          <h2>Sign In</h2>
+          <h3>Sign In</h3>
           <p>Please login to your account</p>
         </div>
 
@@ -82,7 +82,7 @@ const Login = () => {
                 {showPassword ? '🙈' : '👁'}
               </span>
             </div>
-            <div className="text-end mt-1">
+            <div className="mt-2">
               <Link to="/forgot-password" className="forgot-password-link">
                 Forgot Password?
               </Link>

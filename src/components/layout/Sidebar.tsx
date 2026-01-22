@@ -151,9 +151,9 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
     <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
       <div className="sidebar-brand">
         {!isCollapsed ? (
-          <img src="image/inventory-logo.png" alt="Logo" />
+          <img src="inventory-logo.png" alt="Logo" />
         ) : (
-          <img src="image/favicon.png" alt="Logo" />
+          <img src="favicon.png" alt="Logo" />
         )}
       </div>
 
@@ -187,7 +187,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
                         <li key={sub.path} className="nav-item">
                           <Link
                             to={sub.path}
-                            className={`nav-link ${isActiveLink(sub.path) ? 'active' : ''}`}
+                            className={`${isActiveLink(sub.path) ? 'active' : ''}`}
                           >
                             <span className="nav-text">{sub.title}</span>
                           </Link>
