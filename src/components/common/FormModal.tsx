@@ -1,0 +1,86 @@
+import { ReactNode, FormEvent } from 'react';
+import { FiX, FiSave } from 'react-icons/fi';
+
+interface FormModalProps {
+  isOpen: boolean;
+  title: string;
+  onClose: () => void;
+  onSubmit: (e: FormEvent) => void;
+  children: ReactNode;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  isLoading?: boolean;
+  submitLabel?: string;
+  cancelLabel?: string;
+}
+
+const FormModal = ({
+  isOpen,
+  title,
+  onClose,
+  onSubmit,
+  children,
+  size = 'lg',
+  isLoading = false,
+  submitLabel = 'Save',
+  cancelLabel = 'Cancel'
+}: FormModalProps) => {
+  if (!isOpen) return null;
+
+  const sizeClass = {
+    sm: 'modal-sm',
+    md: '',
+    lg: 'modal-lg',
+    xl: 'modal-xl'
+  }[size];
+
+  return (
+    <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1055 }}>
+      <div className={`modal-dialog modal-dialog-centered modal-dialog-scrollable ${sizeClass}`}>
+        <div className="modal-content">
+          <div className="modal-header">
+            <h5 className="modal-title">{title}</h5>
+            <button 
+              type="button" 
+              className="btn-close" 
+              onClick={onClose}
+              disabled={isLoading}
+            ></button>
+          </div>
+          <form onSubmit={onSubmit}>
+            <div className="modal-body">
+              {children}
+            </div>
+            <div className="modal-footer">
+              <button 
+                type="button" 
+                className="btn btn-secondary" 
+                onClick={onClose}
+                disabled={isLoading}
+              >
+                <FiX className="me-1" /> {cancelLabel}
+              </button>
+              <button 
+                type="submit" 
+                className="btn btn-primary-custom"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-1" role="status"></span>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <FiSave className="me-1" /> {submitLabel}
+                  </>
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default FormModal;

@@ -9,6 +9,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { SettingsProvider } from "./contexts/SettingsContext";
 import { NotificationProvider } from "./contexts/NotificationContext";
+import { ToastProvider } from "./components/common/Toast";
 
 // Layout & Protection
 import AdminLayout from "./components/layout/AdminLayout";
@@ -56,9 +57,10 @@ const App = () => (
       <AuthProvider>
         <SettingsProvider>
           <NotificationProvider>
-            <TooltipProvider>
-              <Toaster />
-              <Sonner />
+            <ToastProvider>
+              <TooltipProvider>
+                <Toaster />
+                <Sonner />
               <BrowserRouter>
                 <Routes>
                 {/* Public Routes */}
@@ -135,8 +137,9 @@ const App = () => (
                   </Route>
                   <Route path="*" element={<NotFound />} />
                 </Routes>
-              </BrowserRouter>
-            </TooltipProvider>
+                </BrowserRouter>
+              </TooltipProvider>
+            </ToastProvider>
           </NotificationProvider>
         </SettingsProvider>
       </AuthProvider>
