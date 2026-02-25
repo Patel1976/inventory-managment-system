@@ -42,7 +42,7 @@ const ConfirmDialog = ({
 
   return (
     <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1060 }}>
-      <div className="modal-dialog modal-dialog-centered modal-sm">
+      <div className="modal-dialog modal-dialog-centered modal-md">
         <div className="modal-content">
           <div className="modal-header border-0 pb-0">
             <button 

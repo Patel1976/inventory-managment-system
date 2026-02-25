@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiPhone, FiMail } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
-import { ConfirmDialog, ViewModal, FormModal, DetailRow } from '../../components/common';
 import { useToast } from '../../components/common/Toast';
 
 interface Customer {
@@ -12,15 +11,10 @@ interface Customer {
 const CustomerList = () => {
   const { hasPermission } = useAuth();
   const { showToast } = useToast();
+  const navigate = useNavigate();
   const canManage = hasPermission('customers.manage');
 
-  const [showViewModal, setShowViewModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [formData, setFormData] = useState({ name: '', email: '', phone: '', address: '' });
 
   const [customers, setCustomers] = useState<Customer[]>([
     { id: 1, name: 'John Doe', email: 'john@example.com', phone: '+1 234 567 890', address: '123 Main St, New York', purchases: 15, totalSpent: 4520.00 },
@@ -32,26 +26,11 @@ const CustomerList = () => {
 
   const filteredCustomers = customers.filter(c => c.name.toLowerCase().includes(searchTerm.toLowerCase()) || c.email.toLowerCase().includes(searchTerm.toLowerCase()));
 
-  const handleView = (c: Customer) => { setSelectedCustomer(c); setShowViewModal(true); };
-  const handleEdit = (c: Customer) => { setSelectedCustomer(c); setFormData({ name: c.name, email: c.email, phone: c.phone, address: c.address }); setShowEditModal(true); };
-  const handleDeleteClick = (c: Customer) => { setSelectedCustomer(c); setShowDeleteDialog(true); };
-
-  const handleEditSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); setIsLoading(true);
-    setTimeout(() => {
-      setCustomers(prev => prev.map(c => c.id === selectedCustomer?.id ? { ...c, ...formData } : c));
-      setIsLoading(false); setShowEditModal(false);
-      showToast({ type: 'success', title: 'Success', message: 'Customer updated successfully!' });
-    }, 500);
-  };
-
-  const handleDelete = () => {
-    setIsLoading(true);
-    setTimeout(() => {
-      setCustomers(prev => prev.filter(c => c.id !== selectedCustomer?.id));
-      setIsLoading(false); setShowDeleteDialog(false);
+  const handleDelete = (customer: Customer) => {
+    if (window.confirm(`Are you sure you want to delete "${customer.name}"?`)) {
+      setCustomers(prev => prev.filter(c => c.id !== customer.id));
       showToast({ type: 'success', title: 'Deleted', message: 'Customer deleted successfully!' });
-    }, 500);
+    }
   };
 
   return (
@@ -69,24 +48,12 @@ const CustomerList = () => {
             <td><div><FiMail size={14} className="me-1" />{customer.email}</div><div className="text-muted small"><FiPhone size={12} className="me-1" />{customer.phone}</div></td>
             <td>{customer.address}</td><td>{customer.purchases}</td><td><strong>${customer.totalSpent.toFixed(2)}</strong></td>
             <td>
-              <button className="btn-action view me-1" onClick={() => handleView(customer)}><FiEye /></button>
-              {canManage && <><button className="btn-action edit me-1" onClick={() => handleEdit(customer)}><FiEdit /></button><button className="btn-action delete" onClick={() => handleDeleteClick(customer)}><FiTrash2 /></button></>}
+              <button className="btn-action view me-1" onClick={() => navigate(`/customers/view/${customer.id}`)}><FiEye /></button>
+              {canManage && <><button className="btn-action edit me-1" onClick={() => navigate(`/customers/edit/${customer.id}`)}><FiEdit /></button><button className="btn-action delete" onClick={() => handleDelete(customer)}><FiTrash2 /></button></>}
             </td>
           </tr>
         ))}
       </tbody></table></div></div></div>
-      <ViewModal isOpen={showViewModal} title="Customer Details" onClose={() => setShowViewModal(false)}>
-        {selectedCustomer && <div><DetailRow label="Name" value={<strong>{selectedCustomer.name}</strong>} /><DetailRow label="Email" value={selectedCustomer.email} /><DetailRow label="Phone" value={selectedCustomer.phone} /><DetailRow label="Address" value={selectedCustomer.address} /><DetailRow label="Total Purchases" value={selectedCustomer.purchases} /><DetailRow label="Total Spent" value={<strong>${selectedCustomer.totalSpent.toFixed(2)}</strong>} /></div>}
-      </ViewModal>
-      <FormModal isOpen={showEditModal} title="Edit Customer" onClose={() => setShowEditModal(false)} onSubmit={handleEditSubmit} isLoading={isLoading}>
-        <div className="row g-3">
-          <div className="col-md-6"><label className="form-label">Name *</label><input type="text" className="form-control" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required /></div>
-          <div className="col-md-6"><label className="form-label">Email *</label><input type="email" className="form-control" value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} required /></div>
-          <div className="col-md-6"><label className="form-label">Phone</label><input type="text" className="form-control" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} /></div>
-          <div className="col-12"><label className="form-label">Address</label><textarea className="form-control" rows={2} value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} /></div>
-        </div>
-      </FormModal>
-      <ConfirmDialog isOpen={showDeleteDialog} title="Delete Customer" message={`Are you sure you want to delete "${selectedCustomer?.name}"?`} confirmLabel="Delete" onConfirm={handleDelete} onCancel={() => setShowDeleteDialog(false)} isLoading={isLoading} variant="danger" />
     </div>
   );
 };

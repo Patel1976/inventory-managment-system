@@ -41,13 +41,32 @@ import InventoryReport from "./pages/reports/InventoryReport";
 import PurchaseReport from "./pages/reports/PurchaseReport";
 import CustomerReport from "./pages/reports/CustomerReport";
 import SupplierReport from "./pages/reports/SupplierReport";
-import PurchaseReturn from "./pages/returns/PurchaseReturn";
-import SaleReturn from "./pages/returns/SaleReturn";
 import UserProfile from "./pages/UserProfile";
 import ManageUsers from "./pages/users/ManageUsers";
 import Settings from "./pages/Settings";
 import ActivityLog from "./pages/ActivityLog";
 import NotFound from "./pages/NotFound";
+
+// Sale Returns
+import SaleReturnList from "./pages/saleReturns/SaleReturnList";
+import SaleReturnForm from "./pages/saleReturns/SaleReturnForm";
+import SaleReturnView from "./pages/saleReturns/SaleReturnView";
+
+// Purchase Returns
+import PurchaseReturnList from "./pages/purchaseReturns/PurchaseReturnList";
+import PurchaseReturnForm from "./pages/purchaseReturns/PurchaseReturnForm";
+
+// Customer pages
+import CustomerForm from "./pages/customers/CustomerForm";
+import CustomerView from "./pages/customers/CustomerView";
+
+// Supplier pages
+import SupplierForm from "./pages/suppliers/SupplierForm";
+import SupplierView from "./pages/suppliers/SupplierView";
+
+// Store pages
+import StoreForm from "./pages/stores/StoreForm";
+import StoreView from "./pages/stores/StoreView";
 
 const queryClient = new QueryClient();
 
@@ -83,9 +102,25 @@ const App = () => (
                     <Route path="sales/add" element={<AddSale />} />
                     <Route path="purchases" element={<PurchaseList />} />
                     <Route path="purchases/add" element={<AddPurchase />} />
+                    
+                    {/* Customers */}
                     <Route path="customers" element={<CustomerList />} />
+                    <Route path="customers/add" element={<CustomerForm />} />
+                    <Route path="customers/edit/:id" element={<CustomerForm />} />
+                    <Route path="customers/view/:id" element={<CustomerView />} />
+                    
+                    {/* Suppliers */}
                     <Route path="suppliers" element={<SupplierList />} />
+                    <Route path="suppliers/add" element={<SupplierForm />} />
+                    <Route path="suppliers/edit/:id" element={<SupplierForm />} />
+                    <Route path="suppliers/view/:id" element={<SupplierView />} />
+                    
+                    {/* Stores */}
                     <Route path="stores" element={<StoreList />} />
+                    <Route path="stores/add" element={<StoreForm />} />
+                    <Route path="stores/edit/:id" element={<StoreForm />} />
+                    <Route path="stores/view/:id" element={<StoreView />} />
+                    
                     <Route path="expenses" element={<ExpenseList />} />
                     <Route path="expenses/add" element={<AddExpense />} />
                     <Route path="expenses/categories" element={<ExpenseCategories />} />
@@ -116,8 +151,18 @@ const App = () => (
                         <CustomerReport />
                       </ProtectedRoute>
                     } />
-                    <Route path="purchases/returns" element={<PurchaseReturn />} />
-                    <Route path="sales/returns" element={<SaleReturn />} />
+                    
+                    {/* Purchase Returns */}
+                    <Route path="purchases/returns" element={<PurchaseReturnList />} />
+                    <Route path="purchases/returns/add" element={<PurchaseReturnForm />} />
+                    <Route path="purchases/returns/edit/:id" element={<PurchaseReturnForm />} />
+                    
+                    {/* Sale Returns */}
+                    <Route path="sales/returns" element={<SaleReturnList />} />
+                    <Route path="sales/returns/add" element={<SaleReturnForm />} />
+                    <Route path="sales/returns/edit/:id" element={<SaleReturnForm />} />
+                    <Route path="sales/returns/view/:id" element={<SaleReturnView />} />
+                    
                     <Route path="profile" element={<UserProfile />} />
                     <Route path="users" element={
                       <ProtectedRoute requiredPermission="users.view">

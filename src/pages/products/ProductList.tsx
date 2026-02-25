@@ -155,22 +155,14 @@ const ProductList = () => {
       {/* Page Header */}
       <div className="page-header">
         <h4>Product List</h4>
-        {canManage && (
-          <Link
-            to="/products/add"
-            className="btn btn-primary-custom d-inline-flex align-items-center"
-          >
-            <FiPlus className="me-1" />
-            <span>Add Product</span>
-          </Link>
-        )}
+        <div className="breadcrumb-wrapper"><Link to="/">Home</Link><span>/</span><span>Product List</span></div>
       </div>
 
       {/* Filters & Actions Bar */}
       <div className="data-card mb-4">
         <div className="data-card-body">
           <div className="row g-3 align-items-center">
-            <div className="d-flex justify-content-start align-items-center col-12 col-md-9 gap-3">
+            <div className="d-flex justify-content-start align-items-center col-12 col-md-8 gap-3">
               <div className="col-12 col-md-4">
                 <div className="position-relative">
                   <FiSearch style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)', zIndex: 1 }} />
@@ -208,11 +200,20 @@ const ProductList = () => {
                 </select>
               </div>
             </div>
-            <div className="col-12 col-md-3 text-end">
+            <div className="col-12 col-md-4 text-end d-flex justify-content-end align-items-center">
               <button className="btn btn-outline-secondary me-2 d-inline-flex align-items-center">
                 <FiDownload className="me-1" />
                 <span>Export</span>
               </button>
+              {canManage && (
+                <Link
+                  to="/products/add"
+                  className="btn btn-primary-custom d-inline-flex align-items-center"
+                >
+                  <FiPlus className="me-1" />
+                  <span>Add Product</span>
+                </Link>
+              )}
             </div>
           </div>
         </div>

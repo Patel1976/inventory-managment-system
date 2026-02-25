@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiDownload } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
@@ -31,6 +31,8 @@ const SalesList = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 5;
 
   const [formData, setFormData] = useState({ status: '', paymentStatus: '', paid: 0 });
 
@@ -49,11 +51,18 @@ const SalesList = () => {
     return matchesSearch && matchesStatus;
   });
 
+  const totalPages = Math.ceil(filteredSales.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedSales = filteredSales.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
+
   const handleView = (sale: Sale) => { setSelectedSale(sale); setShowViewModal(true); };
-  const handleEdit = (sale: Sale) => { 
-    setSelectedSale(sale); 
+  const handleEdit = (sale: Sale) => {
+    setSelectedSale(sale);
     setFormData({ status: sale.status, paymentStatus: sale.paymentStatus, paid: sale.paid });
-    setShowEditModal(true); 
+    setShowEditModal(true);
   };
   const handleDeleteClick = (sale: Sale) => { setSelectedSale(sale); setShowDeleteDialog(true); };
 
@@ -78,6 +87,10 @@ const SalesList = () => {
     }, 500);
   };
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter]);
+
   return (
     <div className="sales-list-page">
       <div className="page-header">
@@ -90,7 +103,7 @@ const SalesList = () => {
       <div className="data-card mb-4">
         <div className="data-card-body">
           <div className="row g-3 align-items-center">
-            <div className="col-12 col-md-3">
+            <div className="col-12 col-md-2">
               <div className="input-group">
                 <span className="input-group-text bg-white border-end-0"><FiSearch /></span>
                 <input type="text" className="form-control border-start-0" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
@@ -105,9 +118,9 @@ const SalesList = () => {
                 <option value="pending">Pending</option>
               </select>
             </div>
-            <div className="col-12 col-md-3 text-end">
-              <button className="btn btn-outline-secondary me-2"><FiDownload className="me-1" /> Export</button>
-              <Link to="/sales/add" className="btn btn-primary-custom"><FiPlus className="me-1" /> Add Sale</Link>
+            <div className="col-12 col-md-4 text-end d-flex justify-content-end align-items-center">
+              <button className="btn btn-outline-secondary me-2 d-flex align-items-center"><FiDownload className="me-1" /> Export</button>
+              <Link to="/sales/add" className="btn btn-primary-custom d-flex align-items-center"><FiPlus className="me-1" /> Add Sale</Link>
             </div>
           </div>
         </div>
@@ -121,7 +134,7 @@ const SalesList = () => {
                 <tr><th>Invoice</th><th>Date</th><th>Customer</th><th>Store</th><th>Total</th><th>Paid</th><th>Due</th><th>Status</th><th>Payment</th><th>Action</th></tr>
               </thead>
               <tbody>
-                {filteredSales.map((sale) => (
+                {paginatedSales.map((sale) => (
                   <tr key={sale.id}>
                     <td><strong>{sale.id}</strong></td>
                     <td>{sale.date}</td>
@@ -143,8 +156,72 @@ const SalesList = () => {
             </table>
           </div>
           <div className="d-flex justify-content-between align-items-center mt-4">
-            <div className="text-muted">Showing 1 to {filteredSales.length} of {filteredSales.length} entries</div>
-            <nav><ul className="pagination mb-0"><li className="page-item active"><span className="page-link">1</span></li></ul></nav>
+            <div className="text-muted">
+              Showing {startIndex + 1} to{" "}
+              {Math.min(startIndex + itemsPerPage, filteredSales.length)} of{" "}
+              {filteredSales.length} entries
+            </div>
+
+            <nav>
+              <ul className="pagination mb-0">
+                {/* Previous */}
+                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                  <button
+                    className="page-link"
+                    onClick={() =>
+                      setCurrentPage(prev => Math.max(1, prev - 1))
+                    }
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </button>
+                </li>
+
+                {/* Page Numbers */}
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let page: number;
+
+                  if (totalPages <= 5) {
+                    page = i + 1;
+                  } else if (currentPage <= 3) {
+                    page = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    page = totalPages - 4 + i;
+                  } else {
+                    page = currentPage - 2 + i;
+                  }
+
+                  return (
+                    <li
+                      key={page}
+                      className={`page-item ${currentPage === page ? 'active' : ''}`}
+                    >
+                      <button
+                        className="page-link"
+                        onClick={() => setCurrentPage(page)}
+                      >
+                        {page}
+                      </button>
+                    </li>
+                  );
+                })}
+
+                {/* Next */}
+                <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                  <button
+                    className="page-link"
+                    onClick={() =>
+                      setCurrentPage(prev =>
+                        Math.min(totalPages, prev + 1)
+                      )
+                    }
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </button>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
       </div>

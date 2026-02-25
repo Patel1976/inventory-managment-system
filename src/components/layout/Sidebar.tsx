@@ -129,7 +129,27 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
     setOpenMenu(prev => (prev === title ? null : title));
   };
 
-  const isActiveLink = (path: string) => location.pathname === path;
+  // Find the most specific (longest) matching path for sub-routes
+  const getActivePath = () => {
+    let bestMatch = '/';
+    const allPaths: string[] = [];
+    // Collect all paths from main items and submenus
+    menuItems.forEach(item => {
+      if (item.path) allPaths.push(item.path);
+      item.submenu?.forEach(sub => allPaths.push(sub.path));
+    });
+    allPaths.forEach(p => {
+      // Check for exact match OR if the current URL is a sub-route (e.g. starts with path + '/')
+      if (location.pathname === p || location.pathname.startsWith(`${p}/`)) {
+        if (p.length > bestMatch.length || bestMatch === '/') {
+          bestMatch = p;
+        }
+      }
+    });
+    return bestMatch;
+  };
+  const activePath = getActivePath();
+  const isActiveLink = (path: string) => path === activePath;
   const isMenuOpen = (title: string) => openMenu === title;
 
   useEffect(() => {
@@ -138,7 +158,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
       return;
     }
     const activeMenu = menuItems.find(item =>
-      item.submenu?.some(sub => location.pathname.startsWith(sub.path))
+      item.submenu?.some(sub => isActiveLink(sub.path))
     );
     if (activeMenu) {
       setOpenMenu(activeMenu.title);

@@ -1,8 +1,7 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiMapPin, FiPhone } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
-import { ConfirmDialog, ViewModal, FormModal, DetailRow } from '../../components/common';
 import { useToast } from '../../components/common/Toast';
 
 interface Store { id: number; name: string; code: string; manager: string; phone: string; address: string; products: number; status: string; }
@@ -10,14 +9,9 @@ interface Store { id: number; name: string; code: string; manager: string; phone
 const StoreList = () => {
   const { hasPermission } = useAuth();
   const { showToast } = useToast();
+  const navigate = useNavigate();
   const canManage = hasPermission('stores.manage');
-  const [showViewModal, setShowViewModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [selectedStore, setSelectedStore] = useState<Store | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [formData, setFormData] = useState({ name: '', code: '', manager: '', phone: '', address: '', status: 'Active' });
 
   const [stores, setStores] = useState<Store[]>([
     { id: 1, name: 'Main Store', code: 'MS001', manager: 'John Manager', phone: '+1 234 567 890', address: '123 Main Street, Downtown', products: 248, status: 'Active' },
@@ -27,11 +21,13 @@ const StoreList = () => {
   ]);
 
   const filteredStores = stores.filter(s => s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.code.toLowerCase().includes(searchTerm.toLowerCase()));
-  const handleView = (s: Store) => { setSelectedStore(s); setShowViewModal(true); };
-  const handleEdit = (s: Store) => { setSelectedStore(s); setFormData({ name: s.name, code: s.code, manager: s.manager, phone: s.phone, address: s.address, status: s.status }); setShowEditModal(true); };
-  const handleDeleteClick = (s: Store) => { setSelectedStore(s); setShowDeleteDialog(true); };
-  const handleEditSubmit = (e: React.FormEvent) => { e.preventDefault(); setIsLoading(true); setTimeout(() => { setStores(prev => prev.map(s => s.id === selectedStore?.id ? { ...s, ...formData } : s)); setIsLoading(false); setShowEditModal(false); showToast({ type: 'success', title: 'Success', message: 'Store updated successfully!' }); }, 500); };
-  const handleDelete = () => { setIsLoading(true); setTimeout(() => { setStores(prev => prev.filter(s => s.id !== selectedStore?.id)); setIsLoading(false); setShowDeleteDialog(false); showToast({ type: 'success', title: 'Deleted', message: 'Store deleted successfully!' }); }, 500); };
+
+  const handleDelete = (store: Store) => {
+    if (window.confirm(`Are you sure you want to delete "${store.name}"?`)) {
+      setStores(prev => prev.filter(s => s.id !== store.id));
+      showToast({ type: 'success', title: 'Deleted', message: 'Store deleted successfully!' });
+    }
+  };
 
   return (
     <div className="store-list-page">
@@ -44,14 +40,11 @@ const StoreList = () => {
       <div className="data-card"><div className="data-card-body"><div className="table-responsive"><table className="data-table"><thead><tr><th>#</th><th>Store Name</th><th>Code</th><th>Manager</th><th>Contact</th><th>Products</th><th>Status</th><th>Action</th></tr></thead><tbody>
         {filteredStores.map((store, index) => (
           <tr key={store.id}><td>{index + 1}</td><td><strong>{store.name}</strong></td><td>{store.code}</td><td>{store.manager}</td><td><div><FiPhone size={14} className="me-1" />{store.phone}</div><div className="text-muted small"><FiMapPin size={12} className="me-1" />{store.address}</div></td><td>{store.products}</td><td><span className="badge badge-success">{store.status}</span></td><td>
-            <button className="btn-action view me-1" onClick={() => handleView(store)}><FiEye /></button>
-            {canManage && <><button className="btn-action edit me-1" onClick={() => handleEdit(store)}><FiEdit /></button><button className="btn-action delete" onClick={() => handleDeleteClick(store)}><FiTrash2 /></button></>}
+            <button className="btn-action view me-1" onClick={() => navigate(`/stores/view/${store.id}`)}><FiEye /></button>
+            {canManage && <><button className="btn-action edit me-1" onClick={() => navigate(`/stores/edit/${store.id}`)}><FiEdit /></button><button className="btn-action delete" onClick={() => handleDelete(store)}><FiTrash2 /></button></>}
           </td></tr>
         ))}
       </tbody></table></div></div></div>
-      <ViewModal isOpen={showViewModal} title="Store Details" onClose={() => setShowViewModal(false)}>{selectedStore && <div><DetailRow label="Name" value={<strong>{selectedStore.name}</strong>} /><DetailRow label="Code" value={selectedStore.code} /><DetailRow label="Manager" value={selectedStore.manager} /><DetailRow label="Phone" value={selectedStore.phone} /><DetailRow label="Address" value={selectedStore.address} /><DetailRow label="Products" value={selectedStore.products} /><DetailRow label="Status" value={<span className="badge badge-success">{selectedStore.status}</span>} /></div>}</ViewModal>
-      <FormModal isOpen={showEditModal} title="Edit Store" onClose={() => setShowEditModal(false)} onSubmit={handleEditSubmit} isLoading={isLoading}><div className="row g-3"><div className="col-md-6"><label className="form-label">Store Name *</label><input type="text" className="form-control" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required /></div><div className="col-md-6"><label className="form-label">Code *</label><input type="text" className="form-control" value={formData.code} onChange={(e) => setFormData({ ...formData, code: e.target.value })} required /></div><div className="col-md-6"><label className="form-label">Manager</label><input type="text" className="form-control" value={formData.manager} onChange={(e) => setFormData({ ...formData, manager: e.target.value })} /></div><div className="col-md-6"><label className="form-label">Phone</label><input type="text" className="form-control" value={formData.phone} onChange={(e) => setFormData({ ...formData, phone: e.target.value })} /></div><div className="col-12"><label className="form-label">Address</label><textarea className="form-control" rows={2} value={formData.address} onChange={(e) => setFormData({ ...formData, address: e.target.value })} /></div></div></FormModal>
-      <ConfirmDialog isOpen={showDeleteDialog} title="Delete Store" message={`Are you sure you want to delete "${selectedStore?.name}"?`} confirmLabel="Delete" onConfirm={handleDelete} onCancel={() => setShowDeleteDialog(false)} isLoading={isLoading} variant="danger" />
     </div>
   );
 };

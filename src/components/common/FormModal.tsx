@@ -39,44 +39,45 @@ const FormModal = ({
         <div className="modal-content">
           <div className="modal-header">
             <h5 className="modal-title">{title}</h5>
-            <button 
-              type="button" 
-              className="btn-close" 
+            <button
+              type="button"
+              className="btn-close"
               onClick={onClose}
               disabled={isLoading}
             ></button>
           </div>
-          <form onSubmit={onSubmit}>
-            <div className="modal-body">
+          <div className="modal-body">
+            <form id="formModal" onSubmit={onSubmit}>
               {children}
-            </div>
-            <div className="modal-footer">
-              <button 
-                type="button" 
-                className="btn btn-secondary" 
-                onClick={onClose}
-                disabled={isLoading}
-              >
-                <FiX className="me-1" /> {cancelLabel}
-              </button>
-              <button 
-                type="submit" 
-                className="btn btn-primary-custom"
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <span className="spinner-border spinner-border-sm me-1" role="status"></span>
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    <FiSave className="me-1" /> {submitLabel}
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
+            </form>
+          </div>
+          <div className="modal-footer">
+            <button
+              type="button"
+              className="btn btn-secondary d-flex align-items-center"
+              onClick={onClose}
+              disabled={isLoading}
+            >
+              {cancelLabel}
+            </button>
+            <button
+              type="submit"
+              form="formModal"
+              className="btn btn-primary-custom d-flex align-items-center"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-1" role="status"></span>
+                  Processing...
+                </>
+              ) : (
+                <>
+                  {submitLabel}
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>

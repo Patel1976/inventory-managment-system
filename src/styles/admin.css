@@ -505,22 +505,42 @@ textarea.form-control {
   background: linear-gradient(135deg, #2e3192 0%, #1bbbce 100%);
   color: #fff;
   border: none;
-  padding: 10px 25px;
+  height: 42px;
+  min-width: 130px;
+  justify-content: center;
+  padding: 0px 25px;
   border-radius: 8px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.btn-primary-custom:hover {
+.btn-primary-custom:hover, 
+.btn-secondary:hover, 
+.btn-danger:hover, 
+.btn-secondary-custom:hover, 
+.btn-outline-primary:hover, 
+.btn-outline-secondary:hover {
   opacity: 0.9;
   transform: translateY(-1px);
+}
+
+.btn-secondary, 
+.btn-danger, 
+.btn-outline-primary, 
+.btn-outline-secondary {
+  height: 42px;
+  min-width: 130px;
+  justify-content: center;
 }
 
 .btn-secondary-custom {
   background: #f5f6fa;
   color: #555;
   border: 1px solid #ddd;
+  height: 42px;
+  min-width: 130px;
+  justify-content: center;
   padding: 10px 25px;
   border-radius: 8px;
   font-weight: 500;
