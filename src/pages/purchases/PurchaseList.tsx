@@ -1,19 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiDownload } from 'react-icons/fi';
+import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiDownload, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 import { ConfirmDialog, ViewModal, FormModal, DetailRow } from '../../components/common';
 import { useToast } from '../../components/common/Toast';
 
 interface Purchase {
-  id: string;
-  date: string;
-  supplier: string;
-  store: string;
-  total: number;
-  paid: number;
-  due: number;
-  status: string;
+  id: string; date: string; supplier: string; store: string; total: number; paid: number; due: number; status: string;
 }
 
 const PurchaseList = () => {
@@ -28,7 +21,8 @@ const PurchaseList = () => {
   const [selectedPurchase, setSelectedPurchase] = useState<Purchase | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const [formData, setFormData] = useState({ status: '', paid: 0 });
 
   const [purchases, setPurchases] = useState<Purchase[]>([
@@ -41,13 +35,19 @@ const PurchaseList = () => {
 
   const filteredPurchases = purchases.filter(p => p.id.toLowerCase().includes(searchTerm.toLowerCase()) || p.supplier.toLowerCase().includes(searchTerm.toLowerCase()));
 
+  const totalPages = Math.ceil(filteredPurchases.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedData = filteredPurchases.slice(startIndex, startIndex + itemsPerPage);
+
+  useEffect(() => { setCurrentPage(1); }, [searchTerm]);
+  useEffect(() => { if (currentPage > totalPages && totalPages > 0) setCurrentPage(totalPages); }, [filteredPurchases.length, totalPages, currentPage]);
+
   const handleView = (p: Purchase) => { setSelectedPurchase(p); setShowViewModal(true); };
   const handleEdit = (p: Purchase) => { setSelectedPurchase(p); setFormData({ status: p.status, paid: p.paid }); setShowEditModal(true); };
   const handleDeleteClick = (p: Purchase) => { setSelectedPurchase(p); setShowDeleteDialog(true); };
 
   const handleEditSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+    e.preventDefault(); setIsLoading(true);
     setTimeout(() => {
       setPurchases(prev => prev.map(p => p.id === selectedPurchase?.id ? { ...p, ...formData, due: p.total - formData.paid } : p));
       setIsLoading(false); setShowEditModal(false);
@@ -75,10 +75,7 @@ const PurchaseList = () => {
         <div className="data-card-body">
           <div className="row g-3 align-items-center">
             <div className="col-12 col-md-3">
-              <div className="input-group">
-                <span className="input-group-text bg-white border-end-0"><FiSearch /></span>
-                <input type="text" className="form-control border-start-0" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-              </div>
+              <div className="input-group"><span className="input-group-text bg-white border-end-0"><FiSearch /></span><input type="text" className="form-control border-start-0" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div>
             </div>
             <div className="col-12 col-md-2"><select className="form-select"><option value="">All Suppliers</option></select></div>
             <div className="col-12 col-md-2"><select className="form-select"><option value="">All Status</option></select></div>
@@ -97,15 +94,10 @@ const PurchaseList = () => {
             <table className="data-table">
               <thead><tr><th>Reference</th><th>Date</th><th>Supplier</th><th>Store</th><th>Total</th><th>Paid</th><th>Due</th><th>Status</th><th>Action</th></tr></thead>
               <tbody>
-                {filteredPurchases.map((purchase) => (
+                {paginatedData.map((purchase) => (
                   <tr key={purchase.id}>
-                    <td><strong>{purchase.id}</strong></td>
-                    <td>{purchase.date}</td>
-                    <td>{purchase.supplier}</td>
-                    <td>{purchase.store}</td>
-                    <td>${purchase.total.toFixed(2)}</td>
-                    <td>${purchase.paid.toFixed(2)}</td>
-                    <td>${purchase.due.toFixed(2)}</td>
+                    <td><strong>{purchase.id}</strong></td><td>{purchase.date}</td><td>{purchase.supplier}</td><td>{purchase.store}</td>
+                    <td>${purchase.total.toFixed(2)}</td><td>${purchase.paid.toFixed(2)}</td><td>${purchase.due.toFixed(2)}</td>
                     <td><span className={`badge ${purchase.status === 'Received' ? 'badge-success' : purchase.status === 'Pending' ? 'badge-warning' : 'badge-info'}`}>{purchase.status}</span></td>
                     <td>
                       <button className="btn-action view me-1" onClick={() => handleView(purchase)}><FiEye /></button>
@@ -116,6 +108,31 @@ const PurchaseList = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+          <div className="d-flex justify-content-between align-items-center mt-4">
+            <div className="text-muted">Showing {filteredPurchases.length === 0 ? 0 : startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredPurchases.length)} of {filteredPurchases.length} entries</div>
+            <nav>
+              <ul className="pagination mb-0">
+                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                  <button className="page-link" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}><FiChevronLeft /></button>
+                </li>
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let page: number;
+                  if (totalPages <= 5) page = i + 1;
+                  else if (currentPage <= 3) page = i + 1;
+                  else if (currentPage >= totalPages - 2) page = totalPages - 4 + i;
+                  else page = currentPage - 2 + i;
+                  return (
+                    <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
+                      <button className="page-link" onClick={() => setCurrentPage(page)}>{page}</button>
+                    </li>
+                  );
+                })}
+                <li className={`page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`}>
+                  <button className="page-link" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0}><FiChevronRight /></button>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
       </div>

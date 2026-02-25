@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiMapPin, FiPhone } from 'react-icons/fi';
+import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiMapPin, FiPhone, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../components/common/Toast';
 
@@ -12,6 +12,8 @@ const StoreList = () => {
   const navigate = useNavigate();
   const canManage = hasPermission('stores.manage');
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const [stores, setStores] = useState<Store[]>([
     { id: 1, name: 'Main Store', code: 'MS001', manager: 'John Manager', phone: '+1 234 567 890', address: '123 Main Street, Downtown', products: 248, status: 'Active' },
@@ -21,6 +23,13 @@ const StoreList = () => {
   ]);
 
   const filteredStores = stores.filter(s => s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.code.toLowerCase().includes(searchTerm.toLowerCase()));
+
+  const totalPages = Math.ceil(filteredStores.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedData = filteredStores.slice(startIndex, startIndex + itemsPerPage);
+
+  useEffect(() => { setCurrentPage(1); }, [searchTerm]);
+  useEffect(() => { if (currentPage > totalPages && totalPages > 0) setCurrentPage(totalPages); }, [filteredStores.length, totalPages, currentPage]);
 
   const handleDelete = (store: Store) => {
     if (window.confirm(`Are you sure you want to delete "${store.name}"?`)) {
@@ -38,13 +47,39 @@ const StoreList = () => {
         <div className="col-12 col-md-3 text-end">{canManage && <Link to="/stores/add" className="btn btn-primary-custom"><FiPlus className="me-1" /> Add Store</Link>}</div>
       </div></div></div>
       <div className="data-card"><div className="data-card-body"><div className="table-responsive"><table className="data-table"><thead><tr><th>#</th><th>Store Name</th><th>Code</th><th>Manager</th><th>Contact</th><th>Products</th><th>Status</th><th>Action</th></tr></thead><tbody>
-        {filteredStores.map((store, index) => (
-          <tr key={store.id}><td>{index + 1}</td><td><strong>{store.name}</strong></td><td>{store.code}</td><td>{store.manager}</td><td><div><FiPhone size={14} className="me-1" />{store.phone}</div><div className="text-muted small"><FiMapPin size={12} className="me-1" />{store.address}</div></td><td>{store.products}</td><td><span className="badge badge-success">{store.status}</span></td><td>
+        {paginatedData.map((store, index) => (
+          <tr key={store.id}><td>{startIndex + index + 1}</td><td><strong>{store.name}</strong></td><td>{store.code}</td><td>{store.manager}</td><td><div><FiPhone size={14} className="me-1" />{store.phone}</div><div className="text-muted small"><FiMapPin size={12} className="me-1" />{store.address}</div></td><td>{store.products}</td><td><span className="badge badge-success">{store.status}</span></td><td>
             <button className="btn-action view me-1" onClick={() => navigate(`/stores/view/${store.id}`)}><FiEye /></button>
             {canManage && <><button className="btn-action edit me-1" onClick={() => navigate(`/stores/edit/${store.id}`)}><FiEdit /></button><button className="btn-action delete" onClick={() => handleDelete(store)}><FiTrash2 /></button></>}
           </td></tr>
         ))}
-      </tbody></table></div></div></div>
+      </tbody></table></div>
+      <div className="d-flex justify-content-between align-items-center mt-4">
+        <div className="text-muted">Showing {filteredStores.length === 0 ? 0 : startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredStores.length)} of {filteredStores.length} entries</div>
+        <nav>
+          <ul className="pagination mb-0">
+            <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+              <button className="page-link" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}><FiChevronLeft /></button>
+            </li>
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              let page: number;
+              if (totalPages <= 5) page = i + 1;
+              else if (currentPage <= 3) page = i + 1;
+              else if (currentPage >= totalPages - 2) page = totalPages - 4 + i;
+              else page = currentPage - 2 + i;
+              return (
+                <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
+                  <button className="page-link" onClick={() => setCurrentPage(page)}>{page}</button>
+                </li>
+              );
+            })}
+            <li className={`page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`}>
+              <button className="page-link" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0}><FiChevronRight /></button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      </div></div>
     </div>
   );
 };
