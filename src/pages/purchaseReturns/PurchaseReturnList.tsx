@@ -1,19 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiDownload } from 'react-icons/fi';
+import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiDownload, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../components/common/Toast';
 
 export interface PurchaseReturnItem {
-  id: string;
-  date: string;
-  purchaseRef: string;
-  supplier: string;
-  product: string;
-  quantity: number;
-  returnAmount: number;
-  reason: string;
-  status: string;
+  id: string; date: string; purchaseRef: string; supplier: string; product: string; quantity: number; returnAmount: number; reason: string; status: string;
 }
 
 export const mockPurchaseReturns: PurchaseReturnItem[] = [
@@ -31,6 +23,8 @@ const PurchaseReturnList = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [supplierFilter, setSupplierFilter] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const [returns, setReturns] = useState<PurchaseReturnItem[]>(mockPurchaseReturns);
 
   const filteredReturns = returns.filter(item => {
@@ -41,6 +35,13 @@ const PurchaseReturnList = () => {
     const matchesSupplier = !supplierFilter || item.supplier === supplierFilter;
     return matchesSearch && matchesStatus && matchesSupplier;
   });
+
+  const totalPages = Math.ceil(filteredReturns.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedData = filteredReturns.slice(startIndex, startIndex + itemsPerPage);
+
+  useEffect(() => { setCurrentPage(1); }, [searchTerm, statusFilter, supplierFilter]);
+  useEffect(() => { if (currentPage > totalPages && totalPages > 0) setCurrentPage(totalPages); }, [filteredReturns.length, totalPages, currentPage]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -62,45 +63,30 @@ const PurchaseReturnList = () => {
     <div className="purchase-return-page">
       <div className="page-header">
         <h4>Purchase Returns</h4>
-        <div className="breadcrumb-wrapper">
-          <Link to="/">Home</Link><span>/</span><span>Purchase Returns</span>
-        </div>
+        <div className="breadcrumb-wrapper"><Link to="/">Home</Link><span>/</span><span>Purchase Returns</span></div>
       </div>
 
       <div className="data-card mb-4">
         <div className="data-card-body">
           <div className="row g-3 align-items-center">
             <div className="col-12 col-md-3">
-              <div className="input-group">
-                <span className="input-group-text bg-white border-end-0"><FiSearch /></span>
-                <input type="text" className="form-control border-start-0" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
-              </div>
+              <div className="input-group"><span className="input-group-text bg-white border-end-0"><FiSearch /></span><input type="text" className="form-control border-start-0" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div>
             </div>
             <div className="col-12 col-md-2">
               <select className="form-select" value={supplierFilter} onChange={(e) => setSupplierFilter(e.target.value)}>
                 <option value="">All Suppliers</option>
-                <option value="Tech Suppliers Inc">Tech Suppliers Inc</option>
-                <option value="Global Electronics">Global Electronics</option>
-                <option value="Premium Parts Ltd">Premium Parts Ltd</option>
-                <option value="Digital World">Digital World</option>
+                <option value="Tech Suppliers Inc">Tech Suppliers Inc</option><option value="Global Electronics">Global Electronics</option><option value="Premium Parts Ltd">Premium Parts Ltd</option><option value="Digital World">Digital World</option>
               </select>
             </div>
             <div className="col-12 col-md-2">
               <select className="form-select" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)}>
-                <option value="">All Status</option>
-                <option value="Completed">Completed</option>
-                <option value="Pending">Pending</option>
-                <option value="Processing">Processing</option>
+                <option value="">All Status</option><option value="Completed">Completed</option><option value="Pending">Pending</option><option value="Processing">Processing</option>
               </select>
             </div>
-            <div className="col-12 col-md-2">
-              <input type="date" className="form-control" />
-            </div>
+            <div className="col-12 col-md-2"><input type="date" className="form-control" /></div>
             <div className="col-12 col-md-3 text-end">
               <button className="btn btn-outline-secondary me-2"><FiDownload className="me-1" /> Export</button>
-              <button className="btn btn-primary-custom" onClick={() => navigate('/purchases/returns/add')}>
-                <FiPlus className="me-1" /> Add Return
-              </button>
+              <button className="btn btn-primary-custom" onClick={() => navigate('/purchases/returns/add')}><FiPlus className="me-1" /> Add Return</button>
             </div>
           </div>
         </div>
@@ -110,19 +96,11 @@ const PurchaseReturnList = () => {
         <div className="data-card-body">
           <div className="table-responsive">
             <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Date</th><th>Purchase Ref</th><th>Supplier</th><th>Product</th><th>Quantity</th><th>Return Amount</th><th>Status</th><th>Action</th>
-                </tr>
-              </thead>
+              <thead><tr><th>Date</th><th>Purchase Ref</th><th>Supplier</th><th>Product</th><th>Quantity</th><th>Return Amount</th><th>Status</th><th>Action</th></tr></thead>
               <tbody>
-                {filteredReturns.map((item) => (
+                {paginatedData.map((item) => (
                   <tr key={item.id}>
-                    <td>{item.date}</td>
-                    <td><strong>{item.purchaseRef}</strong></td>
-                    <td>{item.supplier}</td>
-                    <td>{item.product}</td>
-                    <td>{item.quantity}</td>
+                    <td>{item.date}</td><td><strong>{item.purchaseRef}</strong></td><td>{item.supplier}</td><td>{item.product}</td><td>{item.quantity}</td>
                     <td>${item.returnAmount.toFixed(2)}</td>
                     <td><span className={`badge ${getStatusBadge(item.status)}`}>{item.status}</span></td>
                     <td>
@@ -140,12 +118,27 @@ const PurchaseReturnList = () => {
             </table>
           </div>
           <div className="d-flex justify-content-between align-items-center mt-4">
-            <span className="text-muted">Showing 1 to {filteredReturns.length} of {filteredReturns.length} entries</span>
+            <span className="text-muted">Showing {filteredReturns.length === 0 ? 0 : startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredReturns.length)} of {filteredReturns.length} entries</span>
             <nav>
               <ul className="pagination mb-0">
-                <li className="page-item disabled"><a className="page-link" href="#">Previous</a></li>
-                <li className="page-item active"><a className="page-link" href="#">1</a></li>
-                <li className="page-item disabled"><a className="page-link" href="#">Next</a></li>
+                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                  <button className="page-link" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}><FiChevronLeft /></button>
+                </li>
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let page: number;
+                  if (totalPages <= 5) page = i + 1;
+                  else if (currentPage <= 3) page = i + 1;
+                  else if (currentPage >= totalPages - 2) page = totalPages - 4 + i;
+                  else page = currentPage - 2 + i;
+                  return (
+                    <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
+                      <button className="page-link" onClick={() => setCurrentPage(page)}>{page}</button>
+                    </li>
+                  );
+                })}
+                <li className={`page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`}>
+                  <button className="page-link" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0}><FiChevronRight /></button>
+                </li>
               </ul>
             </nav>
           </div>

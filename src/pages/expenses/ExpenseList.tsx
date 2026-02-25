@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiDownload } from 'react-icons/fi';
+import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiDownload, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 import { ConfirmDialog, ViewModal, FormModal, DetailRow } from '../../components/common';
 import { useToast } from '../../components/common/Toast';
@@ -17,6 +17,8 @@ const ExpenseList = () => {
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const [formData, setFormData] = useState({ date: '', category: '', store: '', amount: 0, note: '' });
 
   const [expenses, setExpenses] = useState<Expense[]>([
@@ -28,6 +30,14 @@ const ExpenseList = () => {
   ]);
 
   const filteredExpenses = expenses.filter(e => e.reference.toLowerCase().includes(searchTerm.toLowerCase()) || e.category.toLowerCase().includes(searchTerm.toLowerCase()));
+
+  const totalPages = Math.ceil(filteredExpenses.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedData = filteredExpenses.slice(startIndex, startIndex + itemsPerPage);
+
+  useEffect(() => { setCurrentPage(1); }, [searchTerm]);
+  useEffect(() => { if (currentPage > totalPages && totalPages > 0) setCurrentPage(totalPages); }, [filteredExpenses.length, totalPages, currentPage]);
+
   const handleView = (e: Expense) => { setSelectedExpense(e); setShowViewModal(true); };
   const handleEdit = (e: Expense) => { setSelectedExpense(e); setFormData({ date: e.date, category: e.category, store: e.store, amount: e.amount, note: e.note }); setShowEditModal(true); };
   const handleDeleteClick = (e: Expense) => { setSelectedExpense(e); setShowDeleteDialog(true); };
@@ -45,13 +55,39 @@ const ExpenseList = () => {
         <div className="col-12 col-md-3 text-end"><button className="btn btn-outline-secondary me-2"><FiDownload className="me-1" /> Export</button><Link to="/expenses/add" className="btn btn-primary-custom"><FiPlus className="me-1" /> Add Expense</Link></div>
       </div></div></div>
       <div className="data-card"><div className="data-card-body"><div className="table-responsive"><table className="data-table"><thead><tr><th>#</th><th>Date</th><th>Reference</th><th>Category</th><th>Store</th><th>Amount</th><th>Note</th><th>Action</th></tr></thead><tbody>
-        {filteredExpenses.map((expense, index) => (
-          <tr key={expense.id}><td>{index + 1}</td><td>{expense.date}</td><td><strong>{expense.reference}</strong></td><td><span className="badge badge-info">{expense.category}</span></td><td>{expense.store}</td><td><strong>${expense.amount.toFixed(2)}</strong></td><td>{expense.note}</td><td>
+        {paginatedData.map((expense, index) => (
+          <tr key={expense.id}><td>{startIndex + index + 1}</td><td>{expense.date}</td><td><strong>{expense.reference}</strong></td><td><span className="badge badge-info">{expense.category}</span></td><td>{expense.store}</td><td><strong>${expense.amount.toFixed(2)}</strong></td><td>{expense.note}</td><td>
             <button className="btn-action view me-1" onClick={() => handleView(expense)}><FiEye /></button>
             {canManage && <><button className="btn-action edit me-1" onClick={() => handleEdit(expense)}><FiEdit /></button><button className="btn-action delete" onClick={() => handleDeleteClick(expense)}><FiTrash2 /></button></>}
           </td></tr>
         ))}
-      </tbody></table></div></div></div>
+      </tbody></table></div>
+      <div className="d-flex justify-content-between align-items-center mt-4">
+        <div className="text-muted">Showing {filteredExpenses.length === 0 ? 0 : startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredExpenses.length)} of {filteredExpenses.length} entries</div>
+        <nav>
+          <ul className="pagination mb-0">
+            <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+              <button className="page-link" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}><FiChevronLeft /></button>
+            </li>
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              let page: number;
+              if (totalPages <= 5) page = i + 1;
+              else if (currentPage <= 3) page = i + 1;
+              else if (currentPage >= totalPages - 2) page = totalPages - 4 + i;
+              else page = currentPage - 2 + i;
+              return (
+                <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
+                  <button className="page-link" onClick={() => setCurrentPage(page)}>{page}</button>
+                </li>
+              );
+            })}
+            <li className={`page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`}>
+              <button className="page-link" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0}><FiChevronRight /></button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      </div></div>
       <ViewModal isOpen={showViewModal} title="Expense Details" onClose={() => setShowViewModal(false)}>{selectedExpense && <div><DetailRow label="Reference" value={<strong>{selectedExpense.reference}</strong>} /><DetailRow label="Date" value={selectedExpense.date} /><DetailRow label="Category" value={<span className="badge badge-info">{selectedExpense.category}</span>} /><DetailRow label="Store" value={selectedExpense.store} /><DetailRow label="Amount" value={<strong>${selectedExpense.amount.toFixed(2)}</strong>} /><DetailRow label="Note" value={selectedExpense.note} /></div>}</ViewModal>
       <FormModal isOpen={showEditModal} title="Edit Expense" onClose={() => setShowEditModal(false)} onSubmit={handleEditSubmit} isLoading={isLoading}><div className="row g-3"><div className="col-md-6"><label className="form-label">Date</label><input type="date" className="form-control" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} /></div><div className="col-md-6"><label className="form-label">Category</label><input type="text" className="form-control" value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} /></div><div className="col-md-6"><label className="form-label">Store</label><input type="text" className="form-control" value={formData.store} onChange={(e) => setFormData({ ...formData, store: e.target.value })} /></div><div className="col-md-6"><label className="form-label">Amount</label><input type="number" className="form-control" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })} /></div><div className="col-12"><label className="form-label">Note</label><textarea className="form-control" rows={2} value={formData.note} onChange={(e) => setFormData({ ...formData, note: e.target.value })} /></div></div></FormModal>
       <ConfirmDialog isOpen={showDeleteDialog} title="Delete Expense" message={`Are you sure you want to delete "${selectedExpense?.reference}"?`} confirmLabel="Delete" onConfirm={handleDelete} onCancel={() => setShowDeleteDialog(false)} isLoading={isLoading} variant="danger" />

@@ -1,23 +1,18 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FiActivity, FiSearch, FiFilter } from 'react-icons/fi';
+import { FiActivity, FiSearch, FiFilter, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
 interface Activity {
-  id: string;
-  user: string;
-  action: 'Add' | 'Edit' | 'Delete' | 'View';
-  module: string;
-  description: string;
-  date: string;
-  time: string;
+  id: string; user: string; action: 'Add' | 'Edit' | 'Delete' | 'View'; module: string; description: string; date: string; time: string;
 }
 
 const ActivityLog = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [actionFilter, setActionFilter] = useState('');
   const [moduleFilter, setModuleFilter] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
-  // Mock activity data
   const activities: Activity[] = [
     { id: '1', user: 'Admin User', action: 'Add', module: 'Products', description: 'Added new product "iPhone 15 Pro"', date: '2024-01-15', time: '14:32:00' },
     { id: '2', user: 'Staff Member', action: 'Edit', module: 'Sales', description: 'Updated sale INV-001', date: '2024-01-15', time: '14:15:00' },
@@ -39,6 +34,12 @@ const ActivityLog = () => {
     return matchesSearch && matchesAction && matchesModule;
   });
 
+  const totalPages = Math.ceil(filteredActivities.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedData = filteredActivities.slice(startIndex, startIndex + itemsPerPage);
+
+  useEffect(() => { setCurrentPage(1); }, [searchTerm, actionFilter, moduleFilter]);
+
   const getActionBadgeClass = (action: string) => {
     switch (action) {
       case 'Add': return 'activity-badge add';
@@ -53,104 +54,50 @@ const ActivityLog = () => {
 
   return (
     <div className="activity-log-page">
-      {/* Page Header */}
       <div className="page-header">
         <h4><FiActivity className="me-2" />Activity Log</h4>
-        <div className="breadcrumb-wrapper">
-          <Link to="/">Home</Link>
-          <span>/</span>
-          <span>Activity Log</span>
-        </div>
+        <div className="breadcrumb-wrapper"><Link to="/">Home</Link><span>/</span><span>Activity Log</span></div>
       </div>
 
-      {/* Filters */}
       <div className="data-card mb-4">
         <div className="data-card-body">
           <div className="row g-3 align-items-center">
             <div className="col-12 col-md-4">
-              <div className="input-group">
-                <span className="input-group-text bg-white border-end-0">
-                  <FiSearch />
-                </span>
-                <input
-                  type="text"
-                  className="form-control border-start-0"
-                  placeholder="Search activities..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                />
-              </div>
+              <div className="input-group"><span className="input-group-text bg-white border-end-0"><FiSearch /></span><input type="text" className="form-control border-start-0" placeholder="Search activities..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div>
             </div>
             <div className="col-12 col-md-3">
-              <select 
-                className="form-select"
-                value={actionFilter}
-                onChange={(e) => setActionFilter(e.target.value)}
-              >
-                <option value="">All Actions</option>
-                <option value="Add">Add</option>
-                <option value="Edit">Edit</option>
-                <option value="Delete">Delete</option>
-                <option value="View">View</option>
+              <select className="form-select" value={actionFilter} onChange={(e) => setActionFilter(e.target.value)}>
+                <option value="">All Actions</option><option value="Add">Add</option><option value="Edit">Edit</option><option value="Delete">Delete</option><option value="View">View</option>
               </select>
             </div>
             <div className="col-12 col-md-3">
-              <select 
-                className="form-select"
-                value={moduleFilter}
-                onChange={(e) => setModuleFilter(e.target.value)}
-              >
+              <select className="form-select" value={moduleFilter} onChange={(e) => setModuleFilter(e.target.value)}>
                 <option value="">All Modules</option>
-                {modules.map(mod => (
-                  <option key={mod} value={mod}>{mod}</option>
-                ))}
+                {modules.map(mod => <option key={mod} value={mod}>{mod}</option>)}
               </select>
             </div>
             <div className="col-12 col-md-2">
-              <button 
-                className="btn btn-outline-secondary w-100"
-                onClick={() => { setSearchTerm(''); setActionFilter(''); setModuleFilter(''); }}
-              >
-                <FiFilter className="me-1" /> Clear
-              </button>
+              <button className="btn btn-outline-secondary w-100" onClick={() => { setSearchTerm(''); setActionFilter(''); setModuleFilter(''); }}><FiFilter className="me-1" /> Clear</button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Activity Table */}
       <div className="data-card">
         <div className="data-card-body">
           <div className="table-responsive">
             <table className="data-table">
-              <thead>
-                <tr>
-                  <th>User</th>
-                  <th>Action</th>
-                  <th>Module</th>
-                  <th>Description</th>
-                  <th>Date</th>
-                  <th>Time</th>
-                </tr>
-              </thead>
+              <thead><tr><th>User</th><th>Action</th><th>Module</th><th>Description</th><th>Date</th><th>Time</th></tr></thead>
               <tbody>
-                {filteredActivities.map((activity) => (
+                {paginatedData.map((activity) => (
                   <tr key={activity.id}>
                     <td>
                       <div className="d-flex align-items-center gap-2">
-                        <img 
-                          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(activity.user)}&background=2e3192&color=fff&size=32`}
-                          alt={activity.user}
-                          style={{ width: 32, height: 32, borderRadius: '50%' }}
-                        />
+                        <img src={`https://ui-avatars.com/api/?name=${encodeURIComponent(activity.user)}&background=2e3192&color=fff&size=32`} alt={activity.user} style={{ width: 32, height: 32, borderRadius: '50%' }} />
                         <span>{activity.user}</span>
                       </div>
                     </td>
-                    <td>
-                      <span className={getActionBadgeClass(activity.action)}>
-                        {activity.action}
-                      </span>
-                    </td>
+                    <td><span className={getActionBadgeClass(activity.action)}>{activity.action}</span></td>
                     <td>{activity.module}</td>
                     <td>{activity.description}</td>
                     <td>{activity.date}</td>
@@ -161,20 +108,27 @@ const ActivityLog = () => {
             </table>
           </div>
 
-          {/* Pagination */}
           <div className="d-flex justify-content-between align-items-center mt-4">
-            <div className="text-muted">
-              Showing {filteredActivities.length} of {activities.length} entries
-            </div>
+            <div className="text-muted">Showing {filteredActivities.length === 0 ? 0 : startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredActivities.length)} of {filteredActivities.length} entries</div>
             <nav>
               <ul className="pagination mb-0">
-                <li className="page-item disabled">
-                  <span className="page-link">Previous</span>
+                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                  <button className="page-link" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}><FiChevronLeft /></button>
                 </li>
-                <li className="page-item active"><span className="page-link">1</span></li>
-                <li className="page-item"><a className="page-link" href="#">2</a></li>
-                <li className="page-item">
-                  <a className="page-link" href="#">Next</a>
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let page: number;
+                  if (totalPages <= 5) page = i + 1;
+                  else if (currentPage <= 3) page = i + 1;
+                  else if (currentPage >= totalPages - 2) page = totalPages - 4 + i;
+                  else page = currentPage - 2 + i;
+                  return (
+                    <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
+                      <button className="page-link" onClick={() => setCurrentPage(page)}>{page}</button>
+                    </li>
+                  );
+                })}
+                <li className={`page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`}>
+                  <button className="page-link" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0}><FiChevronRight /></button>
                 </li>
               </ul>
             </nav>
