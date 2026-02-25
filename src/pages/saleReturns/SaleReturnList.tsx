@@ -34,6 +34,7 @@ const SaleReturnList = () => {
   const [customerFilter, setCustomerFilter] = useState('');
   const [returns, setReturns] = useState<SaleReturnItem[]>(mockSaleReturns);
   const [selectedReturn, setSelectedReturn] = useState<any>(null);
+  const [showModal, setShowModal] = useState(false);
   const [isViewOpen, setIsViewOpen] = useState(false);
 
   const handleView = (item: SaleReturnItem) => {
