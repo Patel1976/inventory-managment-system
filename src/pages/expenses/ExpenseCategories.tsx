@@ -59,14 +59,14 @@ const ExpenseCategories = () => {
             <form onSubmit={handleSubmit}>
               <div className="form-group"><label>Category Name *</label><input type="text" className="form-control" placeholder="Enter category name" value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} required /></div>
               <div className="form-group mb-0"><label>Description</label><textarea className="form-control" rows={3} placeholder="Enter description" value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} /></div>
-              <div className="d-flex gap-2 mt-4">{editingCategory && <button type="button" className="btn btn-secondary flex-fill" onClick={handleCancelEdit}>Cancel</button>}<button type="submit" className="btn btn-primary-custom flex-fill" disabled={isLoading}>{isLoading ? <span className="spinner-border spinner-border-sm me-1"></span> : <FiPlus className="me-2" />}{editingCategory ? 'Update Category' : 'Add Category'}</button></div>
+              <div className="d-flex gap-2 mt-4">{editingCategory && <button type="button" className="btn btn-secondary flex-fill" onClick={handleCancelEdit}>Cancel</button>}<button type="submit" className="btn btn-primary-custom flex-fill d-flex align-items-center" disabled={isLoading}>{isLoading ? <span className="spinner-border spinner-border-sm me-1"></span> : <FiPlus className="me-2" />}{editingCategory ? 'Update Category' : 'Add Category'}</button></div>
             </form>
           </div>
         </div>
         <div className="col-12 col-lg-8">
           <div className="data-card"><div className="data-card-header"><h5>All Categories</h5></div><div className="data-card-body"><div className="table-responsive"><table className="data-table"><thead><tr><th>#</th><th>Category Name</th><th>Description</th><th>Expenses</th><th>Total</th><th>Action</th></tr></thead><tbody>
             {categories.map((category, index) => (
-              <tr key={category.id}><td>{index + 1}</td><td><strong>{category.name}</strong></td><td>{category.description}</td><td>{category.expenses}</td><td><strong>${category.total.toLocaleString()}</strong></td><td>
+              <tr key={category.id}><td><div className="fw-semibold">{index + 1}</div></td><td><div className="fw-semibold">{category.name}</div></td><td>{category.description}</td><td>{category.expenses}</td><td><div className="fw-semibold">${category.total.toLocaleString()}</div></td><td>
                 <button className="btn-action view me-1" onClick={() => handleView(category)}><FiEye /></button>
                 {canManage && <><button className="btn-action edit me-1" onClick={() => handleEdit(category)}><FiEdit /></button><button className="btn-action delete" onClick={() => handleDeleteClick(category)}><FiTrash2 /></button></>}
               </td></tr>

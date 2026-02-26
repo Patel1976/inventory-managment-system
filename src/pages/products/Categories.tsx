@@ -285,7 +285,7 @@ const Categories = () => {
       <ConfirmDialog
         isOpen={showDeleteDialog}
         title="Delete Category"
-        message={`Are you sure you want to delete "${selectedCategory?.name}"? This action cannot be undone.`}
+        message={`Are you sure you want to delete "${selectedCategory?.name}"?`}
         confirmLabel="Delete"
         onConfirm={handleDelete}
         onCancel={() => setShowDeleteDialog(false)}

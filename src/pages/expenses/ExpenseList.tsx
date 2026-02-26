@@ -38,15 +38,15 @@ const ExpenseList = () => {
     <div className="expense-list-page">
       <div className="page-header"><h4>Expense List</h4><div className="breadcrumb-wrapper"><Link to="/">Home</Link><span>/</span><span>Expenses</span></div></div>
       <div className="data-card mb-4"><div className="data-card-body"><div className="row g-3 align-items-center">
-        <div className="col-12 col-md-3"><div className="input-group"><span className="input-group-text bg-white border-end-0"><FiSearch /></span><input type="text" className="form-control border-start-0" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div></div>
+        <div className="col-12 col-md-2"><div className="input-group"><span className="input-group-text bg-white border-end-0"><FiSearch /></span><input type="text" className="form-control border-start-0" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div></div>
         <div className="col-12 col-md-2"><select className="form-select"><option value="">All Categories</option></select></div>
         <div className="col-12 col-md-2"><input type="date" className="form-control" /></div>
         <div className="col-12 col-md-2"><input type="date" className="form-control" /></div>
-        <div className="col-12 col-md-3 text-end"><button className="btn btn-outline-secondary me-2"><FiDownload className="me-1" /> Export</button><Link to="/expenses/add" className="btn btn-primary-custom"><FiPlus className="me-1" /> Add Expense</Link></div>
+      <div className="col-12 col-md-4 text-end d-flex justify-content-end"><button className="btn btn-outline-secondary me-2 d-flex align-items-center"><FiDownload className="me-1" /> Export</button><Link to="/expenses/add" className="btn btn-primary-custom d-flex align-items-center"><FiPlus className="me-1" /> Add Expense</Link></div>
       </div></div></div>
       <div className="data-card"><div className="data-card-body"><div className="table-responsive"><table className="data-table"><thead><tr><th>#</th><th>Date</th><th>Reference</th><th>Category</th><th>Store</th><th>Amount</th><th>Note</th><th>Action</th></tr></thead><tbody>
         {filteredExpenses.map((expense, index) => (
-          <tr key={expense.id}><td>{index + 1}</td><td>{expense.date}</td><td><strong>{expense.reference}</strong></td><td><span className="badge badge-info">{expense.category}</span></td><td>{expense.store}</td><td><strong>${expense.amount.toFixed(2)}</strong></td><td>{expense.note}</td><td>
+          <tr key={expense.id}><td><div className="fw-semibold">{index + 1}</div></td><td>{expense.date}</td><td><div className="fw-semibold">{expense.reference}</div></td><td><span className="badge badge-info">{expense.category}</span></td><td>{expense.store}</td><td><div className="fw-semibold">${expense.amount.toFixed(2)}</div></td><td>{expense.note}</td><td>
             <button className="btn-action view me-1" onClick={() => handleView(expense)}><FiEye /></button>
             {canManage && <><button className="btn-action edit me-1" onClick={() => handleEdit(expense)}><FiEdit /></button><button className="btn-action delete" onClick={() => handleDeleteClick(expense)}><FiTrash2 /></button></>}
           </td></tr>

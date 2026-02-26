@@ -4,6 +4,7 @@ import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiDownload } from 'react-ico
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../components/common/Toast';
 import ViewModal from '../../components/common/ViewModal';
+import { ConfirmDialog } from '@/components/common';
 
 export interface PurchaseReturnItem {
   id: string;
@@ -38,6 +39,7 @@ const PurchaseReturnList = () => {
   const [selectedItem, setSelectedItem] = useState<PurchaseReturnItem | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleView = (item: PurchaseReturnItem) => {
     setSelectedItem(item);
@@ -70,10 +72,25 @@ const PurchaseReturnList = () => {
   };
 
   const handleDelete = (item: PurchaseReturnItem) => {
-    if (window.confirm(`Are you sure you want to delete purchase return "${item.id}"?`)) {
-      setReturns(prev => prev.filter(r => r.id !== item.id));
-      showToast({ type: 'success', title: 'Deleted', message: `Purchase return ${item.id} deleted successfully!` });
-    }
+    setSelectedItem(item);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDelete = () => {
+    if (!selectedItem) return;
+
+    setReturns(prev =>
+      prev.filter(r => r.id !== selectedItem?.id)
+    );
+
+    showToast({
+      type: 'success',
+      title: 'Deleted',
+      message: 'Purchase return deleted successfully!'
+    });
+
+    setShowDeleteDialog(false);
+    setSelectedItem(null);
   };
 
   useEffect(() => {
@@ -292,6 +309,14 @@ const PurchaseReturnList = () => {
           </div>
         )}
       </ViewModal>
+
+      <ConfirmDialog
+        isOpen={showDeleteDialog}
+        title="Confirm Delete"
+        message={`Are you sure you want to delete return ${selectedItem?.id}?`}
+        onConfirm={confirmDelete}
+        onCancel={() => setShowDeleteDialog(false)}
+      />
     </div>
   );
 };

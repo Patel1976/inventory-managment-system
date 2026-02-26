@@ -532,6 +532,7 @@ textarea.form-control {
   height: 42px;
   min-width: 130px;
   justify-content: center;
+  border-radius: 8px;
 }
 
 .btn-secondary-custom {

@@ -280,7 +280,7 @@ const Brands = () => {
       <ConfirmDialog
         isOpen={showDeleteDialog}
         title="Delete Brand"
-        message={`Are you sure you want to delete "${selectedBrand?.name}"? This action cannot be undone.`}
+        message={`Are you sure you want to delete "${selectedBrand?.name}"?`}
         confirmLabel="Delete"
         onConfirm={handleDelete}
         onCancel={() => setShowDeleteDialog(false)}

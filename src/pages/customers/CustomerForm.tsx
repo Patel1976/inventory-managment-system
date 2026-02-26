@@ -56,64 +56,133 @@ const CustomerForm = () => {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <div className="row g-4">
-          <div className="col-12 col-lg-8">
-            <div className="form-card">
-              <h5 className="mb-4">Customer Information</h5>
-              <div className="row g-3">
-                <div className="col-12 col-md-6">
-                  <div className="form-group mb-0"><label>Name *</label>
-                    <input type="text" className="form-control" name="name" value={formData.name} onChange={handleChange} placeholder="Enter customer name" required />
-                  </div>
-                </div>
-                <div className="col-12 col-md-6">
-                  <div className="form-group mb-0"><label>Email *</label>
-                    <input type="email" className="form-control" name="email" value={formData.email} onChange={handleChange} placeholder="Enter email address" required />
-                  </div>
-                </div>
-                <div className="col-12 col-md-6">
-                  <div className="form-group mb-0"><label>Phone</label>
-                    <input type="text" className="form-control" name="phone" value={formData.phone} onChange={handleChange} placeholder="Enter phone number" />
-                  </div>
-                </div>
-                <div className="col-12 col-md-6">
-                  <div className="form-group mb-0"><label>City</label>
-                    <input type="text" className="form-control" name="city" value={formData.city} onChange={handleChange} placeholder="Enter city" />
-                  </div>
-                </div>
-                <div className="col-12 col-md-6">
-                  <div className="form-group mb-0"><label>Country</label>
-                    <input type="text" className="form-control" name="country" value={formData.country} onChange={handleChange} placeholder="Enter country" />
-                  </div>
-                </div>
-                <div className="col-12 col-md-6">
-                  <div className="form-group mb-0"><label>Status</label>
-                    <select className="form-select" name="status" value={formData.status} onChange={handleChange}>
-                      <option value="Active">Active</option>
-                      <option value="Inactive">Inactive</option>
-                    </select>
-                  </div>
-                </div>
-                <div className="col-12">
-                  <div className="form-group mb-0"><label>Address</label>
-                    <textarea className="form-control" name="address" value={formData.address} onChange={handleChange} rows={3} placeholder="Enter full address" />
-                  </div>
-                </div>
+        <div className="form-card">
+          <h5 className="mb-4">Customer Information</h5>
+
+          <div className="row g-3">
+
+            <div className="col-12 col-md-6">
+              <div className="form-group mb-0">
+                <label>Name *</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Enter customer name"
+                  required
+                />
               </div>
             </div>
-          </div>
-          <div className="col-12 col-lg-4">
-            <div className="form-card">
-              <div className="d-grid gap-2">
-                <button type="submit" className="btn btn-primary-custom" disabled={isLoading}>
-                  <FiSave className="me-2" /> {isLoading ? 'Saving...' : (isEdit ? 'Update Customer' : 'Save Customer')}
-                </button>
-                <Link to="/customers" className="btn btn-secondary-custom">
-                  <FiX className="me-2" /> Cancel
-                </Link>
+
+            <div className="col-12 col-md-6">
+              <div className="form-group mb-0">
+                <label>Email *</label>
+                <input
+                  type="email"
+                  className="form-control"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Enter email address"
+                  required
+                />
               </div>
             </div>
+
+            <div className="col-12 col-md-6">
+              <div className="form-group mb-0">
+                <label>Phone</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="Enter phone number"
+                />
+              </div>
+            </div>
+
+            <div className="col-12 col-md-6">
+              <div className="form-group mb-0">
+                <label>City</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="city"
+                  value={formData.city}
+                  onChange={handleChange}
+                  placeholder="Enter city"
+                />
+              </div>
+            </div>
+
+            <div className="col-12 col-md-6">
+              <div className="form-group mb-0">
+                <label>Country</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="country"
+                  value={formData.country}
+                  onChange={handleChange}
+                  placeholder="Enter country"
+                />
+              </div>
+            </div>
+
+            <div className="col-12 col-md-6">
+              <div className="form-group mb-0">
+                <label>Status</label>
+                <select
+                  className="form-select"
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                >
+                  <option value="Active">Active</option>
+                  <option value="Inactive">Inactive</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="col-12">
+              <div className="form-group mb-0">
+                <label>Address</label>
+                <textarea
+                  className="form-control"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleChange}
+                  rows={3}
+                  placeholder="Enter full address"
+                />
+              </div>
+            </div>
+
           </div>
+
+          {/* Buttons inside same card */}
+          <div className="d-flex justify-content-end gap-2 mt-4">
+            <Link to="/customers" className="btn btn-secondary-custom d-flex align-items-center">
+              Cancel
+            </Link>
+
+            <button
+              type="submit"
+              className="btn btn-primary-custom"
+              disabled={isLoading}
+            >
+              {isLoading
+                ? 'Saving...'
+                : isEdit
+                  ? 'Update Customer'
+                  : 'Save Customer'}
+            </button>
+          </div>
+
         </div>
       </form>
     </div>

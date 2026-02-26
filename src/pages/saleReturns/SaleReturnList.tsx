@@ -4,6 +4,7 @@ import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiDownload } from 'react-ico
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../components/common/Toast';
 import ViewModal from '@/components/common/ViewModal';
+import ConfirmDialog from '@/components/common/ConfirmDialog';
 
 export interface SaleReturnItem {
   id: string;
@@ -34,17 +35,12 @@ const SaleReturnList = () => {
   const [customerFilter, setCustomerFilter] = useState('');
   const [returns, setReturns] = useState<SaleReturnItem[]>(mockSaleReturns);
   const [selectedReturn, setSelectedReturn] = useState<any>(null);
-  const [showModal, setShowModal] = useState(false);
   const [isViewOpen, setIsViewOpen] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const handleView = (item: SaleReturnItem) => {
-      setSelectedReturn(item);
-      setShowModal(true);
-    };
-
-  const closeModal = () => {
-    setShowModal(false);
-    setSelectedReturn(null);
+    setSelectedReturn(item);
+    setIsViewOpen(true);
   };
 
   const filteredReturns = returns.filter(item => {
@@ -66,10 +62,25 @@ const SaleReturnList = () => {
   };
 
   const handleDelete = (item: SaleReturnItem) => {
-    if (window.confirm(`Are you sure you want to delete sale return "${item.id}"?`)) {
-      setReturns(prev => prev.filter(r => r.id !== item.id));
-      showToast({ type: 'success', title: 'Deleted', message: `Sale return ${item.id} deleted successfully!` });
-    }
+    setSelectedReturn(item);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDelete = () => {
+    if (!selectedReturn) return;
+
+    setReturns(prev =>
+      prev.filter(r => r.id !== selectedReturn.id)
+    );
+
+    showToast({
+      type: 'success',
+      title: 'Deleted',
+      message: 'Sale return deleted successfully!'
+    });
+
+    setShowDeleteDialog(false);
+    setSelectedReturn(null);
   };
 
   return (
@@ -177,7 +188,7 @@ const SaleReturnList = () => {
       <ViewModal
         isOpen={isViewOpen}
         onClose={() => setIsViewOpen(false)}
-        title="Purchase Return Details"
+        title="Sale Return Details"
         size="lg"
       >
         {selectedReturn && (
@@ -237,6 +248,15 @@ const SaleReturnList = () => {
           </div>
         )}
       </ViewModal>
+
+      {/* Confirm Delete Dialog */}
+      <ConfirmDialog
+        isOpen={showDeleteDialog}
+        title="Confirm Delete"
+        message={`Are you sure you want to delete return ${selectedReturn?.id}?`}
+        onConfirm={confirmDelete}
+        onCancel={() => setShowDeleteDialog(false)}
+      />
     </div>
   );
 };
