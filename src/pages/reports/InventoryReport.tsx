@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FiDownload, FiFilter } from 'react-icons/fi';
+import { FiDownload, FiFilter, FiFileText } from 'react-icons/fi';
 
 const InventoryReport = () => {
   const inventoryData = [
@@ -28,7 +28,7 @@ const InventoryReport = () => {
       {/* Filters */}
       <div className="data-card mb-4">
         <div className="data-card-body">
-          <div className="row g-3 align-items-center">
+          <div className="row g-3 align-items-end">
             <div className="col-12 col-md-3">
               <label className="form-label">Category</label>
               <select className="form-select">
@@ -55,9 +55,8 @@ const InventoryReport = () => {
                 <option value="out-of-stock">Out of Stock</option>
               </select>
             </div>
-            <div className="col-12 col-md-3 d-flex align-items-end gap-2">
-              <button className="btn btn-primary-custom"><FiFilter className="me-1" /> Filter</button>
-              <button className="btn btn-outline-secondary"><FiDownload className="me-1" /> Export</button>
+            <div className="col-12 col-md-3 d-flex align-items-end gap-2 justify-content-end">
+              <button className="btn btn-primary-custom d-flex align-items-center"><FiFilter className="me-1" /> Filter</button>
             </div>
           </div>
         </div>
@@ -101,8 +100,12 @@ const InventoryReport = () => {
 
       {/* Table */}
       <div className="data-card">
-        <div className="data-card-header">
+        <div className="data-card-header d-flex justify-content-between align-items-center">
           <h5>Inventory Details</h5>
+          <div className="col-12 col-md-3 d-flex align-items-end gap-2 justify-content-end">
+            <button className="btn btn-outline-secondary d-flex align-items-center"><FiDownload className="me-1" /> Excel</button>
+            <button className="btn btn-outline-secondary d-flex align-items-center"><FiFileText className="me-1" /> PDF</button>
+          </div>
         </div>
         <div className="data-card-body">
           <div className="table-responsive">

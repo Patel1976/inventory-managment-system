@@ -27,7 +27,7 @@ const SalesReport = () => {
       {/* Filters */}
       <div className="data-card mb-4">
         <div className="data-card-body">
-          <div className="row g-3 align-items-center">
+          <div className="row g-3 align-items-end">
             <div className="col-12 col-md-3">
               <label className="form-label">From Date</label>
               <input type="date" className="form-control" />
@@ -44,9 +44,8 @@ const SalesReport = () => {
                 <option value="2">Jane Smith</option>
               </select>
             </div>
-            <div className="col-12 col-md-3 d-flex align-items-end gap-2">
-              <button className="btn btn-primary-custom"><FiFilter className="me-1" /> Filter</button>
-              <button className="btn btn-outline-secondary"><FiDownload className="me-1" /> Export</button>
+            <div className="col-12 col-md-3 d-flex align-items-end gap-2 justify-content-end">
+              <button className="btn btn-primary-custom d-flex align-items-center"><FiFilter className="me-1" /> Filter</button>
             </div>
           </div>
         </div>
@@ -90,8 +89,11 @@ const SalesReport = () => {
 
       {/* Table */}
       <div className="data-card">
-        <div className="data-card-header">
+        <div className="data-card-header d-flex justify-content-between align-items-center">
           <h5>Sales Details</h5>
+          <div className="col-12 col-md-3 d-flex align-items-end gap-2 justify-content-end">
+            <button className="btn btn-outline-secondary d-flex align-items-center"><FiDownload className="me-1" /> Export</button>
+          </div>
         </div>
         <div className="data-card-body">
           <div className="table-responsive">

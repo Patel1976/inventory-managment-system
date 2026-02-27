@@ -49,10 +49,6 @@ const AddAdjustment = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!formData.store || !formData.reason) {
-      alert('Please fill all required fields');
-      return;
-    }
     if (items.some(item => !item.product)) {
       alert('Please select products for all items');
       return;
@@ -62,7 +58,7 @@ const AddAdjustment = () => {
       items: items.map(({ id, ...rest }) => rest),
       createdAt: new Date().toISOString()
     };
-    showToast({ type: 'success', title: 'Success', message: 'Adjustment added successfully!' });
+    showToast({ type: 'success', title: 'Success', message: isEditMode ? 'Adjustment updated successfully' : 'Adjustment created successfully' });
     navigate('/adjustments');
   };
 
@@ -93,6 +89,7 @@ const AddAdjustment = () => {
                     className="form-select"
                     value={formData.store}
                     onChange={(e) => setFormData({...formData, store: e.target.value})}
+                    required
                   >
                     <option value="">Select Store</option>
                     <option value="1">Main Store</option>
@@ -108,6 +105,7 @@ const AddAdjustment = () => {
                     className="form-control"
                     value={formData.date}
                     onChange={(e) => setFormData({...formData, date: e.target.value})}
+                    required
                   />
                 </div>
 
@@ -148,6 +146,7 @@ const AddAdjustment = () => {
                               );
                               setItems(updated);
                             }}
+                            required
                           >
                             <option value="">Select Product</option>
                             <option value="1">iPhone 14 Pro</option>
@@ -171,6 +170,7 @@ const AddAdjustment = () => {
                               setItems(updated);
                             }}
                             style={{ width: '80px' }}
+                            required
                           />
                         </td>
 
@@ -208,6 +208,7 @@ const AddAdjustment = () => {
                     className="form-select"
                     value={formData.reason}
                     onChange={(e) => setFormData({...formData, reason: e.target.value})}
+                    required
                   >
                     <option value="">Select Reason</option>
                     <option value="received">Stock Received</option>
