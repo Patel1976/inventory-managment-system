@@ -8,18 +8,19 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  
+  const [showPassword, setShowPassword] = useState(false);
+
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  
+
   const from = (location.state as any)?.from?.pathname || '/';
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
-    
+
     try {
       const success = await login(email, password);
       if (success) {
@@ -37,70 +38,81 @@ const Login = () => {
   return (
     <div className="login-page">
       <div className="login-card">
-        <div className="login-logo">
-          <span>📦</span>
-          <h2>Inventory</h2>
-        </div>
-        
         <div className="login-title">
-          <h4>Welcome Back!</h4>
-          <p>Sign in to your account to continue</p>
+          <h3>Sign In</h3>
+          <p>Please login to your account</p>
         </div>
 
         {error && <div className="login-error">{error}</div>}
 
         <form className="login-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label><FiMail className="me-2" />Email Address</label>
-            <input
-              type="email"
-              className="form-control"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+            <label>Email Address</label>
+            <div className="input-icon-wrapper">
+              <FiMail className="input-icon" />
+              <input
+                type="email"
+                className="form-control with-icon"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
           </div>
 
           <div className="form-group">
-            <label><FiLock className="me-2" />Password</label>
-            <input
-              type="password"
-              className="form-control"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-            <div className="text-end mt-1">
+            <label>Password</label>
+            <div className="input-icon-wrapper">
+              <FiLock className="input-icon" />
+
+              <input
+                type={showPassword ? 'text' : 'password'}
+                className="form-control with-icon with-toggle"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+
+              <span
+                className="password-toggle"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? '🙈' : '👁'}
+              </span>
+            </div>
+            <div className="mt-2">
               <Link to="/forgot-password" className="forgot-password-link">
                 Forgot Password?
               </Link>
             </div>
           </div>
 
-          <button 
-            type="submit" 
-            className="btn btn-primary-custom"
+          <button
+            type="submit"
+            className="btn btn-login-custom"
             disabled={loading}
           >
             {loading ? (
               <span>Signing in...</span>
             ) : (
               <>
-                <FiLogIn className="me-2" />
                 Sign In
               </>
             )}
           </button>
         </form>
 
-        <div className="mt-4 text-center" style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+        <div className="mt-4" style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
           <p className="mb-1"><strong>Demo Accounts:</strong></p>
-          <p className="mb-0"><span className="badge bg-danger me-1" style={{ fontSize: '10px' }}>Admin</span> admin@inventory.com / admin123</p>
-          <p className="mb-0"><span className="badge bg-warning text-dark me-1" style={{ fontSize: '10px' }}>Manager</span> manager@inventory.com / manager123</p>
-          <p className="mb-0"><span className="badge bg-info me-1" style={{ fontSize: '10px' }}>Staff</span> staff@inventory.com / staff123</p>
+          <p className="mb-0"><span className="fw-bold me-1" style={{ fontSize: '14px' }}>Admin :</span> admin@inventory.com / admin123</p>
+          <p className="mb-0"><span className="fw-bold me-1" style={{ fontSize: '14px' }}>Manager :</span> manager@inventory.com / manager123</p>
+          <p className="mb-0"><span className="fw-bold me-1" style={{ fontSize: '14px' }}>Staff :</span> staff@inventory.com / staff123</p>
         </div>
+      </div>
+      <div className="login-image">
+        <img src="public/image/login_background.svg" alt="Login Background" />
       </div>
     </div>
   );

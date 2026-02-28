@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiDownload, FiFilter, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiDownload, FiFilter, FiFileText, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
 const InventoryReport = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -28,11 +28,36 @@ const InventoryReport = () => {
 
       <div className="data-card mb-4">
         <div className="data-card-body">
-          <div className="row g-3 align-items-center">
-            <div className="col-12 col-md-3"><label className="form-label">Category</label><select className="form-select"><option value="">All Categories</option><option value="electronics">Electronics</option><option value="laptops">Laptops</option><option value="audio">Audio</option></select></div>
-            <div className="col-12 col-md-3"><label className="form-label">Brand</label><select className="form-select"><option value="">All Brands</option><option value="apple">Apple</option><option value="samsung">Samsung</option></select></div>
-            <div className="col-12 col-md-3"><label className="form-label">Stock Status</label><select className="form-select"><option value="">All</option><option value="in-stock">In Stock</option><option value="low-stock">Low Stock</option><option value="out-of-stock">Out of Stock</option></select></div>
-            <div className="col-12 col-md-3 d-flex align-items-end gap-2"><button className="btn btn-primary-custom"><FiFilter className="me-1" /> Filter</button><button className="btn btn-outline-secondary"><FiDownload className="me-1" /> Export</button></div>
+          <div className="row g-3 align-items-end">
+            <div className="col-12 col-md-3">
+              <label className="form-label">Category</label>
+              <select className="form-select">
+                <option value="">All Categories</option>
+                <option value="electronics">Electronics</option>
+                <option value="laptops">Laptops</option>
+                <option value="audio">Audio</option>
+              </select>
+            </div>
+            <div className="col-12 col-md-3">
+              <label className="form-label">Brand</label>
+              <select className="form-select">
+                <option value="">All Brands</option>
+                <option value="apple">Apple</option>
+                <option value="samsung">Samsung</option>
+              </select>
+            </div>
+            <div className="col-12 col-md-3">
+              <label className="form-label">Stock Status</label>
+              <select className="form-select">
+                <option value="">All</option>
+                <option value="in-stock">In Stock</option>
+                <option value="low-stock">Low Stock</option>
+                <option value="out-of-stock">Out of Stock</option>
+              </select>
+            </div>
+            <div className="col-12 col-md-3 d-flex align-items-end gap-2 justify-content-end">
+              <button className="btn btn-primary-custom d-flex align-items-center"><FiFilter className="me-1" /> Filter</button>
+            </div>
           </div>
         </div>
       </div>
@@ -45,7 +70,13 @@ const InventoryReport = () => {
       </div>
 
       <div className="data-card">
-        <div className="data-card-header"><h5>Inventory Details</h5></div>
+        <div className="data-card-header d-flex justify-content-between align-items-center">
+          <h5>Inventory Details</h5>
+          <div className="col-12 col-md-3 d-flex align-items-end gap-2 justify-content-end">
+            <button className="btn btn-outline-secondary d-flex align-items-center"><FiDownload className="me-1" /> Excel</button>
+            <button className="btn btn-outline-secondary d-flex align-items-center"><FiFileText className="me-1" /> PDF</button>
+          </div>
+        </div>
         <div className="data-card-body">
           <div className="table-responsive">
             <table className="data-table">

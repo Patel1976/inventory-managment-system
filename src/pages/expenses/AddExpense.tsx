@@ -1,7 +1,45 @@
-import { Link } from 'react-router-dom';
-import { FiSave, FiX } from 'react-icons/fi';
+import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useToast } from '@/components/common/Toast';
 
 const AddExpense = () => {
+  const navigate = useNavigate();
+  const { showToast } = useToast();
+
+  const [formData, setFormData] = useState({
+    category: '',
+    date: new Date().toISOString().split('T')[0],
+    store: '',
+    reference: '',
+    amount: '',
+    paymentMethod: 'cash',
+    note: '',
+    attachment: null as File | null,
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value, files } = e.target as HTMLInputElement;
+    if (name === 'attachment' && files) {
+      setFormData({ ...formData, attachment: files[0] });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      showToast({ type: 'success', title: 'Success', message: 'Expense added successfully!' });
+      navigate('/expenses');
+    }, 500);
+  };
+
   return (
     <div className="add-expense-page">
       {/* Page Header */}
@@ -16,96 +54,161 @@ const AddExpense = () => {
         </div>
       </div>
 
-      <div className="row g-4">
-        <div className="col-12 col-lg-8">
-          <div className="form-card">
-            <h5 className="mb-4">Expense Details</h5>
-            
-            <div className="row g-3">
-              <div className="col-12 col-md-6">
-                <div className="form-group mb-0">
-                  <label>Category *</label>
-                  <select className="form-select">
-                    <option value="">Select Category</option>
-                    <option value="rent">Rent</option>
-                    <option value="utilities">Utilities</option>
-                    <option value="salary">Salary</option>
-                    <option value="marketing">Marketing</option>
-                    <option value="maintenance">Maintenance</option>
-                    <option value="other">Other</option>
-                  </select>
+      <form onSubmit={handleSubmit}>
+        <div className="row">
+          <div className="col-12">
+            <div className="form-card">
+              <h5 className="mb-4">Expense Details</h5>
+              <div className="row g-3">
+                <div className="col-12 col-md-6">
+                  <div className="form-group mb-0">
+                    <label>Category *</label>
+                    <select
+                      name="category"
+                      className="form-select"
+                      value={formData.category}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">Select Category</option>
+                      <option value="rent">Rent</option>
+                      <option value="utilities">Utilities</option>
+                      <option value="salary">Salary</option>
+                      <option value="marketing">Marketing</option>
+                      <option value="maintenance">Maintenance</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
                 </div>
-              </div>
-              <div className="col-12 col-md-6">
-                <div className="form-group mb-0">
-                  <label>Date *</label>
-                  <input type="date" className="form-control" defaultValue={new Date().toISOString().split('T')[0]} />
-                </div>
-              </div>
-              <div className="col-12 col-md-6">
-                <div className="form-group mb-0">
-                  <label>Store *</label>
-                  <select className="form-select">
-                    <option value="">Select Store</option>
-                    <option value="1">Main Store</option>
-                    <option value="2">Branch 1</option>
-                    <option value="3">Branch 2</option>
-                    <option value="all">All Stores</option>
-                  </select>
-                </div>
-              </div>
-              <div className="col-12 col-md-6">
-                <div className="form-group mb-0">
-                  <label>Reference No</label>
-                  <input type="text" className="form-control" placeholder="Auto-generated" readOnly />
-                </div>
-              </div>
-              <div className="col-12 col-md-6">
-                <div className="form-group mb-0">
-                  <label>Amount *</label>
-                  <input type="number" className="form-control" placeholder="0.00" />
-                </div>
-              </div>
-              <div className="col-12 col-md-6">
-                <div className="form-group mb-0">
-                  <label>Payment Method</label>
-                  <select className="form-select">
-                    <option value="cash">Cash</option>
-                    <option value="card">Card</option>
-                    <option value="bank">Bank Transfer</option>
-                  </select>
-                </div>
-              </div>
-              <div className="col-12">
-                <div className="form-group mb-0">
-                  <label>Note</label>
-                  <textarea className="form-control" rows={4} placeholder="Add a note..."></textarea>
-                </div>
-              </div>
-              <div className="col-12">
-                <div className="form-group mb-0">
-                  <label>Attachment</label>
-                  <input type="file" className="form-control" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
 
-        <div className="col-12 col-lg-4">
-          <div className="form-card">
-            <h5 className="mb-4">Actions</h5>
-            <div className="d-grid gap-2">
-              <button type="submit" className="btn btn-primary-custom">
-                <FiSave className="me-2" /> Save Expense
-              </button>
-              <Link to="/expenses" className="btn btn-secondary-custom">
-                <FiX className="me-2" /> Cancel
-              </Link>
+                <div className="col-12 col-md-6">
+                  <div className="form-group mb-0">
+                    <label>Date *</label>
+                    <input
+                      type="date"
+                      name="date"
+                      className="form-control"
+                      defaultValue={new Date().toISOString().split('T')[0]}
+                      value={formData.date}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="col-12 col-md-6">
+                  <div className="form-group mb-0">
+                    <label>Store *</label>
+                    <select
+                      name="store"
+                      className="form-select"
+                      value={formData.store}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">Select Store</option>
+                      <option value="1">Main Store</option>
+                      <option value="2">Branch 1</option>
+                      <option value="3">Branch 2</option>
+                      <option value="all">All Stores</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="col-12 col-md-6">
+                  <div className="form-group mb-0">
+                    <label>Reference No</label>
+                    <input
+                      type="text"
+                      name="reference"
+                      className="form-control"
+                      placeholder="Auto-generated"
+                      value={formData.reference}
+                      onChange={handleChange}
+                      readOnly
+                    />
+                  </div>
+                </div>
+
+                <div className="col-12 col-md-6">
+                  <div className="form-group mb-0">
+                    <label>Amount *</label>
+                    <input
+                      type="number"
+                      name="amount"
+                      className="form-control"
+                      placeholder="0.00"
+                      value={formData.amount}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="col-12 col-md-6">
+                  <div className="form-group mb-0">
+                    <label>Payment Method</label>
+                    <select
+                      name="paymentMethod"
+                      className="form-select"
+                      value={formData.paymentMethod}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="cash">Cash</option>
+                      <option value="card">Card</option>
+                      <option value="bank">Bank Transfer</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="col-12">
+                  <div className="form-group mb-0">
+                    <label>Note</label>
+                    <textarea
+                      className="form-control"
+                      name="note"
+                      rows={4}
+                      placeholder="Add a note..."
+                      value={formData.note}
+                      onChange={handleChange}
+                    ></textarea>
+                  </div>
+                </div>
+
+                <div className="col-12">
+                  <div className="form-group mb-0">
+                    <label>Attachment</label>
+                    <input
+                      type="file"
+                      name="attachment"
+                      className="form-control"
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                </div>
+
+                {/* Buttons Inside Same Card */}
+                <div className="col-12 mt-4 d-flex justify-content-end">
+                  <div className="d-flex gap-2">
+                    <Link to="/expenses" className="btn btn-secondary-custom d-flex align-items-center">
+                      Cancel
+                    </Link>
+                    <button
+                      type="submit"
+                      className="btn btn-primary-custom"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? 'Saving...' : 'Save Expense'}
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </form>
     </div>
   );
 };

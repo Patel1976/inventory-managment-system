@@ -32,7 +32,7 @@ const AddPurchase = () => {
       </div>
 
       <div className="row g-4">
-        <div className="col-12 col-lg-8">
+        <div className="col-12">
           <div className="form-card">
             <div className="row g-3 mb-4">
               <div className="col-12 col-md-4">
@@ -98,55 +98,81 @@ const AddPurchase = () => {
               </table>
             </div>
 
-            <button type="button" className="btn btn-outline-primary btn-sm" onClick={addItem}>
+            <button type="button" className="btn btn-outline-primary btn-sm d-flex align-items-center" onClick={addItem}>
               <FiPlus className="me-1" /> Add Product
             </button>
           </div>
         </div>
 
-        <div className="col-12 col-lg-4">
+        <div className="col-12">
           <div className="form-card">
             <h5 className="mb-4">Purchase Summary</h5>
-            
-            <div className="d-flex justify-content-between mb-2">
-              <span>Subtotal:</span>
-              <strong>$0.00</strong>
-            </div>
-            <div className="d-flex justify-content-between mb-2">
-              <span>Tax:</span>
-              <strong>$0.00</strong>
-            </div>
-            <div className="d-flex justify-content-between mb-2">
-              <span>Shipping:</span>
-              <strong>$0.00</strong>
-            </div>
-            <hr />
-            <div className="d-flex justify-content-between mb-4">
-              <span style={{ fontSize: '18px', fontWeight: '600' }}>Grand Total:</span>
-              <strong style={{ fontSize: '18px', color: '#2e3192' }}>$0.00</strong>
-            </div>
 
-            <div className="form-group">
-              <label>Payment Status</label>
-              <select className="form-select">
-                <option value="paid">Paid</option>
-                <option value="partial">Partial</option>
-                <option value="unpaid">Unpaid</option>
-              </select>
-            </div>
+            <div className="row g-4">
 
-            <div className="form-group">
-              <label>Note</label>
-              <textarea className="form-control" rows={3} placeholder="Add a note..."></textarea>
-            </div>
+              {/* LEFT COLUMN → TOTALS */}
+              <div className="col-12 col-md-4">
 
-            <div className="d-grid gap-2 mt-4">
-              <button type="submit" className="btn btn-primary-custom">
-                <FiSave className="me-2" /> Save Purchase
-              </button>
-              <Link to="/purchases" className="btn btn-secondary-custom">
-                <FiX className="me-2" /> Cancel
-              </Link>
+                <div className="summary-box p-3 rounded">
+
+                  <div className="d-flex justify-content-between mb-2">
+                    <span>Subtotal:</span>
+                    <strong>$0.00</strong>
+                  </div>
+
+                  <div className="d-flex justify-content-between mb-2">
+                    <span>Tax:</span>
+                    <strong>$0.00</strong>
+                  </div>
+
+                  <div className="d-flex justify-content-between mb-2">
+                    <span>Shipping:</span>
+                    <strong>$0.00</strong>
+                  </div>
+
+                  <hr />
+
+                  <div className="d-flex justify-content-between">
+                    <span className="fw-semibold fs-5">Grand Total:</span>
+                    <strong className="fs-5 text-primary">$0.00</strong>
+                  </div>
+
+                </div>
+              </div>
+
+              {/* RIGHT COLUMN → PAYMENT + ACTIONS */}
+              <div className="col-12 col-md-8">
+
+                <div className="form-group mb-3">
+                  <label className="form-label">Payment Status</label>
+                  <select className="form-select">
+                    <option value="paid">Paid</option>
+                    <option value="partial">Partial</option>
+                    <option value="unpaid">Unpaid</option>
+                  </select>
+                </div>
+
+                <div className="form-group mb-3">
+                  <label className="form-label">Note</label>
+                  <textarea
+                    className="form-control"
+                    rows={3}
+                    placeholder="Add a note..."
+                  ></textarea>
+                </div>
+
+                <div className="d-flex gap-2 mt-4">
+                  <button type="submit" className="btn btn-primary-custom align-items-center d-flex">
+                    Save Purchase
+                  </button>
+
+                  <Link to="/purchases" className="btn btn-secondary-custom d-flex align-items-center">
+                    Cancel
+                  </Link>
+                </div>
+
+              </div>
+
             </div>
           </div>
         </div>

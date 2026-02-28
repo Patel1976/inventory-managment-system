@@ -28,9 +28,9 @@ import SalesList from "./pages/sales/SalesList";
 import AddSale from "./pages/sales/AddSale";
 import PurchaseList from "./pages/purchases/PurchaseList";
 import AddPurchase from "./pages/purchases/AddPurchase";
-import CustomerList from "./pages/people/CustomerList";
-import SupplierList from "./pages/people/SupplierList";
-import StoreList from "./pages/people/StoreList";
+import CustomerList from "./pages/customers/CustomerList";
+import SupplierList from "./pages/suppliers/SupplierList";
+import StoreList from "./pages/stores/StoreList";
 import ExpenseList from "./pages/expenses/ExpenseList";
 import AddExpense from "./pages/expenses/AddExpense";
 import ExpenseCategories from "./pages/expenses/ExpenseCategories";
@@ -50,24 +50,20 @@ import NotFound from "./pages/NotFound";
 // Sale Returns
 import SaleReturnList from "./pages/saleReturns/SaleReturnList";
 import SaleReturnForm from "./pages/saleReturns/SaleReturnForm";
-import SaleReturnView from "./pages/saleReturns/SaleReturnView";
+// import SaleReturnView from "./pages/saleReturns/SaleReturnView";
 
 // Purchase Returns
 import PurchaseReturnList from "./pages/purchaseReturns/PurchaseReturnList";
 import PurchaseReturnForm from "./pages/purchaseReturns/PurchaseReturnForm";
-import PurchaseReturnView from "./pages/purchaseReturns/PurchaseReturnView";
 
 // Customer pages
 import CustomerForm from "./pages/customers/CustomerForm";
-import CustomerView from "./pages/customers/CustomerView";
 
 // Supplier pages
 import SupplierForm from "./pages/suppliers/SupplierForm";
-import SupplierView from "./pages/suppliers/SupplierView";
 
 // Store pages
 import StoreForm from "./pages/stores/StoreForm";
-import StoreView from "./pages/stores/StoreView";
 
 const queryClient = new QueryClient();
 
@@ -108,25 +104,23 @@ const App = () => (
                     <Route path="customers" element={<CustomerList />} />
                     <Route path="customers/add" element={<CustomerForm />} />
                     <Route path="customers/edit/:id" element={<CustomerForm />} />
-                    <Route path="customers/view/:id" element={<CustomerView />} />
                     
                     {/* Suppliers */}
                     <Route path="suppliers" element={<SupplierList />} />
                     <Route path="suppliers/add" element={<SupplierForm />} />
                     <Route path="suppliers/edit/:id" element={<SupplierForm />} />
-                    <Route path="suppliers/view/:id" element={<SupplierView />} />
                     
                     {/* Stores */}
                     <Route path="stores" element={<StoreList />} />
                     <Route path="stores/add" element={<StoreForm />} />
                     <Route path="stores/edit/:id" element={<StoreForm />} />
-                    <Route path="stores/view/:id" element={<StoreView />} />
                     
                     <Route path="expenses" element={<ExpenseList />} />
                     <Route path="expenses/add" element={<AddExpense />} />
                     <Route path="expenses/categories" element={<ExpenseCategories />} />
                     <Route path="adjustments" element={<AdjustmentList />} />
                     <Route path="adjustments/add" element={<AddAdjustment />} />
+                    <Route path="adjustments/edit/:id" element={<AddAdjustment />} />
                     <Route path="reports/sales" element={
                       <ProtectedRoute requiredPermission="reports.view">
                         <SalesReport />
@@ -157,13 +151,12 @@ const App = () => (
                     <Route path="purchases/returns" element={<PurchaseReturnList />} />
                     <Route path="purchases/returns/add" element={<PurchaseReturnForm />} />
                     <Route path="purchases/returns/edit/:id" element={<PurchaseReturnForm />} />
-                    <Route path="purchases/returns/view/:id" element={<PurchaseReturnView />} />
                     
                     {/* Sale Returns */}
                     <Route path="sales/returns" element={<SaleReturnList />} />
                     <Route path="sales/returns/add" element={<SaleReturnForm />} />
                     <Route path="sales/returns/edit/:id" element={<SaleReturnForm />} />
-                    <Route path="sales/returns/view/:id" element={<SaleReturnView />} />
+                    {/* <Route path="sales/returns/view/:id" element={<SaleReturnView />} /> */}
                     
                     <Route path="profile" element={<UserProfile />} />
                     <Route path="users" element={

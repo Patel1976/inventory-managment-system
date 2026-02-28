@@ -1,16 +1,18 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiMail, FiX, FiCheck, FiShield } from 'react-icons/fi';
+import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiMail, FiX, FiCheck, FiShield, FiLock } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
-import { 
-  UserRole, 
-  rolePermissions, 
-  roleDescriptions, 
+import {
+  UserRole,
+  rolePermissions,
+  roleDescriptions,
   roleBadgeColors,
   permissionCategories,
   permissionDescriptions,
   Permission
 } from '../../config/permissions';
+import FormModal from '@/components/common/FormModal';
+import ViewModal from '@/components/common/ViewModal';
 
 interface User {
   id: number;
@@ -25,7 +27,7 @@ interface User {
 const ManageUsers = () => {
   const { hasPermission } = useAuth();
   const canManageUsers = hasPermission('users.manage');
-  
+
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -69,7 +71,7 @@ const ManageUsers = () => {
 
   // Filter users
   const filteredUsers = users.filter(user => {
-    const matchesSearch = 
+    const matchesSearch =
       user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.username.toLowerCase().includes(searchTerm.toLowerCase()) ||
       user.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -122,14 +124,44 @@ const ManageUsers = () => {
     setShowViewModal(true);
   };
 
+  const handleViewPermissions = (role: UserRole) => {
+    setViewingRole(role);
+    setShowPermissionsModal(true);
+  };
+
+  const [editableRolePermissions, setEditableRolePermissions] = useState(rolePermissions);
+
+  const handlePermissionToggle = (role: UserRole, permission: Permission) => {
+    setEditableRolePermissions(prev => {
+      const currentPermissions = prev[role];
+
+      const updatedPermissions = currentPermissions.includes(permission)
+        ? currentPermissions.filter(p => p !== permission)
+        : [...currentPermissions, permission];
+
+      return {
+        ...prev,
+        [role]: updatedPermissions
+      };
+    });
+  };
+
+  const handleSavePermissions = () => {
+    console.log("Updated Role Permissions:", editableRolePermissions);
+
+    // Later → send to API
+
+    setShowPermissionsModal(false);
+  };
+
   const validateForm = () => {
     const errors: Record<string, string> = {};
-    
+
     if (!formData.name.trim()) errors.name = 'Name is required';
     if (!formData.username.trim()) errors.username = 'Username is required';
     if (!formData.email.trim()) errors.email = 'Email is required';
     else if (!/\S+@\S+\.\S+/.test(formData.email)) errors.email = 'Invalid email format';
-    
+
     if (!editingUser) {
       if (!formData.password) errors.password = 'Password is required';
       else if (formData.password.length < 6) errors.password = 'Password must be at least 6 characters';
@@ -138,7 +170,7 @@ const ManageUsers = () => {
       if (formData.password.length < 6) errors.password = 'Password must be at least 6 characters';
       if (formData.password !== formData.confirmPassword) errors.confirmPassword = 'Passwords do not match';
     }
-    
+
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -185,17 +217,17 @@ const ManageUsers = () => {
             <div className="col-12 col-md-3">
               <div className="input-group">
                 <span className="input-group-text bg-white border-end-0"><FiSearch /></span>
-                <input 
-                  type="text" 
-                  className="form-control border-start-0" 
-                  placeholder="Search users..." 
+                <input
+                  type="text"
+                  className="form-control border-start-0"
+                  placeholder="Search users..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
             </div>
-            <div className="col-12 col-md-2">
-              <select 
+            <div className="col-12 col-md-3">
+              <select
                 className="form-select"
                 value={roleFilter}
                 onChange={(e) => setRoleFilter(e.target.value)}
@@ -206,8 +238,8 @@ const ManageUsers = () => {
                 <option value="Staff">Staff</option>
               </select>
             </div>
-            <div className="col-12 col-md-2">
-              <select 
+            <div className="col-12 col-md-3">
+              <select
                 className="form-select"
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
@@ -217,9 +249,9 @@ const ManageUsers = () => {
                 <option value="Inactive">Inactive</option>
               </select>
             </div>
-            <div className="col-12 col-md-5 text-end">
+            <div className="col-12 col-md-3 text-end d-flex justify-content-end">
               {canManageUsers && (
-                <button className="btn btn-primary-custom" onClick={() => handleOpenModal()}>
+                <button className="btn btn-primary-custom d-flex align-items-center" onClick={() => handleOpenModal()}>
                   <FiPlus className="me-1" /> Add User
                 </button>
               )}
@@ -258,13 +290,12 @@ const ManageUsers = () => {
                       </div>
                     </td>
                     <td>
-                      <span 
+                      <span
                         className={`badge ${roleBadgeColors[user.role]} cursor-pointer`}
                         style={{ cursor: 'pointer' }}
                         onClick={() => { setViewingRole(user.role); setShowPermissionsModal(true); }}
                         title="Click to view permissions"
                       >
-                        <FiShield size={10} className="me-1" />
                         {user.role}
                       </span>
                     </td>
@@ -277,6 +308,12 @@ const ManageUsers = () => {
                     <td>
                       <button className="btn-action view me-1" onClick={() => handleViewUser(user)}>
                         <FiEye />
+                      </button>
+                      <button
+                        className="btn-action permissions me-1"
+                        onClick={() => handleViewPermissions(user.role)}
+                      >
+                        <FiLock />
                       </button>
                       {canManageUsers && (
                         <>
@@ -327,267 +364,203 @@ const ManageUsers = () => {
       </div>
 
       {/* Add/Edit User Modal */}
-      {showModal && (
-        <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog modal-dialog-centered modal-lg">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">{editingUser ? 'Edit User' : 'Add New User'}</h5>
-                <button type="button" className="btn-close" onClick={handleCloseModal}></button>
-              </div>
-              <form onSubmit={handleSubmit}>
-                <div className="modal-body">
-                  <div className="row g-3">
-                    <div className="col-md-6">
-                      <label className="form-label">Name <span className="text-danger">*</span></label>
-                      <input
-                        type="text"
-                        className={`form-control ${formErrors.name ? 'is-invalid' : ''}`}
-                        value={formData.name}
-                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                        placeholder="Enter full name"
-                      />
-                      {formErrors.name && <div className="invalid-feedback">{formErrors.name}</div>}
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label">Username <span className="text-danger">*</span></label>
-                      <input
-                        type="text"
-                        className={`form-control ${formErrors.username ? 'is-invalid' : ''}`}
-                        value={formData.username}
-                        onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                        placeholder="Enter username"
-                      />
-                      {formErrors.username && <div className="invalid-feedback">{formErrors.username}</div>}
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label">Email <span className="text-danger">*</span></label>
-                      <input
-                        type="email"
-                        className={`form-control ${formErrors.email ? 'is-invalid' : ''}`}
-                        value={formData.email}
-                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                        placeholder="Enter email address"
-                      />
-                      {formErrors.email && <div className="invalid-feedback">{formErrors.email}</div>}
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label">Role <span className="text-danger">*</span></label>
-                      <select
-                        className="form-select"
-                        value={formData.role}
-                        onChange={(e) => setFormData({ ...formData, role: e.target.value as 'Admin' | 'Manager' | 'Staff' })}
-                      >
-                        <option value="Admin">Admin</option>
-                        <option value="Manager">Manager</option>
-                        <option value="Staff">Staff</option>
-                      </select>
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label">
-                        Password {!editingUser && <span className="text-danger">*</span>}
-                        {editingUser && <small className="text-muted">(leave blank to keep current)</small>}
-                      </label>
-                      <input
-                        type="password"
-                        className={`form-control ${formErrors.password ? 'is-invalid' : ''}`}
-                        value={formData.password}
-                        onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                        placeholder="Enter password"
-                      />
-                      {formErrors.password && <div className="invalid-feedback">{formErrors.password}</div>}
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label">
-                        Confirm Password {!editingUser && <span className="text-danger">*</span>}
-                      </label>
-                      <input
-                        type="password"
-                        className={`form-control ${formErrors.confirmPassword ? 'is-invalid' : ''}`}
-                        value={formData.confirmPassword}
-                        onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                        placeholder="Confirm password"
-                      />
-                      {formErrors.confirmPassword && <div className="invalid-feedback">{formErrors.confirmPassword}</div>}
-                    </div>
-                    <div className="col-md-6">
-                      <label className="form-label">Status <span className="text-danger">*</span></label>
-                      <select
-                        className="form-select"
-                        value={formData.status}
-                        onChange={(e) => setFormData({ ...formData, status: e.target.value as 'Active' | 'Inactive' })}
-                      >
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-                <div className="modal-footer">
-                  <button type="button" className="btn btn-secondary" onClick={handleCloseModal}>
-                    <FiX className="me-1" /> Cancel
-                  </button>
-                  <button type="submit" className="btn btn-primary">
-                    <FiCheck className="me-1" /> {editingUser ? 'Update' : 'Save'} User
-                  </button>
-                </div>
-              </form>
-            </div>
+      <FormModal
+        isOpen={showModal}
+        title={editingUser ? 'Edit User' : 'Add New User'}
+        onClose={handleCloseModal}
+        onSubmit={handleSubmit}
+      >
+        <div className="row g-3">
+
+          <div className="col-md-6">
+            <label className="form-label">Name *</label>
+            <input
+              type="text"
+              className={`form-control ${formErrors.name ? 'is-invalid' : ''}`}
+              value={formData.name}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            />
+            {formErrors.name && <div className="invalid-feedback">{formErrors.name}</div>}
           </div>
+
+          <div className="col-md-6">
+            <label className="form-label">Username *</label>
+            <input
+              type="text"
+              className={`form-control ${formErrors.username ? 'is-invalid' : ''}`}
+              value={formData.username}
+              onChange={(e) => setFormData({ ...formData, username: e.target.value })}
+            />
+          </div>
+
+          <div className="col-md-6">
+            <label className="form-label">Email *</label>
+            <input
+              type="email"
+              className={`form-control ${formErrors.email ? 'is-invalid' : ''}`}
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            />
+          </div>
+
+          <div className="col-md-6">
+            <label className="form-label">Role *</label>
+            <select
+              className="form-select"
+              value={formData.role}
+              onChange={(e) =>
+                setFormData({ ...formData, role: e.target.value as UserRole })
+              }
+            >
+              <option value="Admin">Admin</option>
+              <option value="Manager">Manager</option>
+              <option value="Staff">Staff</option>
+            </select>
+          </div>
+
+          <div className="col-md-6">
+            <label className="form-label">
+              Password {!editingUser && '*'}
+            </label>
+            <input
+              type="password"
+              className="form-control"
+              value={formData.password}
+              onChange={(e) =>
+                setFormData({ ...formData, password: e.target.value })
+              }
+            />
+          </div>
+
+          <div className="col-md-6">
+            <label className="form-label">Confirm Password</label>
+            <input
+              type="password"
+              className="form-control"
+              value={formData.confirmPassword}
+              onChange={(e) =>
+                setFormData({ ...formData, confirmPassword: e.target.value })
+              }
+            />
+          </div>
+
+          <div className="col-md-6">
+            <label className="form-label">Status *</label>
+            <select
+              className="form-select"
+              value={formData.status}
+              onChange={(e) =>
+                setFormData({ ...formData, status: e.target.value as 'Active' | 'Inactive' })
+              }
+            >
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
+
         </div>
-      )}
+      </FormModal>
 
       {/* View User Modal */}
-      {showViewModal && viewingUser && (
-        <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog modal-dialog-centered">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">User Details</h5>
-                <button type="button" className="btn-close" onClick={() => setShowViewModal(false)}></button>
-              </div>
-              <div className="modal-body">
-                <div className="text-center mb-4">
-                  <div className="avatar-lg mx-auto mb-3" style={{
-                    width: '80px',
-                    height: '80px',
-                    borderRadius: '50%',
-                    backgroundColor: viewingUser.role === 'Admin' ? '#dc3545' : viewingUser.role === 'Manager' ? '#ffc107' : '#0dcaf0',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    fontSize: '28px',
-                    color: viewingUser.role === 'Manager' ? '#000' : '#fff',
-                    fontWeight: 'bold'
-                  }}>
-                    {viewingUser.name.charAt(0).toUpperCase()}
-                  </div>
-                  <h5 className="mb-1">{viewingUser.name}</h5>
-                  <span className={`badge ${roleBadgeColors[viewingUser.role]}`}>
-                    <FiShield size={10} className="me-1" />
-                    {viewingUser.role}
-                  </span>
-                  <p className="text-muted small mt-1 mb-0">{roleDescriptions[viewingUser.role]}</p>
-                </div>
-                <table className="table table-borderless">
-                  <tbody>
-                    <tr>
-                      <td className="text-muted" style={{ width: '40%' }}>Username</td>
-                      <td><strong>{viewingUser.username}</strong></td>
-                    </tr>
-                    <tr>
-                      <td className="text-muted">Email</td>
-                      <td><strong>{viewingUser.email}</strong></td>
-                    </tr>
-                    <tr>
-                      <td className="text-muted">Status</td>
-                      <td>
-                        <span className={`badge ${viewingUser.status === 'Active' ? 'bg-success' : 'bg-secondary'}`}>
-                          {viewingUser.status}
-                        </span>
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="text-muted">Created Date</td>
-                      <td><strong>{formatDate(viewingUser.createdDate)}</strong></td>
-                    </tr>
-                  </tbody>
-                </table>
-                
-                {/* Permission Badges */}
-                <div className="mt-3">
-                  <h6 className="mb-2"><FiShield className="me-1" /> Role Permissions</h6>
-                  <div className="d-flex flex-wrap gap-1">
-                    {rolePermissions[viewingUser.role].slice(0, 8).map((perm) => (
-                      <span key={perm} className="badge bg-light text-dark border" style={{ fontSize: '11px' }}>
-                        {permissionDescriptions[perm]}
-                      </span>
-                    ))}
-                    {rolePermissions[viewingUser.role].length > 8 && (
-                      <span 
-                        className="badge bg-primary cursor-pointer" 
-                        style={{ fontSize: '11px', cursor: 'pointer' }}
-                        onClick={() => { setViewingRole(viewingUser.role); setShowPermissionsModal(true); setShowViewModal(false); }}
-                      >
-                        +{rolePermissions[viewingUser.role].length - 8} more
-                      </span>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="modal-footer">
-                <button 
-                  type="button" 
-                  className="btn btn-outline-primary me-2" 
-                  onClick={() => { setViewingRole(viewingUser.role); setShowPermissionsModal(true); setShowViewModal(false); }}
-                >
-                  <FiShield className="me-1" /> View All Permissions
-                </button>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowViewModal(false)}>
-                  Close
-                </button>
+      <ViewModal
+        isOpen={showViewModal}
+        onClose={() => setShowViewModal(false)}
+        title="User Details"
+        size="md"
+      >
+        {viewingUser && (
+          <div className="row g-3">
+
+            <div className="col-12 text-center mb-3">
+              <div className="fw-bold fs-5">{viewingUser.name}</div>
+              <span className={`badge ${roleBadgeColors[viewingUser.role]}`}>
+                {viewingUser.role}
+              </span>
+            </div>
+
+            <div className="col-md-6">
+              <small className="text-muted">Username</small>
+              <div className="fw-semibold">{viewingUser.username}</div>
+            </div>
+
+            <div className="col-md-6">
+              <small className="text-muted">Email</small>
+              <div>{viewingUser.email}</div>
+            </div>
+
+            <div className="col-md-6">
+              <small className="text-muted">Status</small>
+              <div>
+                <span className={`badge ${viewingUser.status === 'Active' ? 'bg-success' : 'bg-secondary'}`}>
+                  {viewingUser.status}
+                </span>
               </div>
             </div>
+
+            <div className="col-md-6">
+              <small className="text-muted">Created Date</small>
+              <div>{formatDate(viewingUser.createdDate)}</div>
+            </div>
+
           </div>
-        </div>
-      )}
+        )}
+      </ViewModal>
 
       {/* Permissions Modal */}
-      {showPermissionsModal && viewingRole && (
-        <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
-          <div className="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">
-                  <FiShield className="me-2" />
-                  <span className={`badge ${roleBadgeColors[viewingRole]} me-2`}>{viewingRole}</span>
-                  Role Permissions
-                </h5>
-                <button type="button" className="btn-close" onClick={() => setShowPermissionsModal(false)}></button>
-              </div>
-              <div className="modal-body">
-                <p className="text-muted mb-4">{roleDescriptions[viewingRole]}</p>
-                
-                {Object.entries(permissionCategories).map(([category, permissions]) => {
-                  const categoryPermissions = permissions.filter(p => rolePermissions[viewingRole].includes(p as Permission));
-                  if (categoryPermissions.length === 0) return null;
-                  
-                  return (
-                    <div key={category} className="mb-4">
-                      <h6 className="border-bottom pb-2 mb-3">{category}</h6>
-                      <div className="row g-2">
-                        {(permissions as readonly string[]).map((perm) => {
-                          const hasAccess = rolePermissions[viewingRole].includes(perm as Permission);
-                          return (
-                            <div key={perm} className="col-md-6">
-                              <div className={`d-flex align-items-center p-2 rounded ${hasAccess ? 'bg-success bg-opacity-10' : 'bg-light'}`}>
-                                <span className={`badge ${hasAccess ? 'bg-success' : 'bg-secondary'} me-2`} style={{ width: '20px', height: '20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                                  {hasAccess ? <FiCheck size={12} /> : <FiX size={12} />}
-                                </span>
-                                <span className={hasAccess ? '' : 'text-muted'}>
-                                  {permissionDescriptions[perm as Permission]}
-                                </span>
-                              </div>
-                            </div>
-                          );
-                        })}
+      <ViewModal
+        isOpen={showPermissionsModal}
+        onClose={() => setShowPermissionsModal(false)}
+        title={`${viewingRole} Role Permissions`}
+        size="lg"
+      >
+        {viewingRole && (
+          <>
+            <p className="text-muted mb-3">
+              {roleDescriptions[viewingRole]}
+            </p>
+
+            {Object.entries(permissionCategories).map(([category, permissions]) => (
+              <div key={category} className="mb-4">
+                <h6 className="border-bottom pb-2">{category}</h6>
+
+                <div className="row g-2">
+                  {permissions.map((perm) => {
+                    const hasAccess =
+                      editableRolePermissions[viewingRole].includes(perm as Permission);
+
+                    return (
+                      <div key={perm} className="col-md-6">
+                        <div className="form-check">
+                          <input
+                            type="checkbox"
+                            className="form-check-input"
+                            checked={hasAccess}
+                            onChange={() =>
+                              handlePermissionToggle(viewingRole, perm as Permission)
+                            }
+                          />
+                          <label className="form-check-label">
+                            {permissionDescriptions[perm as Permission]}
+                          </label>
+                        </div>
                       </div>
-                    </div>
-                  );
-                })}
-              </div>
-              <div className="modal-footer">
-                <div className="me-auto text-muted small">
-                  Total: {rolePermissions[viewingRole].length} permissions
+                    );
+                  })}
                 </div>
-                <button type="button" className="btn btn-secondary" onClick={() => setShowPermissionsModal(false)}>
-                  Close
-                </button>
               </div>
+            ))}
+
+            <div className="text-end mt-3">
+              <button
+                className="btn btn-primary"
+                onClick={handleSavePermissions}
+              >
+                Save Changes
+              </button>
             </div>
-          </div>
-        </div>
-      )}
+          </>
+        )}
+      </ViewModal>
     </div>
   );
 };

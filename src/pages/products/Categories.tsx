@@ -162,8 +162,12 @@ const Categories = () => {
                 {editingCategory && (
                   <button type="button" className="btn btn-secondary flex-fill" onClick={handleCancelEdit}>Cancel</button>
                 )}
-                <button type="submit" className="btn btn-primary-custom flex-fill" disabled={isLoading}>
-                  {isLoading ? <span className="spinner-border spinner-border-sm me-1" role="status"></span> : <FiPlus className="me-2" />}
+                <button type="submit" className="btn btn-primary-custom flex-fill d-flex align-items-center justify-content-center" disabled={isLoading}>
+                  {isLoading ? (
+                    <span className="spinner-border spinner-border-sm me-1" role="status"></span>
+                  ) : (
+                    <FiPlus className="me-2" />
+                  )}
                   {editingCategory ? 'Update Category' : 'Add Category'}
                 </button>
               </div>
@@ -260,7 +264,17 @@ const Categories = () => {
         )}
       </ViewModal>
 
-      <ConfirmDialog isOpen={showDeleteDialog} title="Delete Category" message={`Are you sure you want to delete "${selectedCategory?.name}"? This action cannot be undone.`} confirmLabel="Delete" onConfirm={handleDelete} onCancel={() => setShowDeleteDialog(false)} isLoading={isLoading} variant="danger" />
+      {/* Delete Confirmation */}
+      <ConfirmDialog
+        isOpen={showDeleteDialog}
+        title="Delete Category"
+        message={`Are you sure you want to delete "${selectedCategory?.name}"?`}
+        confirmLabel="Delete"
+        onConfirm={handleDelete}
+        onCancel={() => setShowDeleteDialog(false)}
+        isLoading={isLoading}
+        variant="danger"
+      />
     </div>
   );
 };

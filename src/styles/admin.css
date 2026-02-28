@@ -5,12 +5,13 @@
   position: fixed;
   top: 0;
   left: 0;
-  height: 100vh;
-  width: 250px;
+  bottom: 0;
+  width: 260px;
   background: linear-gradient(180deg, #2e3192 0%, #1bbbce 100%);
   z-index: 1000;
   transition: all 0.3s ease;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .sidebar.collapsed {
@@ -18,7 +19,7 @@
 }
 
 .sidebar-brand {
-  padding: 20px;
+  padding: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -35,8 +36,24 @@
   font-weight: 600;
 }
 
+/* Sidebar scrollbar */
+.sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background-color: #727272;
+  border-radius: 10px;
+}
+
 .sidebar-nav {
   padding: 15px 0;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .sidebar-nav .nav-item {
@@ -102,7 +119,7 @@
   transition: all 0.3s ease;
 }
 
-.sidebar.collapsed + .main-content .main-header {
+.sidebar.collapsed+.main-content .main-header {
   left: 70px;
 }
 
@@ -145,6 +162,11 @@
   position: relative;
 }
 
+.header-icons.icon-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
 .header-icons .icon-btn:hover {
   background: #e9ecf5;
   color: #2e3192;
@@ -152,19 +174,17 @@
 
 .header-icons .badge {
   position: absolute;
-  top: -2px;
-  right: -2px;
+  top: -4px;
   background: #ff4757;
   color: #fff;
   font-size: 10px;
-  padding: 2px 6px;
+  padding: 2px 4px;
   border-radius: 10px;
 }
 
 .user-dropdown {
-  display: flex;
+  display: block;
   align-items: center;
-  gap: 10px;
   cursor: pointer;
   padding: 5px 10px;
   border-radius: 8px;
@@ -198,14 +218,14 @@
 
 /* Main Content Area */
 .main-content {
-  margin-left: 250px;
+  margin-left: 260px;
   padding-top: 60px;
   min-height: 100vh;
   background: #f5f6fa;
   transition: all 0.3s ease;
 }
 
-.sidebar.collapsed + .main-content {
+.sidebar.collapsed+.main-content {
   margin-left: 70px;
 }
 
@@ -414,6 +434,11 @@
   color: #2563eb;
 }
 
+.btn-action.permissions {
+  background: #e0e7ff;
+  color: #4c1d95;
+}
+
 .btn-action.edit {
   background: #fef3c7;
   color: #d97706;
@@ -450,24 +475,32 @@
 
 .form-control {
   width: 100%;
-  padding: 10px 15px;
+  height: 40px;
+  /* padding: 0px 15px; */
   border: 1px solid #ddd;
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: 5px;
+  font-size: 16px;
   transition: all 0.2s ease;
 }
 
 .form-control:focus {
-  border-color: #2e3192;
+  border-color: var(--primary-gradient);
   outline: none;
   box-shadow: 0 0 0 3px rgba(46, 49, 146, 0.1);
 }
 
+textarea.form-control {
+  height: auto;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
 .form-select {
   width: 100%;
-  padding: 10px 15px;
+  height: 40px;
+  padding: 0px 15px;
   border: 1px solid #ddd;
-  border-radius: 8px;
+  border-radius: 5px;
   font-size: 14px;
   background: #fff;
   cursor: pointer;
@@ -477,22 +510,43 @@
   background: linear-gradient(135deg, #2e3192 0%, #1bbbce 100%);
   color: #fff;
   border: none;
-  padding: 10px 25px;
+  height: 42px;
+  min-width: 130px;
+  justify-content: center;
+  padding: 0px 25px;
   border-radius: 8px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
-.btn-primary-custom:hover {
+.btn-primary-custom:hover, 
+.btn-secondary:hover, 
+.btn-danger:hover, 
+.btn-secondary-custom:hover, 
+.btn-outline-primary:hover, 
+.btn-outline-secondary:hover {
   opacity: 0.9;
   transform: translateY(-1px);
+}
+
+.btn-secondary, 
+.btn-danger, 
+.btn-outline-primary, 
+.btn-outline-secondary {
+  height: 42px;
+  min-width: 130px;
+  justify-content: center;
+  border-radius: 8px;
 }
 
 .btn-secondary-custom {
   background: #f5f6fa;
   color: #555;
   border: 1px solid #ddd;
+  height: 42px;
+  min-width: 130px;
+  justify-content: center;
   padding: 10px 25px;
   border-radius: 8px;
   font-weight: 500;
@@ -562,17 +616,25 @@
   .sidebar {
     transform: translateX(-100%);
   }
-  
+
   .sidebar.show {
     transform: translateX(0);
   }
-  
+
   .main-content {
     margin-left: 0;
   }
-  
+
   .main-header {
     left: 0;
+  }
+
+  .login-card {
+    width: 100%;
+  }
+
+  .login-image {
+    display: none;
   }
 }
 
@@ -580,116 +642,28 @@
   .stat-card {
     margin-bottom: 15px;
   }
-  
+
   .page-header {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
-  
+
   .user-dropdown .user-info {
     display: none;
   }
 }
 
-/* Login Page Styles */
-.login-page {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #2e3192 0%, #1bbbce 100%);
-  padding: 20px;
-}
-
-.login-card {
-  background: #fff;
-  border-radius: 16px;
-  padding: 40px;
-  width: 100%;
-  max-width: 420px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-}
-
-.login-logo {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.login-logo span {
-  font-size: 32px;
-}
-
-.login-logo h2 {
-  font-weight: 700;
-  color: #2e3192;
-  margin: 0;
-}
-
-.login-title {
-  text-align: center;
-  margin-bottom: 25px;
-}
-
-.login-title h4 {
-  color: #333;
-  font-weight: 600;
-  margin-bottom: 5px;
-}
-
-.login-title p {
-  color: #888;
-  font-size: 14px;
-  margin: 0;
-}
-
-.login-form .form-group {
-  margin-bottom: 20px;
-}
-
-.login-form .form-group label {
-  display: flex;
-  align-items: center;
-  font-weight: 500;
-  color: #333;
-  margin-bottom: 8px;
-  font-size: 14px;
-}
-
-.login-form .btn-primary-custom {
-  width: 100%;
-  padding: 12px;
-  font-size: 15px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.login-error {
-  background: #fee2e2;
-  color: #dc2626;
-  padding: 12px 15px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-  font-size: 14px;
-  text-align: center;
-}
-
 .forgot-password-link {
-  color: #2e3192;
+  color: #1890ff;
   text-decoration: none;
-  font-size: 13px;
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .forgot-password-link:hover {
   text-decoration: underline;
-  color: #1bbbce;
+  color: #1890ff;
 }
 
 /* Forgot Password Success */

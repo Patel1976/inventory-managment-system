@@ -42,7 +42,7 @@ const ConfirmDialog = ({
 
   return (
     <div className="modal fade show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1060 }}>
-      <div className="modal-dialog modal-dialog-centered modal-sm">
+      <div className="modal-dialog modal-dialog-centered modal-md">
         <div className="modal-content">
           <div className="modal-header border-0 pb-0">
             <button 
@@ -53,7 +53,7 @@ const ConfirmDialog = ({
             ></button>
           </div>
           <div className="modal-body text-center pt-0">
-            <div className="mb-3">
+            <div className="mb-3 d-flex justify-content-center">
               <FiAlertTriangle size={48} color={styles.iconColor} />
             </div>
             <h5 className="mb-2">{title}</h5>
@@ -66,7 +66,7 @@ const ConfirmDialog = ({
               onClick={onCancel}
               disabled={isLoading}
             >
-              <FiX className="me-1" /> {cancelLabel}
+              {cancelLabel}
             </button>
             <button 
               type="button" 

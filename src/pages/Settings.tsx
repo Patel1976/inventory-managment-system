@@ -58,7 +58,7 @@ const Settings = () => {
         {/* General Settings */}
         <div className="col-12 col-lg-6">
           <div className="form-card">
-            <h5 className="mb-4"><FiSettings className="me-2" />General Settings</h5>
+            <h5 className="mb-4 d-flex align-items-center"><FiSettings className="me-2" />General Settings</h5>
             
             <div className="form-group">
               <label>Company Name</label>
@@ -116,7 +116,7 @@ const Settings = () => {
         {/* Inventory & Invoice Settings */}
         <div className="col-12 col-lg-6">
           <div className="form-card mb-4">
-            <h5 className="mb-4"><FiDollarSign className="me-2" />Currency & Tax</h5>
+            <h5 className="mb-4 d-flex align-items-center"><FiDollarSign className="me-2" />Currency & Tax</h5>
             
             <div className="row g-3">
               <div className="col-6">
@@ -155,7 +155,7 @@ const Settings = () => {
           </div>
 
           <div className="form-card mb-4">
-            <h5 className="mb-4"><FiPackage className="me-2" />Stock Settings</h5>
+            <h5 className="mb-4 d-flex align-items-center"><FiPackage className="me-2" />Stock Settings</h5>
             
             <div className="form-group mb-0">
               <label>Stock Alert Threshold</label>
@@ -172,7 +172,7 @@ const Settings = () => {
           </div>
 
           <div className="form-card">
-            <h5 className="mb-4"><FiFileText className="me-2" />Invoice Settings</h5>
+            <h5 className="mb-4 d-flex align-items-center"><FiFileText className="me-2" />Invoice Settings</h5>
             
             <div className="form-group mb-0">
               <label>Invoice Prefix</label>
@@ -192,7 +192,7 @@ const Settings = () => {
         {/* Email Settings */}
         <div className="col-12 col-lg-6">
           <div className="form-card">
-            <h5 className="mb-4"><FiMail className="me-2" />Email Settings</h5>
+            <h5 className="mb-4 d-flex align-items-center"><FiMail className="me-2" />Email Settings</h5>
             
             <div className="form-group">
               <label>SMTP Host</label>
@@ -258,7 +258,7 @@ const Settings = () => {
         {/* Security Settings */}
         <div className="col-12 col-lg-6">
           <div className="form-card">
-            <h5 className="mb-4"><FiShield className="me-2" />Security Settings</h5>
+            <h5 className="mb-4 d-flex align-items-center"><FiShield className="me-2" />Security Settings</h5>
             
             <div className="form-check form-switch mb-3">
               <input 
@@ -298,7 +298,7 @@ const Settings = () => {
       <div className="row mt-4">
         <div className="col-12">
           <button className="btn btn-primary-custom" onClick={handleSave}>
-            <FiSave className="me-2" /> Save All Settings
+            Save All Settings
           </button>
         </div>
       </div>

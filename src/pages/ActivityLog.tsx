@@ -55,7 +55,7 @@ const ActivityLog = () => {
   return (
     <div className="activity-log-page">
       <div className="page-header">
-        <h4><FiActivity className="me-2" />Activity Log</h4>
+        <h4>Activity Log</h4>
         <div className="breadcrumb-wrapper"><Link to="/">Home</Link><span>/</span><span>Activity Log</span></div>
       </div>
 
@@ -76,8 +76,8 @@ const ActivityLog = () => {
                 {modules.map(mod => <option key={mod} value={mod}>{mod}</option>)}
               </select>
             </div>
-            <div className="col-12 col-md-2">
-              <button className="btn btn-outline-secondary w-100" onClick={() => { setSearchTerm(''); setActionFilter(''); setModuleFilter(''); }}><FiFilter className="me-1" /> Clear</button>
+            <div className="col-12 col-md-2 d-flex justify-content-end">
+              <button className="btn btn-outline-secondary w-100 d-flex align-items-center" onClick={() => { setSearchTerm(''); setActionFilter(''); setModuleFilter(''); }}><FiFilter className="me-1" /> Clear</button>
             </div>
           </div>
         </div>

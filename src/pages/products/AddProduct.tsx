@@ -235,18 +235,21 @@ const AddProduct = () => {
               <h5 className="mb-4">Product Image</h5>
               
               <div 
-                className="upload-area text-center p-4 mb-3"
+                className="upload-area p-4 mb-2"
                 style={{ 
                   border: '2px dashed #ddd', 
                   borderRadius: '12px',
-                  background: '#f8f9fa'
+                  background: '#f8f9fa',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
                 }}
               >
                 <FiUpload size={48} color="#888" />
-                <p className="mt-3 mb-2" style={{ color: '#555' }}>
+                <p className="mt-2 mb-2" style={{ color: '#555' }}>
                   Drag and drop image here
                 </p>
-                <p className="text-muted small mb-3">or</p>
+                <p className="text-muted small mb-2">or</p>
                 <label className="btn btn-outline-primary btn-sm">
                   Browse Files
                   <input 
@@ -269,10 +272,10 @@ const AddProduct = () => {
             {/* Actions */}
             <div className="form-card mt-4">
               <div className="d-grid gap-2">
-                <button type="submit" className="btn btn-primary-custom">
+                <button type="submit" className="btn btn-primary-custom d-flex align-items-center justify-content-center">
                   <FiSave className="me-2" /> Save Product
                 </button>
-                <Link to="/products" className="btn btn-secondary-custom">
+                <Link to="/products" className="btn btn-secondary-custom d-flex align-items-center justify-content-center">
                   <FiX className="me-2" /> Cancel
                 </Link>
               </div>

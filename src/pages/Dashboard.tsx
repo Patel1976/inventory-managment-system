@@ -156,7 +156,7 @@ const Dashboard = () => {
           <div className="data-card">
             <div className="data-card-header">
               <h5>Recent Sales</h5>
-              <Link to="/sales" className="btn btn-sm btn-outline-primary">View All</Link>
+              <Link to="/sales" className="btn btn-sm btn-outline-primary d-flex align-items-center">View All</Link>
             </div>
             <div className="data-card-body">
               <div className="table-responsive">
@@ -168,7 +168,6 @@ const Dashboard = () => {
                       <th>Date</th>
                       <th>Amount</th>
                       <th>Status</th>
-                      <th>Action</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -183,15 +182,6 @@ const Dashboard = () => {
                             {sale.status}
                           </span>
                         </td>
-                        <td>
-                          <button className="btn-action view me-1"><FiEye /></button>
-                          {isAdmin && (
-                            <>
-                              <button className="btn-action edit me-1"><FiEdit /></button>
-                              <button className="btn-action delete"><FiTrash2 /></button>
-                            </>
-                          )}
-                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -205,7 +195,7 @@ const Dashboard = () => {
         <div className="col-12 col-xl-4">
           <div className="data-card">
             <div className="data-card-header">
-              <h5><FiAlertTriangle style={{ color: '#f59e0b', marginRight: '8px' }} />Low Stock Alert</h5>
+              <h5 className='d-flex align-items-center'><FiAlertTriangle style={{ color: '#f59e0b', marginRight: '8px' }} />Low Stock Alert</h5>
             </div>
             <div className="data-card-body">
               {lowStockProducts.map((product, index) => (
@@ -235,7 +225,7 @@ const Dashboard = () => {
           <div className="data-card">
             <div className="data-card-header">
               <h5>Top Selling Products</h5>
-              <Link to="/products" className="btn btn-sm btn-outline-primary">View All</Link>
+              <Link to="/products" className="btn btn-sm btn-outline-primary d-flex align-items-center">View All</Link>
             </div>
             <div className="data-card-body">
               <div className="table-responsive">
@@ -266,7 +256,7 @@ const Dashboard = () => {
                         <td><strong>{product.sold}</strong> units</td>
                         <td><strong>{currencySymbol}{product.revenue.toLocaleString()}</strong></td>
                         <td>
-                          <span className="badge badge-success">
+                          <span className="badge badge-success d-inline-flex align-items-center">
                             <FiTrendingUp className="me-1" />Top Seller
                           </span>
                         </td>

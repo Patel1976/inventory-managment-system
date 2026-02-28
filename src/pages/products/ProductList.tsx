@@ -27,20 +27,20 @@ const ProductList = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-  
+
   const { isAdmin, hasPermission } = useAuth();
   const { currencySymbol, stockAlertThreshold } = useSettings();
   const { showToast } = useToast();
-  
+
   const canManage = hasPermission('products.edit');
-  
+
   // Modal states
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   // Form state
   const [formData, setFormData] = useState({
     name: '',
@@ -53,7 +53,7 @@ const ProductList = () => {
     description: '',
     status: 'Active'
   });
-  
+
   const [products, setProducts] = useState<Product[]>([
     { id: 1, name: 'iPhone 14 Pro', sku: 'SKU001', category: 'Electronics', brand: 'Apple', price: 999, costPrice: 850, stock: 120, status: 'Active', image: 'https://via.placeholder.com/40', description: 'Latest iPhone model with advanced features', createdDate: '2024-01-15' },
     { id: 2, name: 'Samsung Galaxy S23', sku: 'SKU002', category: 'Electronics', brand: 'Samsung', price: 899, costPrice: 750, stock: 85, status: 'Active', image: 'https://via.placeholder.com/40', description: 'Flagship Samsung smartphone', createdDate: '2024-01-14' },
@@ -75,7 +75,7 @@ const ProductList = () => {
       product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.brand.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesCategory = !categoryFilter || product.category === categoryFilter;
-    const matchesStatus = !statusFilter || 
+    const matchesStatus = !statusFilter ||
       (statusFilter === 'low-stock' && product.stock <= stockAlertThreshold) ||
       (statusFilter === 'active' && product.stock > stockAlertThreshold) ||
       (statusFilter === product.status.toLowerCase());
@@ -124,11 +124,11 @@ const ProductList = () => {
   const handleEditSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     // Simulate API call
     setTimeout(() => {
-      setProducts(prev => prev.map(p => 
-        p.id === selectedProduct?.id 
+      setProducts(prev => prev.map(p =>
+        p.id === selectedProduct?.id
           ? { ...p, ...formData }
           : p
       ));
@@ -140,7 +140,7 @@ const ProductList = () => {
 
   const handleDelete = () => {
     setIsLoading(true);
-    
+
     // Simulate API call
     setTimeout(() => {
       setProducts(prev => prev.filter(p => p.id !== selectedProduct?.id));
@@ -155,69 +155,63 @@ const ProductList = () => {
       {/* Page Header */}
       <div className="page-header">
         <h4>Product List</h4>
-        <div className="breadcrumb-wrapper">
-          <Link to="/">Home</Link>
-          <span>/</span>
-          <Link to="/products">Products</Link>
-          <span>/</span>
-          <span>Product List</span>
-        </div>
+        <div className="breadcrumb-wrapper"><Link to="/">Home</Link><span>/</span><span>Product List</span></div>
       </div>
 
       {/* Filters & Actions Bar */}
       <div className="data-card mb-4">
         <div className="data-card-body">
           <div className="row g-3 align-items-center">
-            <div className="col-12 col-md-3">
-              <div className="input-group">
-                <span className="input-group-text bg-white border-end-0">
-                  <FiSearch />
-                </span>
-                <input 
-                  type="text" 
-                  className="form-control border-start-0"
-                  placeholder="Search products..."
-                  value={searchTerm}
-                  onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                />
+            <div className="d-flex justify-content-start align-items-center col-12 col-md-8 gap-3">
+              <div className="col-12 col-md-4">
+                <div className="position-relative">
+                  <FiSearch style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)', zIndex: 1 }} />
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Search products..."
+                    value={searchTerm}
+                    onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+                    style={{ paddingLeft: '35px' }}
+                  />
+                </div>
+              </div>
+              <div className="col-12 col-md-4">
+                <select
+                  className="form-select"
+                  value={categoryFilter}
+                  onChange={(e) => { setCategoryFilter(e.target.value); setCurrentPage(1); }}
+                >
+                  <option value="">All Categories</option>
+                  {categories.map(cat => (
+                    <option key={cat} value={cat}>{cat}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="col-12 col-md-4">
+                <select
+                  className="form-select"
+                  value={statusFilter}
+                  onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }}
+                >
+                  <option value="">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="low-stock">Low Stock</option>
+                </select>
               </div>
             </div>
-            <div className="col-12 col-md-2">
-              <select 
-                className="form-select"
-                value={categoryFilter}
-                onChange={(e) => { setCategoryFilter(e.target.value); setCurrentPage(1); }}
-              >
-                <option value="">All Categories</option>
-                {categories.map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
-            <div className="col-12 col-md-2">
-              <select 
-                className="form-select"
-                value={statusFilter}
-                onChange={(e) => { setStatusFilter(e.target.value); setCurrentPage(1); }}
-              >
-                <option value="">All Status</option>
-                <option value="active">Active</option>
-                <option value="low-stock">Low Stock</option>
-              </select>
-            </div>
-            <div className="col-12 col-md-2">
-              <div className="input-group">
-                <span className="input-group-text"><FiCalendar /></span>
-                <input type="date" className="form-control" placeholder="From date" />
-              </div>
-            </div>
-            <div className="col-12 col-md-3 text-end">
-              <button className="btn btn-outline-secondary me-2">
-                <FiDownload className="me-1" /> Export
+            <div className="col-12 col-md-4 text-end d-flex justify-content-end align-items-center">
+              <button className="btn btn-outline-secondary me-2 d-inline-flex align-items-center">
+                <FiDownload className="me-1" />
+                <span>Export</span>
               </button>
               {canManage && (
-                <Link to="/products/add" className="btn btn-primary-custom">
-                  <FiPlus className="me-1" /> Add Product
+                <Link
+                  to="/products/add"
+                  className="btn btn-primary-custom d-inline-flex align-items-center"
+                >
+                  <FiPlus className="me-1" />
+                  <span>Add Product</span>
                 </Link>
               )}
             </div>
@@ -251,8 +245,8 @@ const ProductList = () => {
                       <td><input type="checkbox" /></td>
                       <td>
                         <div className="d-flex align-items-center gap-3">
-                          <img 
-                            src={product.image} 
+                          <img
+                            src={product.image}
                             alt={product.name}
                             className="product-img"
                           />
@@ -299,8 +293,8 @@ const ProductList = () => {
             <nav>
               <ul className="pagination mb-0">
                 <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                  <button 
-                    className="page-link" 
+                  <button
+                    className="page-link"
                     onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                     disabled={currentPage === 1}
                   >
@@ -325,8 +319,8 @@ const ProductList = () => {
                   );
                 })}
                 <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                  <button 
-                    className="page-link" 
+                  <button
+                    className="page-link"
                     onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                     disabled={currentPage === totalPages}
                   >
@@ -348,8 +342,8 @@ const ProductList = () => {
         {selectedProduct && (
           <div className="row">
             <div className="col-md-4 text-center mb-4">
-              <img 
-                src={selectedProduct.image} 
+              <img
+                src={selectedProduct.image}
                 alt={selectedProduct.name}
                 style={{ width: '150px', height: '150px', objectFit: 'cover', borderRadius: '8px' }}
               />
@@ -362,13 +356,13 @@ const ProductList = () => {
               <DetailRow label="Price" value={<strong>{currencySymbol}{selectedProduct.price}</strong>} />
               <DetailRow label="Cost Price" value={`${currencySymbol}${selectedProduct.costPrice || 0}`} />
               <DetailRow label="Stock" value={selectedProduct.stock} />
-              <DetailRow 
-                label="Status" 
+              <DetailRow
+                label="Status"
                 value={
                   <span className={`badge ${getStatus(selectedProduct.stock).class}`}>
                     {getStatus(selectedProduct.stock).label}
                   </span>
-                } 
+                }
               />
               <DetailRow label="Description" value={selectedProduct.description || 'N/A'} />
               <DetailRow label="Created Date" value={selectedProduct.createdDate || 'N/A'} />
@@ -470,7 +464,7 @@ const ProductList = () => {
       <ConfirmDialog
         isOpen={showDeleteDialog}
         title="Delete Product"
-        message={`Are you sure you want to delete "${selectedProduct?.name}"? This action cannot be undone.`}
+        message={`Are you sure you want to delete "${selectedProduct?.name}"?`}
         confirmLabel="Delete"
         onConfirm={handleDelete}
         onCancel={() => setShowDeleteDialog(false)}

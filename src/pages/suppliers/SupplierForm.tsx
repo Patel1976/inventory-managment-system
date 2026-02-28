@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { FiSave, FiX } from 'react-icons/fi';
 import { useToast } from '../../components/common/Toast';
 
 const mockSuppliersData = [
@@ -55,62 +54,126 @@ const SupplierForm = () => {
       </div>
 
       <form onSubmit={handleSubmit}>
-        <div className="row g-4">
-          <div className="col-12 col-lg-8">
+        <div className="row">
+          <div className="col-12">
             <div className="form-card">
-              <h5 className="mb-4">Supplier Information</h5>
+
+              <div className="d-flex justify-content-between align-items-center mb-4">
+                <h5 className="mb-0">Supplier Information</h5>
+              </div>
+
               <div className="row g-3">
+
                 <div className="col-12 col-md-6">
-                  <div className="form-group mb-0"><label>Supplier Name *</label>
-                    <input type="text" className="form-control" name="name" value={formData.name} onChange={handleChange} placeholder="Enter supplier name" required />
-                  </div>
+                  <label>Supplier Name *</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="name"
+                    value={formData.name}
+                    onChange={handleChange}
+                    placeholder="Enter supplier name"
+                    required
+                  />
                 </div>
+
                 <div className="col-12 col-md-6">
-                  <div className="form-group mb-0"><label>Company Name</label>
-                    <input type="text" className="form-control" name="company" value={formData.company} onChange={handleChange} placeholder="Enter company name" />
-                  </div>
+                  <label>Company Name</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="company"
+                    value={formData.company}
+                    onChange={handleChange}
+                    placeholder="Enter company name"
+                  />
                 </div>
+
                 <div className="col-12 col-md-6">
-                  <div className="form-group mb-0"><label>Email *</label>
-                    <input type="email" className="form-control" name="email" value={formData.email} onChange={handleChange} placeholder="Enter email address" required />
-                  </div>
+                  <label>Email *</label>
+                  <input
+                    type="email"
+                    className="form-control"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="Enter email address"
+                    required
+                  />
                 </div>
+
                 <div className="col-12 col-md-6">
-                  <div className="form-group mb-0"><label>Phone</label>
-                    <input type="text" className="form-control" name="phone" value={formData.phone} onChange={handleChange} placeholder="Enter phone number" />
-                  </div>
+                  <label>Phone</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="Enter phone number"
+                  />
                 </div>
+
                 <div className="col-12 col-md-6">
-                  <div className="form-group mb-0"><label>Tax Number</label>
-                    <input type="text" className="form-control" name="taxNumber" value={formData.taxNumber} onChange={handleChange} placeholder="Enter tax number" />
-                  </div>
+                  <label>Tax Number</label>
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="taxNumber"
+                    value={formData.taxNumber}
+                    onChange={handleChange}
+                    placeholder="Enter tax number"
+                  />
                 </div>
+
                 <div className="col-12 col-md-6">
-                  <div className="form-group mb-0"><label>Status</label>
-                    <select className="form-select" name="status" value={formData.status} onChange={handleChange}>
-                      <option value="Active">Active</option>
-                      <option value="Inactive">Inactive</option>
-                    </select>
-                  </div>
+                  <label>Status</label>
+                  <select
+                    className="form-select"
+                    name="status"
+                    value={formData.status}
+                    onChange={handleChange}
+                  >
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                  </select>
                 </div>
+
                 <div className="col-12">
-                  <div className="form-group mb-0"><label>Address</label>
-                    <textarea className="form-control" name="address" value={formData.address} onChange={handleChange} rows={3} placeholder="Enter full address" />
-                  </div>
+                  <label>Address</label>
+                  <textarea
+                    className="form-control"
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    rows={3}
+                    placeholder="Enter full address"
+                  />
                 </div>
+
               </div>
-            </div>
-          </div>
-          <div className="col-12 col-lg-4">
-            <div className="form-card">
-              <div className="d-grid gap-2">
-                <button type="submit" className="btn btn-primary-custom" disabled={isLoading}>
-                  <FiSave className="me-2" /> {isLoading ? 'Saving...' : (isEdit ? 'Update Supplier' : 'Save Supplier')}
-                </button>
-                <Link to="/suppliers" className="btn btn-secondary-custom">
-                  <FiX className="me-2" /> Cancel
+
+              {/* Buttons inside same card */}
+              <div className="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
+
+                <Link to="/suppliers" className="btn btn-secondary-custom d-flex align-items-center">
+                  Cancel
                 </Link>
+
+                <button
+                  type="submit"
+                  className="btn btn-primary-custom"
+                  disabled={isLoading}
+                >
+                  {isLoading
+                    ? 'Saving...'
+                    : isEdit
+                      ? 'Update Supplier'
+                      : 'Save Supplier'}
+                </button>
+
               </div>
+
             </div>
           </div>
         </div>

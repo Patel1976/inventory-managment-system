@@ -74,15 +74,18 @@ const PurchaseList = () => {
       <div className="data-card mb-4">
         <div className="data-card-body">
           <div className="row g-3 align-items-center">
-            <div className="col-12 col-md-3">
-              <div className="input-group"><span className="input-group-text bg-white border-end-0"><FiSearch /></span><input type="text" className="form-control border-start-0" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div>
+            <div className="col-12 col-md-2">
+              <div className="input-group">
+                <span className="input-group-text bg-white border-end-0"><FiSearch /></span>
+                <input type="text" className="form-control border-start-0" placeholder="Search..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
+              </div>
             </div>
             <div className="col-12 col-md-2"><select className="form-select"><option value="">All Suppliers</option></select></div>
             <div className="col-12 col-md-2"><select className="form-select"><option value="">All Status</option></select></div>
             <div className="col-12 col-md-2"><input type="date" className="form-control" /></div>
-            <div className="col-12 col-md-3 text-end">
-              <button className="btn btn-outline-secondary me-2"><FiDownload className="me-1" /> Export</button>
-              <Link to="/purchases/add" className="btn btn-primary-custom"><FiPlus className="me-1" /> Add Purchase</Link>
+            <div className="col-12 col-md-4 text-end d-flex justify-content-end align-items-center">
+              <button className="btn btn-outline-secondary me-2 d-flex align-items-center"><FiDownload className="me-1" /> Export</button>
+              <Link to="/purchases/add" className="btn btn-primary-custom d-flex align-items-center"><FiPlus className="me-1" /> Add Purchase</Link>
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import { ReactNode, useEffect } from 'react';
 import { FiX } from 'react-icons/fi';
 
 interface ViewModalProps {
@@ -18,6 +18,15 @@ const ViewModal = ({
   size = 'lg',
   footer
 }: ViewModalProps) => {
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    document.addEventListener('keydown', handleEsc);
+    return () => document.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
+
   if (!isOpen) return null;
 
   const sizeClass = {
@@ -45,8 +54,8 @@ const ViewModal = ({
           )}
           {!footer && (
             <div className="modal-footer">
-              <button type="button" className="btn btn-secondary" onClick={onClose}>
-                <FiX className="me-1" /> Close
+              <button type="button" className="btn btn-secondary d-flex align-items-center" onClick={onClose}>
+                Close
               </button>
             </div>
           )}

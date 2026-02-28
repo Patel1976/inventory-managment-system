@@ -108,7 +108,7 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
         {/* Notifications */}
         <div className="notification-dropdown" ref={notifRef}>
           <button 
-            className="icon-btn"
+            className="icon-btn header-icons"
             onClick={() => setShowNotifications(!showNotifications)}
           >
             <FiBell />
@@ -174,7 +174,7 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
           
           <ul className={`dropdown-menu dropdown-menu-end ${showUserMenu ? 'show' : ''}`} style={{ display: showUserMenu ? 'block' : 'none' }}>
             <li>
-              <a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); setShowUserMenu(false); }}>
+              <a className="dropdown-item" href="#" onClick={(e) => { e.preventDefault(); navigate('/profile'); setShowUserMenu(false); }}>
                 <FiUser className="me-2" /> Profile
               </a>
             </li>

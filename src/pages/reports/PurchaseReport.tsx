@@ -25,7 +25,7 @@ const PurchaseReport = () => {
 
   const filteredData = purchaseData.filter(item => {
     const matchesSearch = item.reference.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          item.supplier.toLowerCase().includes(searchTerm.toLowerCase());
+      item.supplier.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesSupplier = !supplierFilter || item.supplier === supplierFilter;
     return matchesSearch && matchesSupplier;
   });
@@ -55,12 +55,54 @@ const PurchaseReport = () => {
 
       <div className="data-card mb-4">
         <div className="data-card-body">
-          <div className="row g-3 align-items-center">
-            <div className="col-12 col-md-2"><label className="form-label">From Date</label><input type="date" className="form-control" value={fromDate} onChange={(e) => setFromDate(e.target.value)} /></div>
-            <div className="col-12 col-md-2"><label className="form-label">To Date</label><input type="date" className="form-control" value={toDate} onChange={(e) => setToDate(e.target.value)} /></div>
-            <div className="col-12 col-md-2"><label className="form-label">Supplier</label><select className="form-select" value={supplierFilter} onChange={(e) => setSupplierFilter(e.target.value)}><option value="">All Suppliers</option>{suppliers.map((supplier, idx) => <option key={idx} value={supplier}>{supplier}</option>)}</select></div>
-            <div className="col-12 col-md-3"><label className="form-label">Search</label><div className="input-group"><span className="input-group-text"><FiSearch /></span><input type="text" className="form-control" placeholder="Search reference, supplier..." value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} /></div></div>
-            <div className="col-12 col-md-3 d-flex align-items-end gap-2"><button className="btn btn-primary-custom"><FiFilter className="me-1" /> Filter</button><button className="btn btn-outline-secondary"><FiDownload className="me-1" /> Excel</button><button className="btn btn-outline-secondary"><FiFileText className="me-1" /> PDF</button></div>
+          <div className="row g-3 align-items-end">
+            <div className="col-12 col-md-2">
+              <label className="form-label">From Date</label>
+              <input
+                type="date"
+                className="form-control"
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
+              />
+            </div>
+            <div className="col-12 col-md-2">
+              <label className="form-label">To Date</label>
+              <input
+                type="date"
+                className="form-control"
+                value={toDate}
+                onChange={(e) => setToDate(e.target.value)}
+              />
+            </div>
+            <div className="col-12 col-md-3">
+              <label className="form-label">Supplier</label>
+              <select
+                className="form-select"
+                value={supplierFilter}
+                onChange={(e) => setSupplierFilter(e.target.value)}
+              >
+                <option value="">All Suppliers</option>
+                {suppliers.map((supplier, idx) => (
+                  <option key={idx} value={supplier}>{supplier}</option>
+                ))}
+              </select>
+            </div>
+            <div className="col-12 col-md-3">
+              <label className="form-label">Search</label>
+              <div className="input-group">
+                <span className="input-group-text"><FiSearch /></span>
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="Search reference, supplier..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+            </div>
+            <div className="col-12 col-md-2 d-flex align-items-end gap-2 justify-content-end">
+              <button className="btn btn-primary-custom d-flex align-items-center"><FiFilter className="me-1" /> Filter</button>
+            </div>
           </div>
         </div>
       </div>
@@ -73,7 +115,13 @@ const PurchaseReport = () => {
       </div>
 
       <div className="data-card">
-        <div className="data-card-header"><h5>Purchase Details</h5></div>
+        <div className="data-card-header d-flex justify-content-between align-items-center">
+          <h5>Purchase Details</h5>
+          <div className="col-12 col-md-3 d-flex align-items-end gap-2 justify-content-end">
+            <button className="btn btn-outline-secondary d-flex align-items-center"><FiDownload className="me-1" /> Excel</button>
+            <button className="btn btn-outline-secondary d-flex align-items-center"><FiFileText className="me-1" /> PDF</button>
+          </div>
+        </div>
         <div className="data-card-body">
           <div className="table-responsive">
             <table className="data-table">

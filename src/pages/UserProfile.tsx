@@ -129,7 +129,7 @@ const UserProfile = () => {
           {/* Edit Profile Form */}
           <div className="data-card mb-4">
             <div className="data-card-header">
-              <h5 className="mb-0"><FiUser className="me-2" /> Edit Profile</h5>
+              <h5 className="mb-0">Edit Profile</h5>
             </div>
             <div className="data-card-body">
               <form onSubmit={handleProfileSubmit}>
@@ -188,7 +188,7 @@ const UserProfile = () => {
                   </div>
                   <div className="col-12">
                     <button type="submit" className="btn btn-primary-custom">
-                      <FiSave className="me-2" /> Update Profile
+                      Update Profile
                     </button>
                   </div>
                 </div>
@@ -199,7 +199,7 @@ const UserProfile = () => {
           {/* Change Password Form */}
           <div className="data-card">
             <div className="data-card-header">
-              <h5 className="mb-0"><FiLock className="me-2" /> Change Password</h5>
+              <h5 className="mb-0">Change Password</h5>
             </div>
             <div className="data-card-body">
               <form onSubmit={handlePasswordSubmit}>
@@ -239,7 +239,7 @@ const UserProfile = () => {
                   </div>
                   <div className="col-12">
                     <button type="submit" className="btn btn-primary-custom">
-                      <FiLock className="me-2" /> Change Password
+                      Change Password
                     </button>
                   </div>
                 </div>

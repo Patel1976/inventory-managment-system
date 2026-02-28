@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  FiHome, FiBox, FiShoppingCart, FiUsers, FiTruck, 
+import {
+  FiHome, FiBox, FiShoppingCart, FiUsers,
   FiDollarSign, FiBarChart2, FiSettings, FiChevronDown,
   FiChevronRight, FiLayers, FiFileText, FiActivity
 } from 'react-icons/fi';
@@ -23,7 +23,7 @@ interface MenuItem {
 
 const Sidebar = ({ isCollapsed }: SidebarProps) => {
   const location = useLocation();
-  const [openMenus, setOpenMenus] = useState<string[]>(['Products']);
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
   const { isAdmin, hasPermission } = useAuth();
 
   const menuItems: MenuItem[] = [
@@ -39,8 +39,8 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
         { title: 'Brands', path: '/products/brands', permission: 'brands.manage' },
       ]
     },
-    { 
-      title: 'Purchase', 
+    {
+      title: 'Purchase',
       icon: <FiShoppingCart />,
       permission: 'purchases.view',
       submenu: [
@@ -49,8 +49,8 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
         { title: 'Purchase Returns', path: '/purchases/returns', permission: 'purchases.view' },
       ]
     },
-    { 
-      title: 'Sales', 
+    {
+      title: 'Sales',
       icon: <FiDollarSign />,
       permission: 'sales.view',
       submenu: [
@@ -59,8 +59,8 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
         { title: 'Sale Returns', path: '/sales/returns', permission: 'sales.view' },
       ]
     },
-    { 
-      title: 'People', 
+    {
+      title: 'People',
       icon: <FiUsers />,
       permission: 'customers.view',
       submenu: [
@@ -69,8 +69,8 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
         { title: 'Stores', path: '/stores', permission: 'stores.view' },
       ]
     },
-    { 
-      title: 'Expense', 
+    {
+      title: 'Expense',
       icon: <FiFileText />,
       permission: 'expenses.view',
       submenu: [
@@ -79,8 +79,8 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
         { title: 'Categories', path: '/expenses/categories', permission: 'expenses.manage' },
       ]
     },
-    { 
-      title: 'Stock Adjustment', 
+    {
+      title: 'Stock Adjustment',
       icon: <FiLayers />,
       permission: 'adjustments.view',
       submenu: [
@@ -88,8 +88,8 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
         { title: 'Add Adjustment', path: '/adjustments/add', permission: 'adjustments.create' },
       ]
     },
-    { 
-      title: 'Reports', 
+    {
+      title: 'Reports',
       icon: <FiBarChart2 />,
       permission: 'reports.view',
       submenu: [
@@ -126,23 +126,54 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
   });
 
   const toggleMenu = (title: string) => {
-    setOpenMenus(prev => 
-      prev.includes(title) 
-        ? prev.filter(m => m !== title)
-        : [...prev, title]
-    );
+    setOpenMenu(prev => (prev === title ? null : title));
   };
 
-  const isActiveLink = (path: string) => location.pathname === path;
-  const isMenuOpen = (title: string) => openMenus.includes(title);
+  // Find the most specific (longest) matching path for sub-routes
+  const getActivePath = () => {
+    let bestMatch = '/';
+    const allPaths: string[] = [];
+    // Collect all paths from main items and submenus
+    menuItems.forEach(item => {
+      if (item.path) allPaths.push(item.path);
+      item.submenu?.forEach(sub => allPaths.push(sub.path));
+    });
+    allPaths.forEach(p => {
+      // Check for exact match OR if the current URL is a sub-route (e.g. starts with path + '/')
+      if (location.pathname === p || location.pathname.startsWith(`${p}/`)) {
+        if (p.length > bestMatch.length || bestMatch === '/') {
+          bestMatch = p;
+        }
+      }
+    });
+    return bestMatch;
+  };
+  const activePath = getActivePath();
+  const isActiveLink = (path: string) => path === activePath;
+  const isMenuOpen = (title: string) => openMenu === title;
+
+  useEffect(() => {
+    if (location.pathname === '/') {
+      setOpenMenu(null);
+      return;
+    }
+    const activeMenu = menuItems.find(item =>
+      item.submenu?.some(sub => isActiveLink(sub.path))
+    );
+    if (activeMenu) {
+      setOpenMenu(activeMenu.title);
+    } else {
+      setOpenMenu(null);
+    }
+  }, [location.pathname]);
 
   return (
     <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
       <div className="sidebar-brand">
         {!isCollapsed ? (
-          <h4>📦 Inventory</h4>
+          <img src="inventory-logo.png" alt="Logo" />
         ) : (
-          <span style={{ fontSize: '24px' }}>📦</span>
+          <img src="favicon.png" alt="Logo" />
         )}
       </div>
 
@@ -174,9 +205,9 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
                     <ul className={`submenu ${isMenuOpen(item.title) ? 'show' : ''}`}>
                       {item.submenu.map((sub) => (
                         <li key={sub.path} className="nav-item">
-                          <Link 
-                            to={sub.path} 
-                            className={`nav-link ${isActiveLink(sub.path) ? 'active' : ''}`}
+                          <Link
+                            to={sub.path}
+                            className={`${isActiveLink(sub.path) ? 'active' : ''}`}
                           >
                             <span className="nav-text">{sub.title}</span>
                           </Link>
@@ -186,8 +217,8 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
                   )}
                 </>
               ) : (
-                <Link 
-                  to={item.path!} 
+                <Link
+                  to={item.path!}
                   className={`nav-link ${isActiveLink(item.path!) ? 'active' : ''}`}
                 >
                   <i>{item.icon}</i>
