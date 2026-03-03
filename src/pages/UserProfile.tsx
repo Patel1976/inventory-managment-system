@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FiUser, FiMail, FiPhone, FiMapPin, FiLock, FiSave, FiCamera } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../components/common/Toast';
 
 const UserProfile = () => {
   const { user } = useAuth();
-  
+  const { showToast } = useToast();
   const [profile, setProfile] = useState({
     name: user?.name || 'John Admin',
     email: user?.email || 'admin@inventory.com',
@@ -31,17 +32,17 @@ const UserProfile = () => {
   const handleProfileSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     // Mock save - would integrate with backend
-    alert('Profile updated successfully!');
+    showToast({ type: 'success', title: 'Success', message: 'Profile updated successfully!' });
   };
 
   const handlePasswordSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (passwords.newPassword !== passwords.confirmPassword) {
-      alert('New passwords do not match!');
+      showToast({ type: 'error', title: 'Error', message: 'New passwords do not match!' });
       return;
     }
     // Mock save - would integrate with backend
-    alert('Password changed successfully!');
+    showToast({ type: 'success', title: 'Success', message: 'Password changed successfully!' });
     setPasswords({ currentPassword: '', newPassword: '', confirmPassword: '' });
   };
 
@@ -87,7 +88,7 @@ const UserProfile = () => {
                       bottom: '0',
                       right: '0',
                       borderRadius: '50%',
-                      width: '36px',
+                      minWidth: '36px',
                       height: '36px',
                       padding: '0',
                       display: 'flex',

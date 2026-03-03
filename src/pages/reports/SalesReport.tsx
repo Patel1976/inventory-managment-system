@@ -5,6 +5,9 @@ import { FiDownload, FiFilter, FiChevronLeft, FiChevronRight } from 'react-icons
 const SalesReport = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
+  const [customerFilter, setCustomerFilter] = useState('');
 
   const salesData = [
     { date: '2024-01-15', invoice: 'INV-001', customer: 'John Doe', products: 3, total: 1250.00, profit: 312.50 },
@@ -12,11 +15,35 @@ const SalesReport = () => {
     { date: '2024-01-14', invoice: 'INV-003', customer: 'Bob Wilson', products: 5, total: 2100.00, profit: 525.00 },
     { date: '2024-01-13', invoice: 'INV-004', customer: 'Alice Brown', products: 1, total: 450.00, profit: 112.50 },
     { date: '2024-01-13', invoice: 'INV-005', customer: 'Charlie Davis', products: 4, total: 1800.00, profit: 450.00 },
+    { date: '2024-01-13', invoice: 'INV-006', customer: 'David Miller', products: 2, total: 900.00, profit: 225.00 },
   ];
 
-  const totalPages = Math.ceil(salesData.length / itemsPerPage);
+  const filteredData = salesData.filter((sale) => {
+    const saleDate = new Date(sale.date);
+    const matchFrom =
+      !fromDate || saleDate >= new Date(fromDate);
+    const matchTo =
+      !toDate || saleDate <= new Date(toDate);
+    const matchCustomer =
+      !customerFilter || sale.customer === customerFilter;
+    return matchFrom && matchTo && matchCustomer;
+  });
+
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedData = salesData.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedData = filteredData.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
+
+  const totalSales = filteredData.reduce((sum, sale) => sum + sale.total, 0);
+  const totalProfit = filteredData.reduce((sum, sale) => sum + sale.profit, 0);
+  const totalProducts = filteredData.reduce((sum, sale) => sum + sale.products, 0);
+  const totalOrders = filteredData.length;
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [fromDate, toDate, customerFilter]);
 
   return (
     <div className="sales-report-page">
@@ -30,18 +57,32 @@ const SalesReport = () => {
           <div className="row g-3 align-items-end">
             <div className="col-12 col-md-3">
               <label className="form-label">From Date</label>
-              <input type="date" className="form-control" />
+              <input
+                type="date"
+                className="form-control"
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
+              />
             </div>
             <div className="col-12 col-md-3">
               <label className="form-label">To Date</label>
-              <input type="date" className="form-control" />
+              <input
+                type="date"
+                className="form-control"
+                value={fromDate}
+                onChange={(e) => setFromDate(e.target.value)}
+              />
             </div>
             <div className="col-12 col-md-3">
               <label className="form-label">Customer</label>
-              <select className="form-select">
+              <select
+                className="form-select"
+                value={customerFilter}
+                onChange={(e) => setCustomerFilter(e.target.value)}
+              >
                 <option value="">All Customers</option>
-                <option value="1">John Doe</option>
-                <option value="2">Jane Smith</option>
+                <option value="John Doe">John Doe</option>
+                <option value="Jane Smith">Jane Smith</option>
               </select>
             </div>
             <div className="col-12 col-md-3 d-flex align-items-end gap-2 justify-content-end">
@@ -52,10 +93,10 @@ const SalesReport = () => {
       </div>
 
       <div className="row g-4 mb-4">
-        <div className="col-12 col-md-3"><div className="stat-card"><div className="stat-content"><h3>$6,450.00</h3><p>Total Sales</p></div></div></div>
-        <div className="col-12 col-md-3"><div className="stat-card"><div className="stat-content"><h3>$1,612.50</h3><p>Total Profit</p></div></div></div>
-        <div className="col-12 col-md-3"><div className="stat-card"><div className="stat-content"><h3>15</h3><p>Products Sold</p></div></div></div>
-        <div className="col-12 col-md-3"><div className="stat-card"><div className="stat-content"><h3>5</h3><p>Total Orders</p></div></div></div>
+        <div className="col-12 col-md-3"><div className="stat-card"><div className="stat-content"><h3>${totalSales.toFixed(2)}</h3><p>Total Sales</p></div></div></div>
+        <div className="col-12 col-md-3"><div className="stat-card"><div className="stat-content"><h3>${totalProfit.toFixed(2)}</h3><p>Total Profit</p></div></div></div>
+        <div className="col-12 col-md-3"><div className="stat-card"><div className="stat-content"><h3>{totalProducts}</h3><p>Products Sold</p></div></div></div>
+        <div className="col-12 col-md-3"><div className="stat-card"><div className="stat-content"><h3>{totalOrders}</h3><p>Total Orders</p></div></div></div>
       </div>
 
       <div className="data-card">
@@ -89,22 +130,39 @@ const SalesReport = () => {
             <nav>
               <ul className="pagination mb-0">
                 <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                  <button className="page-link" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}><FiChevronLeft /></button>
+                  <button
+                    className="page-link"
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </button>
                 </li>
                 {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                   let page: number;
-                  if (totalPages <= 5) page = i + 1;
-                  else if (currentPage <= 3) page = i + 1;
-                  else if (currentPage >= totalPages - 2) page = totalPages - 4 + i;
-                  else page = currentPage - 2 + i;
+                  if (totalPages <= 5) {
+                    page = i + 1;
+                  } else if (currentPage <= 3) {
+                    page = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    page = totalPages - 4 + i;
+                  } else {
+                    page = currentPage - 2 + i;
+                  }
                   return (
                     <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
                       <button className="page-link" onClick={() => setCurrentPage(page)}>{page}</button>
                     </li>
                   );
                 })}
-                <li className={`page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`}>
-                  <button className="page-link" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0}><FiChevronRight /></button>
+                <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                  <button
+                    className="page-link"
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </button>
                 </li>
               </ul>
             </nav>

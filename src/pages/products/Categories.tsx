@@ -19,15 +19,15 @@ const Categories = () => {
   const { hasPermission } = useAuth();
   const { showToast } = useToast();
   const canManage = hasPermission('categories.manage');
-  
+
   const [showViewModal, setShowViewModal] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null);
   const [editingCategory, setEditingCategory] = useState<Category | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
-  
+  const itemsPerPage = 5;
+
   const [formData, setFormData] = useState({
     name: '',
     slug: '',
@@ -76,11 +76,11 @@ const Categories = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    
+
     setTimeout(() => {
       if (editingCategory) {
-        setCategories(prev => prev.map(c => 
-          c.id === editingCategory.id 
+        setCategories(prev => prev.map(c =>
+          c.id === editingCategory.id
             ? { ...c, ...formData }
             : c
         ));
@@ -103,7 +103,7 @@ const Categories = () => {
 
   const handleDelete = () => {
     setIsLoading(true);
-    
+
     setTimeout(() => {
       setCategories(prev => prev.filter(c => c.id !== selectedCategory?.id));
       setIsLoading(false);
@@ -226,22 +226,39 @@ const Categories = () => {
                 <nav>
                   <ul className="pagination mb-0">
                     <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                      <button className="page-link" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}><FiChevronLeft /></button>
+                      <button
+                        className="page-link"
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        disabled={currentPage === 1}
+                      >
+                        Previous
+                      </button>
                     </li>
                     {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                       let page: number;
-                      if (totalPages <= 5) page = i + 1;
-                      else if (currentPage <= 3) page = i + 1;
-                      else if (currentPage >= totalPages - 2) page = totalPages - 4 + i;
-                      else page = currentPage - 2 + i;
+                      if (totalPages <= 5) {
+                        page = i + 1;
+                      } else if (currentPage <= 3) {
+                        page = i + 1;
+                      } else if (currentPage >= totalPages - 2) {
+                        page = totalPages - 4 + i;
+                      } else {
+                        page = currentPage - 2 + i;
+                      }
                       return (
                         <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
                           <button className="page-link" onClick={() => setCurrentPage(page)}>{page}</button>
                         </li>
                       );
                     })}
-                    <li className={`page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`}>
-                      <button className="page-link" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0}><FiChevronRight /></button>
+                    <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                      <button
+                        className="page-link"
+                        onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                        disabled={currentPage === totalPages}
+                      >
+                        Next
+                      </button>
                     </li>
                   </ul>
                 </nav>

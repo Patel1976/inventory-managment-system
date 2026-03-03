@@ -25,11 +25,12 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
   const location = useLocation();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const { isAdmin, hasPermission } = useAuth();
+  const [isHovered, setIsHovered] = useState(false);
 
   const menuItems: MenuItem[] = [
     { title: 'Dashboard', icon: <FiHome />, path: '/', permission: 'dashboard.view' },
-    { 
-      title: 'Products', 
+    {
+      title: 'Products',
       icon: <FiBox />,
       permission: 'products.view',
       submenu: [
@@ -168,9 +169,12 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
   }, [location.pathname]);
 
   return (
-    <div className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+    <div className={`sidebar ${isCollapsed && !isHovered ? 'collapsed' : ''}`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <div className="sidebar-brand">
-        {!isCollapsed ? (
+        {(!isCollapsed || isHovered) ? (
           <img src="inventory-logo.png" alt="Logo" />
         ) : (
           <img src="favicon.png" alt="Logo" />
@@ -192,7 +196,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
                     }}
                   >
                     <i>{item.icon}</i>
-                    {!isCollapsed && (
+                    {(!isCollapsed || isHovered) && (
                       <>
                         <span className="nav-text">{item.title}</span>
                         <span style={{ marginLeft: 'auto' }}>
@@ -201,7 +205,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
                       </>
                     )}
                   </a>
-                  {!isCollapsed && (
+                  {(!isCollapsed || isHovered) && (
                     <ul className={`submenu ${isMenuOpen(item.title) ? 'show' : ''}`}>
                       {item.submenu.map((sub) => (
                         <li key={sub.path} className="nav-item">
@@ -222,7 +226,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
                   className={`nav-link ${isActiveLink(item.path!) ? 'active' : ''}`}
                 >
                   <i>{item.icon}</i>
-                  {!isCollapsed && <span className="nav-text">{item.title}</span>}
+                  {(!isCollapsed || isHovered) && <span className="nav-text">{item.title}</span>}
                 </Link>
               )}
             </li>

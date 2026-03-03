@@ -17,15 +17,24 @@ const SupplierList = () => {
   const [isViewOpen, setIsViewOpen] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const [suppliers, setSuppliers] = useState<Supplier[]>([
     { id: 1, name: 'Tech Suppliers Inc', company: 'Tech Suppliers Inc', email: 'contact@techsuppliers.com', phone: '+1 234 567 890', address: '100 Tech Park, Silicon Valley', taxNumber: 'TX-001234', purchases: 45, totalPurchased: 125000.00, status: 'Active' },
     { id: 2, name: 'Global Electronics', company: 'Global Electronics Ltd', email: 'sales@globalelec.com', phone: '+1 234 567 891', address: '200 Industry Blvd, Texas', taxNumber: 'TX-005678', purchases: 32, totalPurchased: 89500.00, status: 'Active' },
     { id: 3, name: 'Premium Parts Ltd', company: 'Premium Parts Ltd', email: 'info@premiumparts.com', phone: '+1 234 567 892', address: '300 Commerce St, Florida', taxNumber: 'TX-009012', purchases: 28, totalPurchased: 67800.00, status: 'Active' },
     { id: 4, name: 'Digital World', company: 'Digital World Corp', email: 'orders@digitalworld.com', phone: '+1 234 567 893', address: '400 Digital Ave, California', taxNumber: 'TX-003456', purchases: 19, totalPurchased: 45200.00, status: 'Inactive' },
+    { id: 5, name: 'Global Solutions', company: 'Global Solutions Ltd', email: 'info@globalsolutions.com', phone: '+1 234 567 894', address: '500 Global St, New York', taxNumber: 'TX-007890', purchases: 25, totalPurchased: 72300.00, status: 'Active' },
+    { id: 6, name: 'Innovate Tech', company: 'Innovate Tech Inc', email: 'support@innovatetech.com', phone: '+1 234 567 895', address: '600 Innovation Blvd, Boston', taxNumber: 'TX-012345', purchases: 12, totalPurchased: 34500.00, status: 'Active' },
   ]);
 
   const filteredSuppliers = suppliers.filter(s => s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.email.toLowerCase().includes(searchTerm.toLowerCase()));
+
+  // Pagination
+  const totalPages = Math.ceil(filteredSuppliers.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedSuppliers = filteredSuppliers.slice(startIndex, startIndex + itemsPerPage);
 
   const handleDelete = (supplier: Supplier) => {
     setSelectedSupplier(supplier);
@@ -76,7 +85,9 @@ const SupplierList = () => {
                 </Link>
               }
             </div>
-          </div></div></div>
+          </div>
+        </div>
+      </div>
       <div className="data-card">
         <div className="data-card-body">
           <div className="table-responsive">
@@ -93,7 +104,7 @@ const SupplierList = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredSuppliers.map((supplier, index) => (
+                {paginatedSuppliers.map((supplier, index) => (
                   <tr key={supplier.id}>
                     <td>
                       <div className="fw-semibold">{index + 1}</div>
@@ -129,6 +140,51 @@ const SupplierList = () => {
                 ))}
               </tbody>
             </table>
+          </div>
+          {/* Pagination */}
+          <div className="d-flex justify-content-between align-items-center mt-4">
+            <div className="text-muted">
+              Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredSuppliers.length)} of {filteredSuppliers.length} entries
+            </div>
+            <nav>
+              <ul className="pagination mb-0">
+                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                  <button
+                    className="page-link"
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </button>
+                </li>
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let page: number;
+                  if (totalPages <= 5) {
+                    page = i + 1;
+                  } else if (currentPage <= 3) {
+                    page = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    page = totalPages - 4 + i;
+                  } else {
+                    page = currentPage - 2 + i;
+                  }
+                  return (
+                    <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
+                      <button className="page-link" onClick={() => setCurrentPage(page)}>{page}</button>
+                    </li>
+                  );
+                })}
+                <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                  <button
+                    className="page-link"
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </button>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
       </div>

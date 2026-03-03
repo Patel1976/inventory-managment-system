@@ -25,8 +25,8 @@ const SupplierReport = () => {
 
   const filteredData = supplierData.filter(item => {
     const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          item.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          item.phone.includes(searchTerm);
+      item.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.phone.includes(searchTerm);
     const matchesSupplier = !supplierFilter || item.name === supplierFilter;
     return matchesSearch && matchesSupplier;
   });
@@ -57,25 +57,25 @@ const SupplierReport = () => {
           <div className="row g-3 align-items-end">
             <div className="col-12 col-md-2">
               <label className="form-label">From Date</label>
-              <input 
-                type="date" 
-                className="form-control" 
+              <input
+                type="date"
+                className="form-control"
                 value={fromDate}
                 onChange={(e) => setFromDate(e.target.value)}
               />
             </div>
             <div className="col-12 col-md-2">
               <label className="form-label">To Date</label>
-              <input 
-                type="date" 
+              <input
+                type="date"
                 className="form-control"
                 value={toDate}
                 onChange={(e) => setToDate(e.target.value)}
               />
             </div>
-            <div className="col-12 col-md-2">
+            <div className="col-12 col-md-3">
               <label className="form-label">Supplier</label>
-              <select 
+              <select
                 className="form-select"
                 value={supplierFilter}
                 onChange={(e) => setSupplierFilter(e.target.value)}
@@ -90,16 +90,16 @@ const SupplierReport = () => {
               <label className="form-label">Search</label>
               <div className="input-group">
                 <span className="input-group-text"><FiSearch /></span>
-                <input 
-                  type="text" 
-                  className="form-control" 
+                <input
+                  type="text"
+                  className="form-control"
                   placeholder="Search name, email, phone..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
             </div>
-            <div className="col-12 col-md-3 d-flex align-items-end gap-2 justify-content-end">
+            <div className="col-12 col-md-2 d-flex align-items-end gap-2 justify-content-end">
               <button className="btn btn-primary-custom d-flex align-items-center"><FiFilter className="me-1" /> Filter</button>
             </div>
           </div>
@@ -147,22 +147,39 @@ const SupplierReport = () => {
             <nav>
               <ul className="pagination mb-0">
                 <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                  <button className="page-link" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}><FiChevronLeft /></button>
+                  <button
+                    className="page-link"
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </button>
                 </li>
                 {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                   let page: number;
-                  if (totalPages <= 5) page = i + 1;
-                  else if (currentPage <= 3) page = i + 1;
-                  else if (currentPage >= totalPages - 2) page = totalPages - 4 + i;
-                  else page = currentPage - 2 + i;
+                  if (totalPages <= 5) {
+                    page = i + 1;
+                  } else if (currentPage <= 3) {
+                    page = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    page = totalPages - 4 + i;
+                  } else {
+                    page = currentPage - 2 + i;
+                  }
                   return (
                     <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
                       <button className="page-link" onClick={() => setCurrentPage(page)}>{page}</button>
                     </li>
                   );
                 })}
-                <li className={`page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`}>
-                  <button className="page-link" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0}><FiChevronRight /></button>
+                <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                  <button
+                    className="page-link"
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </button>
                 </li>
               </ul>
             </nav>

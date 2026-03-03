@@ -13,6 +13,8 @@ import {
 } from '../../config/permissions';
 import FormModal from '@/components/common/FormModal';
 import ViewModal from '@/components/common/ViewModal';
+import ConfirmDialog from '@/components/common/ConfirmDialog';
+import { useToast } from '../../components/common/Toast';
 
 interface User {
   id: number;
@@ -39,6 +41,10 @@ const ManageUsers = () => {
   const [viewingRole, setViewingRole] = useState<UserRole | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { showToast } = useToast();
 
   // Form state
   const [formData, setFormData] = useState({
@@ -54,7 +60,7 @@ const ManageUsers = () => {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   // Mock users data
-  const [users] = useState<User[]>([
+  const [users, setUsers] = useState<User[]>([
     { id: 1, name: 'John Admin', username: 'johnadmin', email: 'john.admin@example.com', role: 'Admin', status: 'Active', createdDate: '2024-01-15' },
     { id: 2, name: 'Sarah Manager', username: 'sarahm', email: 'sarah.m@example.com', role: 'Manager', status: 'Active', createdDate: '2024-02-10' },
     { id: 3, name: 'Mike Staff', username: 'mikestaff', email: 'mike.staff@example.com', role: 'Staff', status: 'Active', createdDate: '2024-02-20' },
@@ -148,20 +154,15 @@ const ManageUsers = () => {
 
   const handleSavePermissions = () => {
     console.log("Updated Role Permissions:", editableRolePermissions);
-
-    // Later → send to API
-
     setShowPermissionsModal(false);
   };
 
   const validateForm = () => {
     const errors: Record<string, string> = {};
-
     if (!formData.name.trim()) errors.name = 'Name is required';
     if (!formData.username.trim()) errors.username = 'Username is required';
     if (!formData.email.trim()) errors.email = 'Email is required';
     else if (!/\S+@\S+\.\S+/.test(formData.email)) errors.email = 'Invalid email format';
-
     if (!editingUser) {
       if (!formData.password) errors.password = 'Password is required';
       else if (formData.password.length < 6) errors.password = 'Password must be at least 6 characters';
@@ -170,7 +171,6 @@ const ManageUsers = () => {
       if (formData.password.length < 6) errors.password = 'Password must be at least 6 characters';
       if (formData.password !== formData.confirmPassword) errors.confirmPassword = 'Passwords do not match';
     }
-
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -178,16 +178,30 @@ const ManageUsers = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (validateForm()) {
-      // Mock save - in real app would call API
       console.log('Saving user:', formData);
       handleCloseModal();
     }
   };
 
-  const handleDelete = (userId: number) => {
-    if (window.confirm('Are you sure you want to delete this user?')) {
-      console.log('Deleting user:', userId);
-    }
+  const handleDeleteClick = (user: User) => {
+    setSelectedUser(user);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDelete = () => {
+    if (!selectedUser) return;
+    setIsLoading(true);
+    setTimeout(() => {
+      setIsLoading(false);
+      setShowDeleteDialog(false);
+      showToast({ type: 'success', title: 'Deleted', message: 'User deleted successfully!' });
+      setSelectedUser(prev => {
+        if (prev) {
+          setUsers(users.filter(u => u.id !== prev.id));
+        }
+        return null;
+      });
+    }, 500);
   };
 
   const formatDate = (dateStr: string) => {
@@ -320,7 +334,7 @@ const ManageUsers = () => {
                           <button className="btn-action edit me-1" onClick={() => handleOpenModal(user)}>
                             <FiEdit />
                           </button>
-                          <button className="btn-action delete" onClick={() => handleDelete(user.id)}>
+                          <button className="btn-action delete" onClick={() => handleDeleteClick(user)}>
                             <FiTrash2 />
                           </button>
                         </>
@@ -338,28 +352,50 @@ const ManageUsers = () => {
           </div>
 
           {/* Pagination */}
-          {totalPages > 1 && (
-            <div className="d-flex justify-content-between align-items-center mt-3">
-              <div className="text-muted small">
-                Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredUsers.length)} of {filteredUsers.length} entries
-              </div>
-              <nav>
-                <ul className="pagination pagination-sm mb-0">
-                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                    <button className="page-link" onClick={() => setCurrentPage(prev => prev - 1)}>Previous</button>
-                  </li>
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+          <div className="d-flex justify-content-between align-items-center mt-3">
+            <div className="text-muted small">
+              Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredUsers.length)} of {filteredUsers.length} entries
+            </div>
+            <nav>
+              <ul className="pagination mb-0">
+                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                  <button
+                    className="page-link"
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </button>
+                </li>
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let page: number;
+                  if (totalPages <= 5) {
+                    page = i + 1;
+                  } else if (currentPage <= 3) {
+                    page = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    page = totalPages - 4 + i;
+                  } else {
+                    page = currentPage - 2 + i;
+                  }
+                  return (
                     <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
                       <button className="page-link" onClick={() => setCurrentPage(page)}>{page}</button>
                     </li>
-                  ))}
-                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                    <button className="page-link" onClick={() => setCurrentPage(prev => prev + 1)}>Next</button>
-                  </li>
-                </ul>
-              </nav>
-            </div>
-          )}
+                  );
+                })}
+                <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                  <button
+                    className="page-link"
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </button>
+                </li>
+              </ul>
+            </nav>
+          </div>
         </div>
       </div>
 
@@ -561,6 +597,21 @@ const ManageUsers = () => {
           </>
         )}
       </ViewModal>
+
+      {/* Delete Confirmation */}
+      <ConfirmDialog
+        isOpen={showDeleteDialog}
+        title="Delete User"
+        message={`Are you sure you want to delete "${selectedUser?.name}"?`}
+        confirmLabel="Delete"
+        onConfirm={confirmDelete}
+        onCancel={() => {
+          setShowDeleteDialog(false);
+          setSelectedUser(null);
+        }}
+        isLoading={isLoading}
+        variant="danger"
+      />
     </div>
   );
 };

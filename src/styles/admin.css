@@ -18,6 +18,10 @@
   width: 70px;
 }
 
+.sidebar.collapsed .sidebar-nav .nav-item .nav-link {
+  display: block;
+}
+
 .sidebar-brand {
   padding: 10px;
   display: flex;
@@ -431,22 +435,38 @@
 
 .btn-action.view {
   background: #dbeafe;
-  color: #2563eb;
+  color: #0d6efd;
+}
+.btn-action.view:hover {
+  background: #0d6efd;
+  color: #ffffff;
 }
 
 .btn-action.permissions {
-  background: #e0e7ff;
-  color: #4c1d95;
+  background: #ede9fe;
+  color: #6f42c1;
+}
+.btn-action.permissions:hover {
+  background: #6f42c1;
+  color: #ffffff;
 }
 
 .btn-action.edit {
-  background: #fef3c7;
-  color: #d97706;
+  background: #fff3cd;
+  color: #fd7e14;
+}
+.btn-action.edit:hover {
+  background: #fd7e14;
+  color: #ffffff;
 }
 
 .btn-action.delete {
   background: #fee2e2;
   color: #dc2626;
+}
+.btn-action.delete:hover {
+  background: #dc2626;
+  color: #ffffff;
 }
 
 .btn-action:hover {

@@ -43,6 +43,8 @@
   --primary-light: rgba(34, 197, 94, 0.15);
 
   /* Dark Mode Colors */
+  --sidebar-brand-bg: #1a1a2e;
+  --sidebar-nav-bg: #1a1a2e;
   --sidebar-bg: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
   --header-bg: #1a1a2e;
   --body-bg: #0f0f23;
@@ -64,6 +66,7 @@
   --bs-primary-rgb: 34, 197, 94;
   --bs-body-bg: #0f0f23;
   --bs-body-color: #e5e5e5;
+  --bs-secondary-color: #e5e5e5;
 }
 
 /* Primary Color Themes */
@@ -840,7 +843,7 @@ a:hover {
 }
 
 .login-title h3 {
-  color: #000;
+  color: var(--text-primary);
   margin: 0 0 8px 0;
   font-size: 24px;
   font-weight: 700;
@@ -859,7 +862,7 @@ a:hover {
   display: flex;
   align-items: center;
   font-weight: 500;
-  color: #333 !important;
+  color: var(--text-primary);
   margin-bottom: 10px;
   font-size: 14px;
 }

@@ -16,6 +16,7 @@ export const mockSaleReturns: SaleReturnItem[] = [
   { id: 'SR-003', date: '2024-01-13', saleRef: 'INV-003', customer: 'Bob Wilson', product: 'Sony Headphones', quantity: 2, returnAmount: 698.00, reason: 'Not as described', status: 'Completed' },
   { id: 'SR-004', date: '2024-01-12', saleRef: 'INV-001', customer: 'John Doe', product: 'MacBook Pro M2', quantity: 1, returnAmount: 1999.00, reason: 'Changed mind', status: 'Processing' },
   { id: 'SR-005', date: '2024-01-11', saleRef: 'INV-004', customer: 'Alice Brown', product: 'Dell Monitor 27"', quantity: 1, returnAmount: 299.00, reason: 'Dead pixels', status: 'Completed' },
+  { id: 'SR-006', date: '2024-01-10', saleRef: 'INV-005', customer: 'Charlie Davis', product: 'Logitech MX Master 3', quantity: 1, returnAmount: 99.00, reason: 'Wrong model shipped', status: 'Completed' },
 ];
 
 const SaleReturnList = () => {
@@ -26,7 +27,7 @@ const SaleReturnList = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [customerFilter, setCustomerFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 10;
+  const itemsPerPage = 5;
   const [returns, setReturns] = useState<SaleReturnItem[]>(mockSaleReturns);
   const [selectedReturn, setSelectedReturn] = useState<any>(null);
   const [isViewOpen, setIsViewOpen] = useState(false);
@@ -154,22 +155,39 @@ const SaleReturnList = () => {
             <nav>
               <ul className="pagination mb-0">
                 <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                  <button className="page-link" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}><FiChevronLeft /></button>
+                  <button
+                    className="page-link"
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </button>
                 </li>
                 {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                   let page: number;
-                  if (totalPages <= 5) page = i + 1;
-                  else if (currentPage <= 3) page = i + 1;
-                  else if (currentPage >= totalPages - 2) page = totalPages - 4 + i;
-                  else page = currentPage - 2 + i;
+                  if (totalPages <= 5) {
+                    page = i + 1;
+                  } else if (currentPage <= 3) {
+                    page = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    page = totalPages - 4 + i;
+                  } else {
+                    page = currentPage - 2 + i;
+                  }
                   return (
                     <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
                       <button className="page-link" onClick={() => setCurrentPage(page)}>{page}</button>
                     </li>
                   );
                 })}
-                <li className={`page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`}>
-                  <button className="page-link" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0}><FiChevronRight /></button>
+                <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                  <button
+                    className="page-link"
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </button>
                 </li>
               </ul>
             </nav>

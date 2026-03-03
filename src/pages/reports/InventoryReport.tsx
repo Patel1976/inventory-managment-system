@@ -1,23 +1,48 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiDownload, FiFilter, FiFileText, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 
 const InventoryReport = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [brandFilter, setBrandFilter] = useState('');
+  const [stockFilter, setStockFilter] = useState('');
 
   const inventoryData = [
-    { sku: 'SKU001', product: 'iPhone 14 Pro', category: 'Electronics', inStock: 120, sold: 45, purchasePrice: 800, sellingPrice: 999 },
-    { sku: 'SKU002', product: 'Samsung Galaxy S23', category: 'Electronics', inStock: 85, sold: 38, purchasePrice: 700, sellingPrice: 899 },
-    { sku: 'SKU003', product: 'MacBook Pro M2', category: 'Laptops', inStock: 42, sold: 32, purchasePrice: 1600, sellingPrice: 1999 },
-    { sku: 'SKU004', product: 'Sony Headphones', category: 'Audio', inStock: 156, sold: 28, purchasePrice: 250, sellingPrice: 349 },
-    { sku: 'SKU005', product: 'Apple Watch', category: 'Wearables', inStock: 68, sold: 25, purchasePrice: 300, sellingPrice: 399 },
-    { sku: 'SKU006', product: 'Dell Monitor 27"', category: 'Electronics', inStock: 5, sold: 15, purchasePrice: 250, sellingPrice: 349 },
+    { sku: 'SKU001', product: 'iPhone 14 Pro', category: 'electronics', brand: 'apple', inStock: 120, sold: 45, purchasePrice: 800, sellingPrice: 999 },
+    { sku: 'SKU002', product: 'Samsung Galaxy S23', category: 'electronics', brand: 'samsung', inStock: 85, sold: 38, purchasePrice: 700, sellingPrice: 899 },
+    { sku: 'SKU003', product: 'MacBook Pro M2', category: 'laptops', brand: 'apple', inStock: 42, sold: 32, purchasePrice: 1600, sellingPrice: 1999 },
+    { sku: 'SKU004', product: 'Sony Headphones', category: 'audio', brand: 'sony', inStock: 156, sold: 28, purchasePrice: 250, sellingPrice: 349 },
+    { sku: 'SKU005', product: 'Apple Watch', category: 'wearables', brand: 'apple', inStock: 68, sold: 25, purchasePrice: 300, sellingPrice: 399 },
+    { sku: 'SKU006', product: 'Dell Monitor 27"', category: 'electronics', brand: 'dell', inStock: 5, sold: 15, purchasePrice: 250, sellingPrice: 349 }
   ];
 
-  const totalPages = Math.ceil(inventoryData.length / itemsPerPage);
+  const filteredData = inventoryData.filter((item) => {
+    const matchCategory =
+      !categoryFilter || item.category === categoryFilter;
+
+    const matchBrand =
+      !brandFilter || item.brand === brandFilter;
+
+    const matchStock =
+      !stockFilter ||
+      (stockFilter === 'in-stock' && item.inStock > 50) ||
+      (stockFilter === 'low-stock' && item.inStock <= 50 && item.inStock > 10) ||
+      (stockFilter === 'out-of-stock' && item.inStock <= 10);
+
+    return matchCategory && matchBrand && matchStock;
+  });
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedData = inventoryData.slice(startIndex, startIndex + itemsPerPage);
+  const paginatedData = filteredData.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [categoryFilter, brandFilter, stockFilter]);
 
   return (
     <div className="inventory-report-page">
@@ -31,7 +56,10 @@ const InventoryReport = () => {
           <div className="row g-3 align-items-end">
             <div className="col-12 col-md-3">
               <label className="form-label">Category</label>
-              <select className="form-select">
+              <select className="form-select"
+                value={categoryFilter}
+                onChange={e => setCategoryFilter(e.target.value)}
+              >
                 <option value="">All Categories</option>
                 <option value="electronics">Electronics</option>
                 <option value="laptops">Laptops</option>
@@ -40,7 +68,11 @@ const InventoryReport = () => {
             </div>
             <div className="col-12 col-md-3">
               <label className="form-label">Brand</label>
-              <select className="form-select">
+              <select
+                className="form-select"
+                value={brandFilter}
+                onChange={(e) => setBrandFilter(e.target.value)}
+              >
                 <option value="">All Brands</option>
                 <option value="apple">Apple</option>
                 <option value="samsung">Samsung</option>
@@ -48,7 +80,11 @@ const InventoryReport = () => {
             </div>
             <div className="col-12 col-md-3">
               <label className="form-label">Stock Status</label>
-              <select className="form-select">
+              <select
+                className="form-select"
+                value={stockFilter}
+                onChange={(e) => setStockFilter(e.target.value)}
+              >
                 <option value="">All</option>
                 <option value="in-stock">In Stock</option>
                 <option value="low-stock">Low Stock</option>
@@ -97,22 +133,39 @@ const InventoryReport = () => {
             <nav>
               <ul className="pagination mb-0">
                 <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                  <button className="page-link" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}><FiChevronLeft /></button>
+                  <button
+                    className="page-link"
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </button>
                 </li>
                 {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                   let page: number;
-                  if (totalPages <= 5) page = i + 1;
-                  else if (currentPage <= 3) page = i + 1;
-                  else if (currentPage >= totalPages - 2) page = totalPages - 4 + i;
-                  else page = currentPage - 2 + i;
+                  if (totalPages <= 5) {
+                    page = i + 1;
+                  } else if (currentPage <= 3) {
+                    page = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    page = totalPages - 4 + i;
+                  } else {
+                    page = currentPage - 2 + i;
+                  }
                   return (
                     <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
                       <button className="page-link" onClick={() => setCurrentPage(page)}>{page}</button>
                     </li>
                   );
                 })}
-                <li className={`page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`}>
-                  <button className="page-link" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0}><FiChevronRight /></button>
+                <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                  <button
+                    className="page-link"
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </button>
                 </li>
               </ul>
             </nav>

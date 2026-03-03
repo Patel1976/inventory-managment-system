@@ -31,6 +31,7 @@ const PurchaseList = () => {
     { id: 'PO-003', date: '2024-01-13', supplier: 'Premium Parts Ltd', store: 'Main Store', total: 2100.00, paid: 2100.00, due: 0, status: 'Received' },
     { id: 'PO-004', date: '2024-01-12', supplier: 'Tech Suppliers Inc', store: 'Branch 2', total: 1450.00, paid: 0, due: 1450.00, status: 'Ordered' },
     { id: 'PO-005', date: '2024-01-11', supplier: 'Digital World', store: 'Main Store', total: 4800.00, paid: 4800.00, due: 0, status: 'Received' },
+    { id: 'PO-006', date: '2024-01-10', supplier: 'Global Electronics', store: 'Branch 3', total: 3200.00, paid: 3200.00, due: 0, status: 'Received' },
   ]);
 
   const filteredPurchases = purchases.filter(p => p.id.toLowerCase().includes(searchTerm.toLowerCase()) || p.supplier.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -117,22 +118,39 @@ const PurchaseList = () => {
             <nav>
               <ul className="pagination mb-0">
                 <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                  <button className="page-link" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}><FiChevronLeft /></button>
+                  <button
+                    className="page-link"
+                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </button>
                 </li>
                 {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                   let page: number;
-                  if (totalPages <= 5) page = i + 1;
-                  else if (currentPage <= 3) page = i + 1;
-                  else if (currentPage >= totalPages - 2) page = totalPages - 4 + i;
-                  else page = currentPage - 2 + i;
+                  if (totalPages <= 5) {
+                    page = i + 1;
+                  } else if (currentPage <= 3) {
+                    page = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    page = totalPages - 4 + i;
+                  } else {
+                    page = currentPage - 2 + i;
+                  }
                   return (
                     <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
                       <button className="page-link" onClick={() => setCurrentPage(page)}>{page}</button>
                     </li>
                   );
                 })}
-                <li className={`page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`}>
-                  <button className="page-link" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0}><FiChevronRight /></button>
+                <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                  <button
+                    className="page-link"
+                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </button>
                 </li>
               </ul>
             </nav>

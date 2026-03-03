@@ -73,38 +73,55 @@ const ExpenseCategories = () => {
         </div>
         <div className="col-12 col-lg-8">
           <div className="data-card"><div className="data-card-header"><h5>All Categories</h5></div><div className="data-card-body"><div className="table-responsive"><table className="data-table"><thead><tr><th>#</th><th>Category Name</th><th>Description</th><th>Expenses</th><th>Total</th><th>Action</th></tr></thead><tbody>
-            {categories.map((category, index) => (
+            {paginatedData.map((category, index) => (
               <tr key={category.id}><td><div className="fw-semibold">{index + 1}</div></td><td><div className="fw-semibold">{category.name}</div></td><td>{category.description}</td><td>{category.expenses}</td><td><div className="fw-semibold">${category.total.toLocaleString()}</div></td><td>
                 <button className="btn-action view me-1" onClick={() => handleView(category)}><FiEye /></button>
                 {canManage && <><button className="btn-action edit me-1" onClick={() => handleEdit(category)}><FiEdit /></button><button className="btn-action delete" onClick={() => handleDeleteClick(category)}><FiTrash2 /></button></>}
               </td></tr>
             ))}
           </tbody></table></div>
-          <div className="d-flex justify-content-between align-items-center mt-4">
-            <div className="text-muted">Showing {categories.length === 0 ? 0 : startIndex + 1} to {Math.min(startIndex + itemsPerPage, categories.length)} of {categories.length} entries</div>
-            <nav>
-              <ul className="pagination mb-0">
-                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                  <button className="page-link" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1}><FiChevronLeft /></button>
-                </li>
-                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                  let page: number;
-                  if (totalPages <= 5) page = i + 1;
-                  else if (currentPage <= 3) page = i + 1;
-                  else if (currentPage >= totalPages - 2) page = totalPages - 4 + i;
-                  else page = currentPage - 2 + i;
-                  return (
-                    <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
-                      <button className="page-link" onClick={() => setCurrentPage(page)}>{page}</button>
-                    </li>
-                  );
-                })}
-                <li className={`page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`}>
-                  <button className="page-link" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages || totalPages === 0}><FiChevronRight /></button>
-                </li>
-              </ul>
-            </nav>
-          </div>
+            <div className="d-flex justify-content-between align-items-center mt-4">
+              <div className="text-muted">Showing {paginatedData.length === 0 ? 0 : startIndex + 1} to {Math.min(startIndex + itemsPerPage, paginatedData.length)} of {paginatedData.length} entries</div>
+              <nav>
+                <ul className="pagination mb-0">
+                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                    <button
+                      className="page-link"
+                      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                      disabled={currentPage === 1}
+                    >
+                      Previous
+                    </button>
+                  </li>
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let page: number;
+                    if (totalPages <= 5) {
+                      page = i + 1;
+                    } else if (currentPage <= 3) {
+                      page = i + 1;
+                    } else if (currentPage >= totalPages - 2) {
+                      page = totalPages - 4 + i;
+                    } else {
+                      page = currentPage - 2 + i;
+                    }
+                    return (
+                      <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
+                        <button className="page-link" onClick={() => setCurrentPage(page)}>{page}</button>
+                      </li>
+                    );
+                  })}
+                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                    <button
+                      className="page-link"
+                      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            </div>
           </div></div>
         </div>
       </div>

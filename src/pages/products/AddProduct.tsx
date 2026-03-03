@@ -239,7 +239,7 @@ const AddProduct = () => {
                 style={{ 
                   border: '2px dashed #ddd', 
                   borderRadius: '12px',
-                  background: '#f8f9fa',
+                  background: 'var(--table-header-bg)',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
@@ -250,7 +250,7 @@ const AddProduct = () => {
                   Drag and drop image here
                 </p>
                 <p className="text-muted small mb-2">or</p>
-                <label className="btn btn-outline-primary btn-sm">
+                <label className="btn btn-outline-primary btn-sm align-items-center d-flex">
                   Browse Files
                   <input 
                     type="file" 
