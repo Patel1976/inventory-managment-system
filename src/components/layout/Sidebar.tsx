@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   FiHome, FiBox, FiShoppingCart, FiUsers,
@@ -10,6 +10,7 @@ import { Permission } from '../../config/permissions';
 
 interface SidebarProps {
   isCollapsed: boolean;
+  setIsCollapsed: (value: boolean) => void;
 }
 
 interface MenuItem {
@@ -21,11 +22,14 @@ interface MenuItem {
   permission?: Permission;
 }
 
-const Sidebar = ({ isCollapsed }: SidebarProps) => {
+const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
   const location = useLocation();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const { isAdmin, hasPermission } = useAuth();
   const [isHovered, setIsHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 991);
+  const isSidebarExpanded = isMobile ? !isCollapsed : (!isCollapsed || isHovered);
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   const menuItems: MenuItem[] = [
     { title: 'Dashboard', icon: <FiHome />, path: '/', permission: 'dashboard.view' },
@@ -168,13 +172,47 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
     }
   }, [location.pathname]);
 
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 991);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (isMobile) {
+      setIsCollapsed(true);
+    }
+  }, [location.pathname]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        isMobile &&
+        sidebarRef.current &&
+        !sidebarRef.current.contains(event.target as Node)
+      ) {
+        setIsCollapsed(true);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isMobile]);
+
   return (
-    <div className={`sidebar ${isCollapsed && !isHovered ? 'collapsed' : ''}`}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+    <div ref={sidebarRef}
+      className={`sidebar 
+        ${!isMobile && isCollapsed && !isHovered ? 'collapsed' : ''} 
+        ${isMobile ? (isCollapsed ? '' : 'show') : ''}
+      `}
+      onMouseEnter={() => !isMobile && setIsHovered(true)}
+      onMouseLeave={() => !isMobile && setIsHovered(false)}
     >
       <div className="sidebar-brand">
-        {(!isCollapsed || isHovered) ? (
+        {isSidebarExpanded ? (
           <img src="inventory-logo.png" alt="Logo" />
         ) : (
           <img src="favicon.png" alt="Logo" />
@@ -196,7 +234,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
                     }}
                   >
                     <i>{item.icon}</i>
-                    {(!isCollapsed || isHovered) && (
+                    {isSidebarExpanded && (
                       <>
                         <span className="nav-text">{item.title}</span>
                         <span style={{ marginLeft: 'auto' }}>
@@ -205,7 +243,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
                       </>
                     )}
                   </a>
-                  {(!isCollapsed || isHovered) && (
+                  {isSidebarExpanded && (
                     <ul className={`submenu ${isMenuOpen(item.title) ? 'show' : ''}`}>
                       {item.submenu.map((sub) => (
                         <li key={sub.path} className="nav-item">
@@ -226,7 +264,7 @@ const Sidebar = ({ isCollapsed }: SidebarProps) => {
                   className={`nav-link ${isActiveLink(item.path!) ? 'active' : ''}`}
                 >
                   <i>{item.icon}</i>
-                  {(!isCollapsed || isHovered) && <span className="nav-text">{item.title}</span>}
+                  {isSidebarExpanded && <span className="nav-text">{item.title}</span>}
                 </Link>
               )}
             </li>

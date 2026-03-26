@@ -4,10 +4,10 @@ import { FiSave, FiX } from 'react-icons/fi';
 import { useToast } from '../../components/common/Toast';
 
 const mockStoresData = [
-  { id: 1, name: 'Main Store', email: 'main@store.com', phone: '+1 234 567 890', address: '123 Main Street, Downtown', manager: 'John Manager', status: 'Active' },
-  { id: 2, name: 'Branch 1', email: 'branch1@store.com', phone: '+1 234 567 891', address: '456 Oak Avenue, Uptown', manager: 'Jane Supervisor', status: 'Active' },
-  { id: 3, name: 'Branch 2', email: 'branch2@store.com', phone: '+1 234 567 892', address: '789 Pine Road, Midtown', manager: 'Bob Lead', status: 'Active' },
-  { id: 4, name: 'Warehouse', email: 'warehouse@store.com', phone: '+1 234 567 893', address: '100 Industrial Park', manager: 'Alice Stock', status: 'Active' },
+  { id: 1, name: 'Main Store', email: 'main@store.com', phone: '+1 234 567 890', address: '123 Main Street, Downtown', manager: 'John Manager', status: 'active' },
+  { id: 2, name: 'Branch 1', email: 'branch1@store.com', phone: '+1 234 567 891', address: '456 Oak Avenue, Uptown', manager: 'Jane Supervisor', status: 'active' },
+  { id: 3, name: 'Branch 2', email: 'branch2@store.com', phone: '+1 234 567 892', address: '789 Pine Road, Midtown', manager: 'Bob Lead', status: 'active' },
+  { id: 4, name: 'Warehouse', email: 'warehouse@store.com', phone: '+1 234 567 893', address: '100 Industrial Park', manager: 'Alice Stock', status: 'active' },
 ];
 
 const StoreForm = () => {
@@ -18,7 +18,7 @@ const StoreForm = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    name: '', email: '', phone: '', address: '', manager: '', status: 'Active'
+    name: '', email: '', phone: '', address: '', manager: '', status: 'active'
   });
 
   useEffect(() => {
@@ -128,8 +128,8 @@ const StoreForm = () => {
                       value={formData.status}
                       onChange={handleChange}
                     >
-                      <option value="Active">Active</option>
-                      <option value="Inactive">Inactive</option>
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
                     </select>
                   </div>
                 </div>

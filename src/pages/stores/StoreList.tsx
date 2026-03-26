@@ -21,12 +21,12 @@ const StoreList = () => {
   const itemsPerPage = 10;
 
   const [stores, setStores] = useState<Store[]>([
-    { id: 1, name: 'Main Store', code: 'MS001', email: 'main@store.com', phone: '+1 234 567 890', address: '123 Main Street, Downtown', manager: 'John Manager', products: 248, status: 'Active' },
-    { id: 2, name: 'Branch 1', code: 'BR001', email: 'branch1@store.com', phone: '+1 234 567 891', address: '456 Oak Avenue, Uptown', manager: 'Jane Supervisor', products: 156, status: 'Active' },
-    { id: 3, name: 'Branch 2', code: 'BR002', email: 'branch2@store.com', phone: '+1 234 567 892', address: '789 Pine Road, Midtown', manager: 'Bob Lead', products: 98, status: 'Active' },
-    { id: 4, name: 'Warehouse', code: 'WH001', email: 'warehouse@store.com', phone: '+1 234 567 893', address: '100 Industrial Park', manager: 'Alice Stock', products: 520, status: 'Active' },
-    { id: 5, name: 'Outlet Store', code: 'OS001', email: 'outlet@store.com', phone: '+1 234 567 894', address: '200 Outlet Blvd, Suburbia', manager: 'Charlie Retailer', products: 87, status: 'Active' },
-    { id: 6, name: 'Showroom', code: 'SR001', email: 'showroom@store.com', phone: '+1 234 567 895', address: '300 Showroom Ave, City Center', manager: 'Diana Display', products: 176, status: 'Inactive' },
+    { id: 1, name: 'Main Store', code: 'MS001', email: 'main@store.com', phone: '+1 234 567 890', address: '123 Main Street, Downtown', manager: 'John Manager', products: 248, status: 'active' },
+    { id: 2, name: 'Branch 1', code: 'BR001', email: 'branch1@store.com', phone: '+1 234 567 891', address: '456 Oak Avenue, Uptown', manager: 'Jane Supervisor', products: 156, status: 'active' },
+    { id: 3, name: 'Branch 2', code: 'BR002', email: 'branch2@store.com', phone: '+1 234 567 892', address: '789 Pine Road, Midtown', manager: 'Bob Lead', products: 98, status: 'active' },
+    { id: 4, name: 'Warehouse', code: 'WH001', email: 'warehouse@store.com', phone: '+1 234 567 893', address: '100 Industrial Park', manager: 'Alice Stock', products: 520, status: 'active' },
+    { id: 5, name: 'Outlet Store', code: 'OS001', email: 'outlet@store.com', phone: '+1 234 567 894', address: '200 Outlet Blvd, Suburbia', manager: 'Charlie Retailer', products: 87, status: 'active' },
+    { id: 6, name: 'Showroom', code: 'SR001', email: 'showroom@store.com', phone: '+1 234 567 895', address: '300 Showroom Ave, City Center', manager: 'Diana Display', products: 176, status: 'inactive' },
   ]);
 
   const filteredStores = stores.filter(s => s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.code.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -219,7 +219,7 @@ const StoreList = () => {
                   <small className="text-muted">Status</small>
                   <div>
                     <span
-                      className={`badge ${selectedStore.status === 'Active'
+                      className={`badge ${selectedStore.status === 'active'
                         ? 'badge-success'
                         : 'badge-warning'
                         }`}

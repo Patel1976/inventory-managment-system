@@ -4,11 +4,11 @@ import { FiSave, FiX } from 'react-icons/fi';
 import { useToast } from '../../components/common/Toast';
 
 const mockCustomersData = [
-  { id: 1, name: 'John Doe', email: 'john@example.com', phone: '+1 234 567 890', address: '123 Main St', city: 'New York', country: 'USA', status: 'Active' },
-  { id: 2, name: 'Jane Smith', email: 'jane@example.com', phone: '+1 234 567 891', address: '456 Oak Ave', city: 'Los Angeles', country: 'USA', status: 'Active' },
-  { id: 3, name: 'Bob Wilson', email: 'bob@example.com', phone: '+1 234 567 892', address: '789 Pine Rd', city: 'Chicago', country: 'USA', status: 'Active' },
-  { id: 4, name: 'Alice Brown', email: 'alice@example.com', phone: '+1 234 567 893', address: '321 Elm St', city: 'Houston', country: 'USA', status: 'Inactive' },
-  { id: 5, name: 'Charlie Davis', email: 'charlie@example.com', phone: '+1 234 567 894', address: '654 Maple Dr', city: 'Phoenix', country: 'USA', status: 'Active' },
+  { id: 1, name: 'John Doe', email: 'john@example.com', phone: '+1 234 567 890', address: '123 Main St', city: 'New York', country: 'USA', status: 'active' },
+  { id: 2, name: 'Jane Smith', email: 'jane@example.com', phone: '+1 234 567 891', address: '456 Oak Ave', city: 'Los Angeles', country: 'USA', status: 'active' },
+  { id: 3, name: 'Bob Wilson', email: 'bob@example.com', phone: '+1 234 567 892', address: '789 Pine Rd', city: 'Chicago', country: 'USA', status: 'active' },
+  { id: 4, name: 'Alice Brown', email: 'alice@example.com', phone: '+1 234 567 893', address: '321 Elm St', city: 'Houston', country: 'USA', status: 'inactive' },
+  { id: 5, name: 'Charlie Davis', email: 'charlie@example.com', phone: '+1 234 567 894', address: '654 Maple Dr', city: 'Phoenix', country: 'USA', status: 'active' },
 ];
 
 const CustomerForm = () => {
@@ -19,7 +19,7 @@ const CustomerForm = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    name: '', email: '', phone: '', address: '', city: '', country: '', status: 'Active'
+    name: '', email: '', phone: '', address: '', city: '', country: '', status: 'active'
   });
 
   useEffect(() => {
@@ -142,8 +142,8 @@ const CustomerForm = () => {
                   value={formData.status}
                   onChange={handleChange}
                 >
-                  <option value="Active">Active</option>
-                  <option value="Inactive">Inactive</option>
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
                 </select>
               </div>
             </div>

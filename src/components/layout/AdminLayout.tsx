@@ -13,7 +13,7 @@ const AdminLayout = () => {
 
   return (
     <div className="admin-wrapper">
-      <Sidebar isCollapsed={sidebarCollapsed} />
+      <Sidebar isCollapsed={sidebarCollapsed} setIsCollapsed={setSidebarCollapsed} />
       
       <div className={`main-content ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
         <Header onToggleSidebar={toggleSidebar} />

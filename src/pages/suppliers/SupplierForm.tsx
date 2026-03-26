@@ -3,10 +3,10 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useToast } from '../../components/common/Toast';
 
 const mockSuppliersData = [
-  { id: 1, name: 'Tech Suppliers Inc', company: 'Tech Suppliers Inc', email: 'contact@techsuppliers.com', phone: '+1 234 567 890', address: '100 Tech Park, Silicon Valley', taxNumber: 'TX-001234', status: 'Active' },
-  { id: 2, name: 'Global Electronics', company: 'Global Electronics Ltd', email: 'sales@globalelec.com', phone: '+1 234 567 891', address: '200 Industry Blvd, Texas', taxNumber: 'TX-005678', status: 'Active' },
-  { id: 3, name: 'Premium Parts Ltd', company: 'Premium Parts Ltd', email: 'info@premiumparts.com', phone: '+1 234 567 892', address: '300 Commerce St, Florida', taxNumber: 'TX-009012', status: 'Active' },
-  { id: 4, name: 'Digital World', company: 'Digital World Corp', email: 'orders@digitalworld.com', phone: '+1 234 567 893', address: '400 Digital Ave, California', taxNumber: 'TX-003456', status: 'Inactive' },
+  { id: 1, name: 'Tech Suppliers Inc', company: 'Tech Suppliers Inc', email: 'contact@techsuppliers.com', phone: '+1 234 567 890', address: '100 Tech Park, Silicon Valley', taxNumber: 'TX-001234', status: 'active' },
+  { id: 2, name: 'Global Electronics', company: 'Global Electronics Ltd', email: 'sales@globalelec.com', phone: '+1 234 567 891', address: '200 Industry Blvd, Texas', taxNumber: 'TX-005678', status: 'active' },
+  { id: 3, name: 'Premium Parts Ltd', company: 'Premium Parts Ltd', email: 'info@premiumparts.com', phone: '+1 234 567 892', address: '300 Commerce St, Florida', taxNumber: 'TX-009012', status: 'active' },
+  { id: 4, name: 'Digital World', company: 'Digital World Corp', email: 'orders@digitalworld.com', phone: '+1 234 567 893', address: '400 Digital Ave, California', taxNumber: 'TX-003456', status: 'inactive' },
 ];
 
 const SupplierForm = () => {
@@ -17,7 +17,7 @@ const SupplierForm = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    name: '', company: '', email: '', phone: '', address: '', taxNumber: '', status: 'Active'
+    name: '', company: '', email: '', phone: '', address: '', taxNumber: '', status: 'active'
   });
 
   useEffect(() => {
@@ -134,8 +134,8 @@ const SupplierForm = () => {
                     value={formData.status}
                     onChange={handleChange}
                   >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
                   </select>
                 </div>
 

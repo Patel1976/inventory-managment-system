@@ -6,7 +6,7 @@ import { useToast } from '../../components/common/Toast';
 import ViewModal from '@/components/common/ViewModal';
 import ConfirmDialog from '@/components/common/ConfirmDialog';
 
-interface Supplier { id: number; name: string; company: string; email: string; phone: string; address: string; taxNumber: string; purchases: number; totalPurchased: number, status: 'Active' | 'Inactive'; }
+interface Supplier { id: number; name: string; company: string; email: string; phone: string; address: string; taxNumber: string; purchases: number; totalPurchased: number, status: 'active' | 'inactive'; }
 
 const SupplierList = () => {
   const { hasPermission } = useAuth();
@@ -21,12 +21,12 @@ const SupplierList = () => {
   const itemsPerPage = 10;
 
   const [suppliers, setSuppliers] = useState<Supplier[]>([
-    { id: 1, name: 'Tech Suppliers Inc', company: 'Tech Suppliers Inc', email: 'contact@techsuppliers.com', phone: '+1 234 567 890', address: '100 Tech Park, Silicon Valley', taxNumber: 'TX-001234', purchases: 45, totalPurchased: 125000.00, status: 'Active' },
-    { id: 2, name: 'Global Electronics', company: 'Global Electronics Ltd', email: 'sales@globalelec.com', phone: '+1 234 567 891', address: '200 Industry Blvd, Texas', taxNumber: 'TX-005678', purchases: 32, totalPurchased: 89500.00, status: 'Active' },
-    { id: 3, name: 'Premium Parts Ltd', company: 'Premium Parts Ltd', email: 'info@premiumparts.com', phone: '+1 234 567 892', address: '300 Commerce St, Florida', taxNumber: 'TX-009012', purchases: 28, totalPurchased: 67800.00, status: 'Active' },
-    { id: 4, name: 'Digital World', company: 'Digital World Corp', email: 'orders@digitalworld.com', phone: '+1 234 567 893', address: '400 Digital Ave, California', taxNumber: 'TX-003456', purchases: 19, totalPurchased: 45200.00, status: 'Inactive' },
-    { id: 5, name: 'Global Solutions', company: 'Global Solutions Ltd', email: 'info@globalsolutions.com', phone: '+1 234 567 894', address: '500 Global St, New York', taxNumber: 'TX-007890', purchases: 25, totalPurchased: 72300.00, status: 'Active' },
-    { id: 6, name: 'Innovate Tech', company: 'Innovate Tech Inc', email: 'support@innovatetech.com', phone: '+1 234 567 895', address: '600 Innovation Blvd, Boston', taxNumber: 'TX-012345', purchases: 12, totalPurchased: 34500.00, status: 'Active' },
+    { id: 1, name: 'Tech Suppliers Inc', company: 'Tech Suppliers Inc', email: 'contact@techsuppliers.com', phone: '+1 234 567 890', address: '100 Tech Park, Silicon Valley', taxNumber: 'TX-001234', purchases: 45, totalPurchased: 125000.00, status: 'active' },
+    { id: 2, name: 'Global Electronics', company: 'Global Electronics Ltd', email: 'sales@globalelec.com', phone: '+1 234 567 891', address: '200 Industry Blvd, Texas', taxNumber: 'TX-005678', purchases: 32, totalPurchased: 89500.00, status: 'active' },
+    { id: 3, name: 'Premium Parts Ltd', company: 'Premium Parts Ltd', email: 'info@premiumparts.com', phone: '+1 234 567 892', address: '300 Commerce St, Florida', taxNumber: 'TX-009012', purchases: 28, totalPurchased: 67800.00, status: 'active' },
+    { id: 4, name: 'Digital World', company: 'Digital World Corp', email: 'orders@digitalworld.com', phone: '+1 234 567 893', address: '400 Digital Ave, California', taxNumber: 'TX-003456', purchases: 19, totalPurchased: 45200.00, status: 'inactive' },
+    { id: 5, name: 'Global Solutions', company: 'Global Solutions Ltd', email: 'info@globalsolutions.com', phone: '+1 234 567 894', address: '500 Global St, New York', taxNumber: 'TX-007890', purchases: 25, totalPurchased: 72300.00, status: 'active' },
+    { id: 6, name: 'Innovate Tech', company: 'Innovate Tech Inc', email: 'support@innovatetech.com', phone: '+1 234 567 895', address: '600 Innovation Blvd, Boston', taxNumber: 'TX-012345', purchases: 12, totalPurchased: 34500.00, status: 'active' },
   ]);
 
   const filteredSuppliers = suppliers.filter(s => s.name.toLowerCase().includes(searchTerm.toLowerCase()) || s.email.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -208,7 +208,7 @@ const SupplierList = () => {
                 <div className="col-md-6">
                   <small className="text-muted">Status</small>
                   <div>
-                    <span className={`badge ${selectedSupplier.status === 'Active'
+                    <span className={`badge ${selectedSupplier.status === 'active'
                       ? 'badge-success'
                       : 'badge-warning'
                       }`}>
