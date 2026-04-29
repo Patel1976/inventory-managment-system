@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiDownload, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { Link, useNavigate } from 'react-router-dom';
+import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiDownload } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
-import { ConfirmDialog, ViewModal, FormModal, DetailRow } from '../../components/common';
+import { ConfirmDialog, ViewModal, DetailRow } from '../../components/common';
 import { useToast } from '../../components/common/Toast';
 
 interface Expense { id: number; date: string; category: string; reference: string; store: string; amount: number; note: string; }
@@ -11,15 +11,14 @@ const ExpenseList = () => {
   const { hasPermission } = useAuth();
   const { showToast } = useToast();
   const canManage = hasPermission('expenses.manage');
+  const navigate = useNavigate();
   const [showViewModal, setShowViewModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-  const [formData, setFormData] = useState({ date: '', category: '', store: '', amount: 0, note: '' });
 
   const [expenses, setExpenses] = useState<Expense[]>([
     { id: 1, date: '2024-01-15', category: 'Rent', reference: 'EXP-001', store: 'Main Store', amount: 2500.00, note: 'Monthly rent payment' },
@@ -40,9 +39,8 @@ const ExpenseList = () => {
   useEffect(() => { if (currentPage > totalPages && totalPages > 0) setCurrentPage(totalPages); }, [filteredExpenses.length, totalPages, currentPage]);
 
   const handleView = (e: Expense) => { setSelectedExpense(e); setShowViewModal(true); };
-  const handleEdit = (e: Expense) => { setSelectedExpense(e); setFormData({ date: e.date, category: e.category, store: e.store, amount: e.amount, note: e.note }); setShowEditModal(true); };
+  const handleEdit = (e: Expense) => { navigate(`/expenses/edit/${e.id}`, { state: { expense: e } }); };
   const handleDeleteClick = (e: Expense) => { setSelectedExpense(e); setShowDeleteDialog(true); };
-  const handleEditSubmit = (ev: React.FormEvent) => { ev.preventDefault(); setIsLoading(true); setTimeout(() => { setExpenses(prev => prev.map(e => e.id === selectedExpense?.id ? { ...e, ...formData } : e)); setIsLoading(false); setShowEditModal(false); showToast({ type: 'success', title: 'Success', message: 'Expense updated successfully!' }); }, 500); };
   const handleDelete = () => { setIsLoading(true); setTimeout(() => { setExpenses(prev => prev.filter(e => e.id !== selectedExpense?.id)); setIsLoading(false); setShowDeleteDialog(false); showToast({ type: 'success', title: 'Deleted', message: 'Expense deleted successfully!' }); }, 500); };
 
   return (
@@ -180,7 +178,6 @@ const ExpenseList = () => {
           </div>
         </div></div>
       <ViewModal isOpen={showViewModal} title="Expense Details" onClose={() => setShowViewModal(false)}>{selectedExpense && <div><DetailRow label="Reference" value={<strong>{selectedExpense.reference}</strong>} /><DetailRow label="Date" value={selectedExpense.date} /><DetailRow label="Category" value={<span className="badge badge-info">{selectedExpense.category}</span>} /><DetailRow label="Store" value={selectedExpense.store} /><DetailRow label="Amount" value={<strong>${selectedExpense.amount.toFixed(2)}</strong>} /><DetailRow label="Note" value={selectedExpense.note} /></div>}</ViewModal>
-      <FormModal isOpen={showEditModal} title="Edit Expense" onClose={() => setShowEditModal(false)} onSubmit={handleEditSubmit} isLoading={isLoading}><div className="row g-3"><div className="col-md-6"><label className="form-label">Date</label><input type="date" className="form-control" value={formData.date} onChange={(e) => setFormData({ ...formData, date: e.target.value })} /></div><div className="col-md-6"><label className="form-label">Category</label><input type="text" className="form-control" value={formData.category} onChange={(e) => setFormData({ ...formData, category: e.target.value })} /></div><div className="col-md-6"><label className="form-label">Store</label><input type="text" className="form-control" value={formData.store} onChange={(e) => setFormData({ ...formData, store: e.target.value })} /></div><div className="col-md-6"><label className="form-label">Amount</label><input type="number" className="form-control" value={formData.amount} onChange={(e) => setFormData({ ...formData, amount: parseFloat(e.target.value) })} /></div><div className="col-12"><label className="form-label">Note</label><textarea className="form-control" rows={2} value={formData.note} onChange={(e) => setFormData({ ...formData, note: e.target.value })} /></div></div></FormModal>
       <ConfirmDialog isOpen={showDeleteDialog} title="Delete Expense" message={`Are you sure you want to delete "${selectedExpense?.reference}"?`} confirmLabel="Delete" onConfirm={handleDelete} onCancel={() => setShowDeleteDialog(false)} isLoading={isLoading} variant="danger" />
     </div>
   );

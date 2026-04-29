@@ -1,10 +1,14 @@
-import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { Link, useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { useToast } from '@/components/common/Toast';
 
 const AddExpense = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { id } = useParams();
+  const { state } = useLocation();
+  const isEdit = !!id;
+  const editData = state?.expense;
 
   const [formData, setFormData] = useState({
     category: '',
@@ -16,6 +20,20 @@ const AddExpense = () => {
     note: '',
     attachment: null as File | null,
   });
+
+  useEffect(() => {
+    if (isEdit && editData) {
+      setFormData(prev => ({
+        ...prev,
+        category: editData.category?.toLowerCase() || '',
+        date: editData.date || prev.date,
+        store: editData.store === 'Main Store' ? '1' : editData.store === 'Branch 1' ? '2' : editData.store === 'Branch 2' ? '3' : editData.store === 'All Stores' ? 'all' : '',
+        reference: editData.reference || '',
+        amount: editData.amount?.toString() || '',
+        note: editData.note || '',
+      }));
+    }
+  }, [isEdit, editData]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -35,7 +53,7 @@ const AddExpense = () => {
     setIsSubmitting(true);
     setTimeout(() => {
       setIsSubmitting(false);
-      showToast({ type: 'success', title: 'Success', message: 'Expense added successfully!' });
+      showToast({ type: 'success', title: 'Success', message: isEdit ? 'Expense updated successfully!' : 'Expense added successfully!' });
       navigate('/expenses');
     }, 500);
   };
@@ -44,13 +62,13 @@ const AddExpense = () => {
     <div className="add-expense-page">
       {/* Page Header */}
       <div className="page-header">
-        <h4>Add Expense</h4>
+        <h4>{isEdit ? 'Edit Expense' : 'Add Expense'}</h4>
         <div className="breadcrumb-wrapper">
           <Link to="/">Home</Link>
           <span>/</span>
           <Link to="/expenses">Expenses</Link>
           <span>/</span>
-          <span>Add Expense</span>
+          <span>{isEdit ? 'Edit Expense' : 'Add Expense'}</span>
         </div>
       </div>
 
@@ -200,7 +218,7 @@ const AddExpense = () => {
                       className="btn btn-primary-custom"
                       disabled={isSubmitting}
                     >
-                      {isSubmitting ? 'Saving...' : 'Save Expense'}
+                      {isSubmitting ? 'Saving...' : isEdit ? 'Update Expense' : 'Save Expense'}
                     </button>
                   </div>
                 </div>

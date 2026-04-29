@@ -93,12 +93,15 @@ const App = () => (
                     <Route index element={<Dashboard />} />
                     <Route path="products" element={<ProductList />} />
                     <Route path="products/add" element={<AddProduct />} />
+                    <Route path="products/edit/:id" element={<AddProduct />} />
                     <Route path="products/categories" element={<Categories />} />
                     <Route path="products/brands" element={<Brands />} />
                     <Route path="sales" element={<SalesList />} />
                     <Route path="sales/add" element={<AddSale />} />
+                    <Route path="sales/edit/:id" element={<AddSale />} />
                     <Route path="purchases" element={<PurchaseList />} />
                     <Route path="purchases/add" element={<AddPurchase />} />
+                    <Route path="purchases/edit/:id" element={<AddPurchase />} />
                     
                     {/* Customers */}
                     <Route path="customers" element={<CustomerList />} />
@@ -117,6 +120,7 @@ const App = () => (
                     
                     <Route path="expenses" element={<ExpenseList />} />
                     <Route path="expenses/add" element={<AddExpense />} />
+                    <Route path="expenses/edit/:id" element={<AddExpense />} />
                     <Route path="expenses/categories" element={<ExpenseCategories />} />
                     <Route path="adjustments" element={<AdjustmentList />} />
                     <Route path="adjustments/add" element={<AddAdjustment />} />

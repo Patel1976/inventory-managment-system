@@ -1,9 +1,15 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation, useParams } from 'react-router-dom';
 import { FiSave, FiX, FiUpload } from 'react-icons/fi';
+import { useToast } from '@/components/common/Toast';
 
 const AddProduct = () => {
   const navigate = useNavigate();
+  const { showToast } = useToast();
+  const { id } = useParams();
+  const { state } = useLocation();
+  const isEdit = !!id;
+  const editData = state?.product;
   const [formData, setFormData] = useState({
     name: '',
     sku: '',
@@ -19,6 +25,22 @@ const AddProduct = () => {
     image: null as File | null,
   });
 
+  useEffect(() => {
+    if (isEdit && editData) {
+      setFormData(prev => ({
+        ...prev,
+        name: editData.name || '',
+        sku: editData.sku || '',
+        category: editData.category?.toLowerCase() || '',
+        brand: editData.brand?.toLowerCase() || '',
+        purchasePrice: editData.costPrice?.toString() || '',
+        sellingPrice: editData.price?.toString() || '',
+        quantity: editData.stock?.toString() || '',
+        description: editData.description || '',
+      }));
+    }
+  }, [isEdit, editData]);
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -26,9 +48,7 @@ const AddProduct = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would normally send data to the server
-    console.log('Form submitted:', formData);
-    alert('Product added successfully!');
+    showToast({ type: 'success', title: 'Success', message: isEdit ? 'Product updated successfully!' : 'Product added successfully!' });
     navigate('/products');
   };
 
@@ -36,13 +56,13 @@ const AddProduct = () => {
     <div className="add-product-page">
       {/* Page Header */}
       <div className="page-header">
-        <h4>Add Product</h4>
+        <h4>{isEdit ? 'Edit Product' : 'Add Product'}</h4>
         <div className="breadcrumb-wrapper">
           <Link to="/">Home</Link>
           <span>/</span>
           <Link to="/products">Products</Link>
           <span>/</span>
-          <span>Add Product</span>
+          <span>{isEdit ? 'Edit Product' : 'Add Product'}</span>
         </div>
       </div>
 
@@ -273,7 +293,7 @@ const AddProduct = () => {
             <div className="form-card mt-4">
               <div className="d-grid gap-2">
                 <button type="submit" className="btn btn-primary-custom d-flex align-items-center justify-content-center">
-                  <FiSave className="me-2" /> Save Product
+                  <FiSave className="me-2" /> {isEdit ? 'Update Product' : 'Save Product'}
                 </button>
                 <Link to="/products" className="btn btn-secondary-custom d-flex align-items-center justify-content-center">
                   <FiX className="me-2" /> Cancel

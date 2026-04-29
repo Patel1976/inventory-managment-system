@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { FiUser, FiMail, FiPhone, FiMapPin, FiLock, FiSave, FiCamera } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
@@ -7,6 +7,9 @@ import { useToast } from '../components/common/Toast';
 const UserProfile = () => {
   const { user } = useAuth();
   const { showToast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+
   const [profile, setProfile] = useState({
     name: user?.name || 'John Admin',
     email: user?.email || 'admin@inventory.com',
@@ -20,6 +23,24 @@ const UserProfile = () => {
     newPassword: '',
     confirmPassword: ''
   });
+
+  const handleAvatarClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      showToast({ type: 'error', title: 'Invalid File', message: 'Please select an image file.' });
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => setAvatarPreview(reader.result as string);
+    reader.readAsDataURL(file);
+    // reset so same file can be re-selected
+    e.target.value = '';
+  };
 
   const handleProfileChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setProfile({ ...profile, [e.target.name]: e.target.value });
@@ -64,41 +85,66 @@ const UserProfile = () => {
           <div className="data-card">
             <div className="data-card-body text-center py-5">
               <div className="profile-avatar-wrapper mb-4">
-                <div 
-                  className="profile-avatar mx-auto"
+                <div
+                  onClick={handleAvatarClick}
                   style={{
                     width: '120px',
                     height: '120px',
                     borderRadius: '50%',
-                    background: 'linear-gradient(135deg, var(--primary-color) 0%, #4a4fc7 100%)',
+                    background: avatarPreview ? 'none' : 'linear-gradient(135deg, var(--primary-color) 0%, #4a4fc7 100%)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
                     color: 'white',
                     fontSize: '48px',
                     fontWeight: '600',
-                    position: 'relative'
+                    position: 'relative',
+                    cursor: 'pointer',
+                    overflow: 'hidden',
+                    margin: '0 auto'
                   }}
                 >
-                  {profile.name.charAt(0).toUpperCase()}
-                  <button 
-                    className="btn btn-sm btn-primary-custom"
-                    style={{
-                      position: 'absolute',
-                      bottom: '0',
-                      right: '0',
-                      borderRadius: '50%',
-                      minWidth: '36px',
-                      height: '36px',
-                      padding: '0',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}
+                  {avatarPreview ? (
+                    <img
+                      src={avatarPreview}
+                      alt="Profile"
+                      style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '50%' }}
+                    />
+                  ) : (
+                    profile.name.charAt(0).toUpperCase()
+                  )}
+                  {/* Hover overlay */}
+                  <div style={{
+                    position: 'absolute', inset: 0, borderRadius: '50%',
+                    background: 'rgba(0,0,0,0.35)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    opacity: 0, transition: 'opacity 0.2s'
+                  }}
+                    onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
+                    onMouseLeave={e => (e.currentTarget.style.opacity = '0')}
                   >
-                    <FiCamera size={16} />
-                  </button>
+                    <FiCamera size={28} color="#fff" />
+                  </div>
+                  {/* Camera badge */}
+                  {/* <div style={{
+                    position: 'absolute', bottom: 4, right: 4,
+                    width: '32px', height: '32px', borderRadius: '50%',
+                    background: 'var(--primary-color)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    border: '2px solid var(--card-bg)', pointerEvents: 'none'
+                  }}>
+                    <FiCamera size={14} color="#fff" />
+                  </div> */}
                 </div>
+                {/* Hidden file input */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  style={{ display: 'none' }}
+                  onChange={handleAvatarChange}
+                />
+                <p className="text-muted mt-2 mb-0" style={{ fontSize: '12px' }}>Click to change photo</p>
               </div>
               <h5 className="mb-1">{profile.name}</h5>
               <span 

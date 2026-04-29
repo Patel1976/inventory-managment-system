@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiDownload, FiCalendar, FiX, FiSave } from 'react-icons/fi';
+import { Link, useNavigate } from 'react-router-dom';
+import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiDownload } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSettings } from '../../contexts/SettingsContext';
-import { ConfirmDialog, ViewModal, FormModal, DetailRow } from '../../components/common';
+import { ConfirmDialog, ViewModal, DetailRow } from '../../components/common';
 import { useToast } from '../../components/common/Toast';
 
 interface Product {
@@ -22,37 +22,24 @@ interface Product {
 }
 
 const ProductList = () => {
+  const navigate = useNavigate();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const { isAdmin, hasPermission } = useAuth();
+  const { hasPermission } = useAuth();
   const { currencySymbol, stockAlertThreshold } = useSettings();
   const { showToast } = useToast();
 
   const canManage = hasPermission('products.edit');
 
-  // Modal states
   const [showViewModal, setShowViewModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  // Form state
-  const [formData, setFormData] = useState({
-    name: '',
-    sku: '',
-    category: '',
-    brand: '',
-    price: 0,
-    costPrice: 0,
-    stock: 0,
-    description: '',
-    status: 'Active'
-  });
 
   const [products, setProducts] = useState<Product[]>([
     { id: 1, name: 'iPhone 14 Pro', sku: 'SKU001', category: 'Electronics', brand: 'Apple', price: 999, costPrice: 850, stock: 120, status: 'Active', image: 'https://via.placeholder.com/40', description: 'Latest iPhone model with advanced features', createdDate: '2024-01-15' },
@@ -101,41 +88,12 @@ const ProductList = () => {
   };
 
   const handleEdit = (product: Product) => {
-    setSelectedProduct(product);
-    setFormData({
-      name: product.name,
-      sku: product.sku,
-      category: product.category,
-      brand: product.brand,
-      price: product.price,
-      costPrice: product.costPrice || 0,
-      stock: product.stock,
-      description: product.description || '',
-      status: product.status
-    });
-    setShowEditModal(true);
+    navigate(`/products/edit/${product.id}`, { state: { product } });
   };
 
   const handleDeleteClick = (product: Product) => {
     setSelectedProduct(product);
     setShowDeleteDialog(true);
-  };
-
-  const handleEditSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      setProducts(prev => prev.map(p =>
-        p.id === selectedProduct?.id
-          ? { ...p, ...formData }
-          : p
-      ));
-      setIsLoading(false);
-      setShowEditModal(false);
-      showToast({ type: 'success', title: 'Success', message: 'Product updated successfully!' });
-    }, 500);
   };
 
   const handleDelete = () => {
@@ -370,95 +328,6 @@ const ProductList = () => {
           </div>
         )}
       </ViewModal>
-
-      {/* Edit Product Modal */}
-      <FormModal
-        isOpen={showEditModal}
-        title="Edit Product"
-        onClose={() => setShowEditModal(false)}
-        onSubmit={handleEditSubmit}
-        isLoading={isLoading}
-      >
-        <div className="row g-3">
-          <div className="col-md-6">
-            <label className="form-label">Product Name <span className="text-danger">*</span></label>
-            <input
-              type="text"
-              className="form-control"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              required
-            />
-          </div>
-          <div className="col-md-6">
-            <label className="form-label">SKU <span className="text-danger">*</span></label>
-            <input
-              type="text"
-              className="form-control"
-              value={formData.sku}
-              onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
-              required
-            />
-          </div>
-          <div className="col-md-6">
-            <label className="form-label">Category</label>
-            <select
-              className="form-select"
-              value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-            >
-              {categories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
-          </div>
-          <div className="col-md-6">
-            <label className="form-label">Brand</label>
-            <input
-              type="text"
-              className="form-control"
-              value={formData.brand}
-              onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-            />
-          </div>
-          <div className="col-md-4">
-            <label className="form-label">Selling Price</label>
-            <input
-              type="number"
-              className="form-control"
-              value={formData.price}
-              onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
-            />
-          </div>
-          <div className="col-md-4">
-            <label className="form-label">Cost Price</label>
-            <input
-              type="number"
-              className="form-control"
-              value={formData.costPrice}
-              onChange={(e) => setFormData({ ...formData, costPrice: parseFloat(e.target.value) })}
-            />
-          </div>
-          <div className="col-md-4">
-            <label className="form-label">Stock</label>
-            <input
-              type="number"
-              className="form-control"
-              value={formData.stock}
-              onChange={(e) => setFormData({ ...formData, stock: parseInt(e.target.value) })}
-            />
-          </div>
-          <div className="col-12">
-            <label className="form-label">Description</label>
-            <textarea
-              className="form-control"
-              rows={3}
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-            />
-          </div>
-        </div>
-      </FormModal>
 
       {/* Delete Confirmation */}
       <ConfirmDialog

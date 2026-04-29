@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiDownload, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { Link, useNavigate } from 'react-router-dom';
+import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiDownload } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
-import { ConfirmDialog, ViewModal, FormModal, DetailRow } from '../../components/common';
+import { ConfirmDialog, ViewModal, DetailRow } from '../../components/common';
 import { useToast } from '../../components/common/Toast';
 
 interface Purchase {
@@ -15,15 +15,15 @@ const PurchaseList = () => {
   const canEdit = hasPermission('purchases.edit');
   const canDelete = hasPermission('purchases.delete');
 
+  const navigate = useNavigate();
+
   const [showViewModal, setShowViewModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedPurchase, setSelectedPurchase] = useState<Purchase | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const [formData, setFormData] = useState({ status: '', paid: 0 });
 
   const [purchases, setPurchases] = useState<Purchase[]>([
     { id: 'PO-001', date: '2024-01-15', supplier: 'Tech Suppliers Inc', store: 'Main Store', total: 5250.00, paid: 5250.00, due: 0, status: 'Received' },
@@ -44,17 +44,8 @@ const PurchaseList = () => {
   useEffect(() => { if (currentPage > totalPages && totalPages > 0) setCurrentPage(totalPages); }, [filteredPurchases.length, totalPages, currentPage]);
 
   const handleView = (p: Purchase) => { setSelectedPurchase(p); setShowViewModal(true); };
-  const handleEdit = (p: Purchase) => { setSelectedPurchase(p); setFormData({ status: p.status, paid: p.paid }); setShowEditModal(true); };
+  const handleEdit = (p: Purchase) => { navigate(`/purchases/edit/${p.id}`, { state: { purchase: p } }); };
   const handleDeleteClick = (p: Purchase) => { setSelectedPurchase(p); setShowDeleteDialog(true); };
-
-  const handleEditSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); setIsLoading(true);
-    setTimeout(() => {
-      setPurchases(prev => prev.map(p => p.id === selectedPurchase?.id ? { ...p, ...formData, due: p.total - formData.paid } : p));
-      setIsLoading(false); setShowEditModal(false);
-      showToast({ type: 'success', title: 'Success', message: 'Purchase updated successfully!' });
-    }, 500);
-  };
 
   const handleDelete = () => {
     setIsLoading(true);
@@ -172,21 +163,6 @@ const PurchaseList = () => {
           </div>
         )}
       </ViewModal>
-
-      <FormModal isOpen={showEditModal} title="Edit Purchase" onClose={() => setShowEditModal(false)} onSubmit={handleEditSubmit} isLoading={isLoading}>
-        <div className="row g-3">
-          <div className="col-md-6">
-            <label className="form-label">Status</label>
-            <select className="form-select" value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })}>
-              <option value="Ordered">Ordered</option><option value="Pending">Pending</option><option value="Received">Received</option>
-            </select>
-          </div>
-          <div className="col-md-6">
-            <label className="form-label">Amount Paid</label>
-            <input type="number" className="form-control" value={formData.paid} onChange={(e) => setFormData({ ...formData, paid: parseFloat(e.target.value) })} />
-          </div>
-        </div>
-      </FormModal>
 
       <ConfirmDialog isOpen={showDeleteDialog} title="Delete Purchase" message={`Are you sure you want to delete "${selectedPurchase?.id}"?`} confirmLabel="Delete" onConfirm={handleDelete} onCancel={() => setShowDeleteDialog(false)} isLoading={isLoading} variant="danger" />
     </div>

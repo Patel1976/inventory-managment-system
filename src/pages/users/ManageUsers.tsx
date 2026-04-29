@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiMail, FiX, FiCheck, FiShield, FiLock } from 'react-icons/fi';
+import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiMail, FiLock } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 import {
   UserRole,
@@ -153,8 +153,8 @@ const ManageUsers = () => {
   };
 
   const handleSavePermissions = () => {
-    console.log("Updated Role Permissions:", editableRolePermissions);
     setShowPermissionsModal(false);
+    showToast({ type: 'success', title: 'Saved', message: 'Permissions updated successfully!' });
   };
 
   const validateForm = () => {
@@ -177,10 +177,16 @@ const ManageUsers = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (validateForm()) {
-      console.log('Saving user:', formData);
-      handleCloseModal();
+    if (!validateForm()) return;
+    if (editingUser) {
+      setUsers(prev => prev.map(u => u.id === editingUser.id ? { ...u, name: formData.name, username: formData.username, email: formData.email, role: formData.role, status: formData.status } : u));
+      showToast({ type: 'success', title: 'Updated', message: 'User updated successfully!' });
+    } else {
+      const newUser: User = { id: Date.now(), name: formData.name, username: formData.username, email: formData.email, role: formData.role, status: formData.status, createdDate: new Date().toISOString().split('T')[0] };
+      setUsers(prev => [...prev, newUser]);
+      showToast({ type: 'success', title: 'Added', message: 'User added successfully!' });
     }
+    handleCloseModal();
   };
 
   const handleDeleteClick = (user: User) => {

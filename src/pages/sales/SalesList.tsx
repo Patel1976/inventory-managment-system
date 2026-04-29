@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiDownload } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
-import { ConfirmDialog, ViewModal, FormModal, DetailRow } from '../../components/common';
+import { ConfirmDialog, ViewModal, DetailRow } from '../../components/common';
 import { useToast } from '../../components/common/Toast';
 
 interface Sale {
@@ -24,8 +24,9 @@ const SalesList = () => {
   const canEdit = hasPermission('sales.edit');
   const canDelete = hasPermission('sales.delete');
 
+  const navigate = useNavigate();
+
   const [showViewModal, setShowViewModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [selectedSale, setSelectedSale] = useState<Sale | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -33,8 +34,6 @@ const SalesList = () => {
   const [statusFilter, setStatusFilter] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
-
-  const [formData, setFormData] = useState({ status: '', paymentStatus: '', paid: 0 });
 
   const [sales, setSales] = useState<Sale[]>([
     { id: 'INV-001', date: '2024-01-15', customer: 'John Doe', store: 'Main Store', total: 1250.00, paid: 1250.00, due: 0, status: 'Completed', paymentStatus: 'Paid', items: [{ name: 'iPhone 14 Pro', qty: 1, price: 999 }, { name: 'AirPods Pro', qty: 1, price: 251 }] },
@@ -60,22 +59,9 @@ const SalesList = () => {
 
   const handleView = (sale: Sale) => { setSelectedSale(sale); setShowViewModal(true); };
   const handleEdit = (sale: Sale) => {
-    setSelectedSale(sale);
-    setFormData({ status: sale.status, paymentStatus: sale.paymentStatus, paid: sale.paid });
-    setShowEditModal(true);
+    navigate(`/sales/edit/${sale.id}`, { state: { sale } });
   };
   const handleDeleteClick = (sale: Sale) => { setSelectedSale(sale); setShowDeleteDialog(true); };
-
-  const handleEditSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setTimeout(() => {
-      setSales(prev => prev.map(s => s.id === selectedSale?.id ? { ...s, ...formData, due: s.total - formData.paid } : s));
-      setIsLoading(false);
-      setShowEditModal(false);
-      showToast({ type: 'success', title: 'Success', message: 'Sale updated successfully!' });
-    }, 500);
-  };
 
   const handleDelete = () => {
     setIsLoading(true);
@@ -249,30 +235,6 @@ const SalesList = () => {
           </div>
         )}
       </ViewModal>
-
-      <FormModal isOpen={showEditModal} title="Edit Sale" onClose={() => setShowEditModal(false)} onSubmit={handleEditSubmit} isLoading={isLoading}>
-        <div className="row g-3">
-          <div className="col-md-6">
-            <label className="form-label">Status</label>
-            <select className="form-select" value={formData.status} onChange={(e) => setFormData({ ...formData, status: e.target.value })}>
-              <option value="Pending">Pending</option>
-              <option value="Completed">Completed</option>
-            </select>
-          </div>
-          <div className="col-md-6">
-            <label className="form-label">Payment Status</label>
-            <select className="form-select" value={formData.paymentStatus} onChange={(e) => setFormData({ ...formData, paymentStatus: e.target.value })}>
-              <option value="Unpaid">Unpaid</option>
-              <option value="Partial">Partial</option>
-              <option value="Paid">Paid</option>
-            </select>
-          </div>
-          <div className="col-md-6">
-            <label className="form-label">Amount Paid</label>
-            <input type="number" className="form-control" value={formData.paid} onChange={(e) => setFormData({ ...formData, paid: parseFloat(e.target.value) })} />
-          </div>
-        </div>
-      </FormModal>
 
       <ConfirmDialog isOpen={showDeleteDialog} title="Delete Sale" message={`Are you sure you want to delete sale "${selectedSale?.id}"?`} confirmLabel="Delete" onConfirm={handleDelete} onCancel={() => setShowDeleteDialog(false)} isLoading={isLoading} variant="danger" />
     </div>
