@@ -1,49 +1,92 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { FiSave, FiX } from 'react-icons/fi';
-import { mockSaleReturns } from './SaleReturnList';
 import { useToast } from '../../components/common/Toast';
+import * as saleReturnService from '../../services/saleReturnService';
+import * as saleService from '../../services/saleService';
+import { getProducts } from '../../services/productService';
+
+interface Sale { id: number; reference: string; customer: { name: string }; }
+interface SaleItem { id: number; product: { name: string; id: number }; quantity: number; unit_price: number; }
+interface Product { id: number; name: string; }
 
 const SaleReturnForm = () => {
   const navigate = useNavigate();
   const { id } = useParams();
+  const { state } = useLocation();
   const { showToast } = useToast();
   const isEdit = Boolean(id);
+  const editData = state?.saleReturn;
+
+  const [sales, setSales] = useState<(Sale & { items: SaleItem[] })[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [selectedSale, setSelectedSale] = useState<Sale & { items: SaleItem[] } | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    saleRef: '',
-    product: '',
+    sale_id: '',
+    product_id: '',
+    return_date: new Date().toISOString().split('T')[0],
     quantity: 1,
-    returnDate: new Date().toISOString().split('T')[0],
+    return_amount: 0,
     reason: '',
     status: 'Pending'
   });
 
   useEffect(() => {
-    if (isEdit && id) {
-      const existing = mockSaleReturns.find(r => r.id === id);
-      if (existing) {
-        setFormData({
-          saleRef: existing.saleRef,
-          product: existing.product,
-          quantity: existing.quantity,
-          returnDate: existing.date,
-          reason: existing.reason,
-          status: existing.status
-        });
-      }
-    }
-  }, [id, isEdit]);
+    saleService.getSales().then(r => setSales(r.data.data)).catch(() => {});
+    getProducts().then(r => setProducts(r.data.data)).catch(() => {});
+  }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (isEdit && editData) {
+      setFormData({
+        sale_id: String(editData.sale_id || ''),
+        product_id: String(editData.product_id || ''),
+        return_date: editData.date || new Date().toISOString().split('T')[0],
+        quantity: editData.quantity || 1,
+        return_amount: editData.return_amount || 0,
+        reason: editData.reason || '',
+        status: editData.status || 'Pending'
+      });
+    }
+  }, [isEdit, editData]);
+
+  const handleSaleChange = (saleId: string) => {
+    setFormData({ ...formData, sale_id: saleId });
+    const sale = sales.find(s => s.id === Number(saleId));
+    setSelectedSale(sale || null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      showToast({ type: 'success', title: 'Success', message: isEdit ? 'Sale return updated successfully!' : 'Sale return added successfully!' });
+    
+    const payload = {
+      sale_id: Number(formData.sale_id),
+      product_id: Number(formData.product_id),
+      return_date: formData.return_date,
+      quantity: Number(formData.quantity),
+      return_amount: Number(formData.return_amount),
+      reason: formData.reason,
+      status: formData.status
+    };
+
+    try {
+      if (isEdit) {
+        await saleReturnService.updateSaleReturn(Number(id), payload);
+        showToast({ type: 'success', title: 'Success', message: 'Sale return updated successfully!' });
+      } else {
+        await saleReturnService.createSaleReturn(payload);
+        showToast({ type: 'success', title: 'Success', message: 'Sale return created successfully!' });
+      }
       navigate('/sales/returns');
-    }, 500);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || 'Operation failed!';
+      showToast({ type: 'error', title: 'Error', message: msg });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -70,35 +113,29 @@ const SaleReturnForm = () => {
           <div className="row g-3">
             <div className="col-12 col-md-6">
               <label className="form-label">Sale Reference *</label>
-              <select className="form-select" value={formData.saleRef} onChange={(e) => setFormData({ ...formData, saleRef: e.target.value })} required>
+              <select className="form-select" value={formData.sale_id} onChange={(e) => handleSaleChange(e.target.value)} required>
                 <option value="">Select Sale</option>
-                <option value="INV-001">INV-001 - John Doe</option>
-                <option value="INV-002">INV-002 - Jane Smith</option>
-                <option value="INV-003">INV-003 - Bob Wilson</option>
-                <option value="INV-004">INV-004 - Alice Brown</option>
+                {sales.map(s => <option key={s.id} value={s.id}>{s.reference} - {s.customer?.name}</option>)}
               </select>
             </div>
             <div className="col-12 col-md-6">
               <label className="form-label">Product *</label>
-              <select className="form-select" value={formData.product} onChange={(e) => setFormData({ ...formData, product: e.target.value })} required>
+              <select className="form-select" value={formData.product_id} onChange={(e) => setFormData({ ...formData, product_id: e.target.value })} required>
                 <option value="">Select Product</option>
-                <option value="iPhone 14 Pro">iPhone 14 Pro</option>
-                <option value="Samsung Galaxy S23">Samsung Galaxy S23</option>
-                <option value="MacBook Pro M2">MacBook Pro M2</option>
-                <option value="Sony Headphones">Sony Headphones</option>
+                {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
               </select>
             </div>
-            <div className="col-12 col-md-6">
+            <div className="col-12 col-md-4">
               <label className="form-label">Quantity *</label>
               <input type="number" className="form-control" min="1" value={formData.quantity} onChange={(e) => setFormData({ ...formData, quantity: parseInt(e.target.value) })} required />
             </div>
-            <div className="col-12 col-md-6">
-              <label className="form-label">Return Date *</label>
-              <input type="date" className="form-control" value={formData.returnDate} onChange={(e) => setFormData({ ...formData, returnDate: e.target.value })} required />
+            <div className="col-12 col-md-4">
+              <label className="form-label">Return Amount *</label>
+              <input type="number" className="form-control" min="0" step="0.01" value={formData.return_amount} onChange={(e) => setFormData({ ...formData, return_amount: parseFloat(e.target.value) })} required />
             </div>
-            <div className="col-12">
-              <label className="form-label">Reason *</label>
-              <textarea className="form-control" rows={3} value={formData.reason} onChange={(e) => setFormData({ ...formData, reason: e.target.value })} placeholder="Enter return reason..." required />
+            <div className="col-12 col-md-4">
+              <label className="form-label">Return Date *</label>
+              <input type="date" className="form-control" value={formData.return_date} onChange={(e) => setFormData({ ...formData, return_date: e.target.value })} required />
             </div>
             <div className="col-12 col-md-6">
               <label className="form-label">Status</label>
@@ -108,14 +145,18 @@ const SaleReturnForm = () => {
                 <option value="Completed">Completed</option>
               </select>
             </div>
+            <div className="col-12">
+              <label className="form-label">Reason *</label>
+              <textarea className="form-control" rows={3} value={formData.reason} onChange={(e) => setFormData({ ...formData, reason: e.target.value })} placeholder="Enter return reason..." required />
+            </div>
           </div>
           {/* Action Buttons */}
           <div className="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
             <Link to="/sales/returns" className="btn btn-secondary-custom d-flex align-items-center">
-              Cancel
+              <FiX className="me-1" /> Cancel
             </Link>
-            <button type="submit" className="btn btn-primary-custom" disabled={isLoading}>
-              {isLoading ? 'Saving...' : (isEdit ? 'Update Return' : 'Save Return')}
+            <button type="submit" className="btn btn-primary-custom d-flex align-items-center" disabled={isLoading}>
+              <FiSave className="me-1" /> {isLoading ? 'Saving...' : (isEdit ? 'Update Return' : 'Save Return')}
             </button>
           </div>
         </div>

@@ -4,15 +4,16 @@ import { FiPlus, FiEdit, FiTrash2, FiEye, FiChevronLeft, FiChevronRight } from '
 import { useAuth } from '../../contexts/AuthContext';
 import { ConfirmDialog, ViewModal, DetailRow } from '../../components/common';
 import { useToast } from '../../components/common/Toast';
+import * as brandService from '../../services/brandService';
 
 interface Brand {
   id: number;
   name: string;
   logo: string;
-  products: number;
+  products_count?: number;
   status: 'Active' | 'Inactive';
   description?: string;
-  createdDate?: string;
+  created_at?: string;
 }
 
 const Brands = () => {
@@ -34,19 +35,15 @@ const Brands = () => {
     description: ''
   });
 
-  const [brands, setBrands] = useState<Brand[]>([
-    { id: 1, name: 'Apple', logo: 'https://via.placeholder.com/40', products: 35, status: 'Active', description: 'Technology company', createdDate: '2024-01-15' },
-    { id: 2, name: 'Samsung', logo: 'https://via.placeholder.com/40', products: 28, status: 'Active', description: 'Electronics manufacturer', createdDate: '2024-01-14' },
-    { id: 3, name: 'Sony', logo: 'https://via.placeholder.com/40', products: 22, status: 'Active', description: 'Entertainment company', createdDate: '2024-01-13' },
-    { id: 4, name: 'Dell', logo: 'https://via.placeholder.com/40', products: 18, status: 'Active', description: 'Computer manufacturer', createdDate: '2024-01-12' },
-    { id: 5, name: 'Logitech', logo: 'https://via.placeholder.com/40', products: 24, status: 'Active', description: 'Peripherals manufacturer', createdDate: '2024-01-11' },
-    { id: 6, name: 'Microsoft', logo: 'https://via.placeholder.com/40', products: 15, status: 'Active', description: 'Software company', createdDate: '2024-01-10' },
-    { id: 7, name: 'HP', logo: 'https://via.placeholder.com/40', products: 12, status: 'Inactive', description: 'Computing devices', createdDate: '2024-01-09' },
-  ]);
+  const [brands, setBrands] = useState<Brand[]>([]);
 
   const totalPages = Math.ceil(brands.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = brands.slice(startIndex, startIndex + itemsPerPage);
+
+  useEffect(() => {
+    brandService.getBrands().then(res => setBrands(res.data.data)).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (currentPage > totalPages && totalPages > 0) setCurrentPage(totalPages);
@@ -56,32 +53,47 @@ const Brands = () => {
   const handleEdit = (brand: Brand) => { setEditingBrand(brand); setFormData({ name: brand.name, status: brand.status, description: brand.description || '' }); };
   const handleDeleteClick = (brand: Brand) => { setSelectedBrand(brand); setShowDeleteDialog(true); };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setTimeout(() => {
+    const fd = new FormData();
+    fd.append('name', formData.name);
+    fd.append('status', formData.status);
+    fd.append('description', formData.description);
+    const fileInput = (e.target as HTMLFormElement).querySelector('input[type="file"]') as HTMLInputElement;
+    if (fileInput?.files?.[0]) fd.append('logo', fileInput.files[0]);
+    try {
       if (editingBrand) {
-        setBrands(prev => prev.map(b => b.id === editingBrand.id ? { ...b, ...formData } : b));
+        await brandService.updateBrand(editingBrand.id, fd);
         showToast({ type: 'success', title: 'Success', message: 'Brand updated successfully!' });
         setEditingBrand(null);
       } else {
-        const newBrand: Brand = { id: brands.length + 1, name: formData.name, logo: 'https://via.placeholder.com/40', products: 0, status: formData.status, description: formData.description, createdDate: new Date().toISOString().split('T')[0] };
-        setBrands(prev => [...prev, newBrand]);
+        await brandService.createBrand(fd);
         showToast({ type: 'success', title: 'Success', message: 'Brand added successfully!' });
       }
+      const res = await brandService.getBrands();
+      setBrands(res.data.data);
       setFormData({ name: '', status: 'Active', description: '' });
+    } catch {
+      showToast({ type: 'error', title: 'Error', message: 'Operation failed!' });
+    } finally {
       setIsLoading(false);
-    }, 500);
+    }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
+    if (!selectedBrand) return;
     setIsLoading(true);
-    setTimeout(() => {
-      setBrands(prev => prev.filter(b => b.id !== selectedBrand?.id));
+    try {
+      await brandService.deleteBrand(selectedBrand.id);
+      setBrands(prev => prev.filter(b => b.id !== selectedBrand.id));
+      showToast({ type: 'success', title: 'Deleted', message: 'Brand deleted successfully!' });
+    } catch {
+      showToast({ type: 'error', title: 'Error', message: 'Delete failed!' });
+    } finally {
       setIsLoading(false);
       setShowDeleteDialog(false);
-      showToast({ type: 'success', title: 'Deleted', message: 'Brand deleted successfully!' });
-    }, 500);
+    }
   };
 
   const handleCancelEdit = () => { setEditingBrand(null); setFormData({ name: '', status: 'Active', description: '' }); };
@@ -147,9 +159,9 @@ const Brands = () => {
                     {paginatedData.map((brand, index) => (
                       <tr key={brand.id}>
                         <td>{startIndex + index + 1}</td>
-                        <td><img src={brand.logo} alt={brand.name} className="product-img" /></td>
+                        <td><img src={brand.logo || 'https://placehold.co/40x40?text=N/A'} alt={brand.name} className="product-img" onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/40x40?text=N/A'; }} /></td>
                         <td><strong>{brand.name}</strong></td>
-                        <td>{brand.products}</td>
+                        <td>{brand.products_count ?? 0}</td>
                         <td><span className={`badge ${brand.status === 'Active' ? 'badge-success' : 'badge-danger'}`}>{brand.status}</span></td>
                         <td>
                           <button className="btn-action view me-1" onClick={() => handleView(brand)}><FiEye /></button>
@@ -216,14 +228,14 @@ const Brands = () => {
         {selectedBrand && (
           <div className="row">
             <div className="col-md-3 text-center mb-3">
-              <img src={selectedBrand.logo} alt={selectedBrand.name} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px' }} />
+              <img src={selectedBrand.logo || 'https://placehold.co/80x80?text=N/A'} alt={selectedBrand.name} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px' }} onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/80x80?text=N/A'; }} />
             </div>
             <div className="col-md-9">
               <DetailRow label="Name" value={<strong>{selectedBrand.name}</strong>} />
-              <DetailRow label="Products" value={selectedBrand.products} />
+              <DetailRow label="Products" value={selectedBrand.products_count ?? 0} />
               <DetailRow label="Status" value={<span className={`badge ${selectedBrand.status === 'Active' ? 'badge-success' : 'badge-danger'}`}>{selectedBrand.status}</span>} />
               <DetailRow label="Description" value={selectedBrand.description || 'N/A'} />
-              <DetailRow label="Created Date" value={selectedBrand.createdDate || 'N/A'} />
+              <DetailRow label="Created Date" value={selectedBrand.created_at?.split('T')[0] || selectedBrand.createdDate || 'N/A'} />
             </div>
           </div>
         )}

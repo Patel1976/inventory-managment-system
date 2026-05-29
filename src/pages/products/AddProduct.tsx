@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation, useParams } from 'react-router-dom';
 import { FiSave, FiX, FiUpload } from 'react-icons/fi';
 import { useToast } from '@/components/common/Toast';
+import { getBrands } from '../../services/brandService';
+import * as categoryService from '../../services/categoryService';
+import * as productService from '../../services/productService';
 
 const AddProduct = () => {
   const navigate = useNavigate();
@@ -24,6 +27,8 @@ const AddProduct = () => {
     description: '',
     image: null as File | null,
   });
+  const [brands, setBrands] = useState<Array<{id:number;name:string}>>([]);
+  const [categories, setCategories] = useState<Array<{id:number;name:string}>>([]);
 
   useEffect(() => {
     if (isEdit && editData) {
@@ -31,15 +36,22 @@ const AddProduct = () => {
         ...prev,
         name: editData.name || '',
         sku: editData.sku || '',
-        category: editData.category?.toLowerCase() || '',
-        brand: editData.brand?.toLowerCase() || '',
-        purchasePrice: editData.costPrice?.toString() || '',
-        sellingPrice: editData.price?.toString() || '',
-        quantity: editData.stock?.toString() || '',
+        category: String(editData.category_id || editData.category?.id || editData.category || ''),
+        brand: String(editData.brand_id || editData.brand?.id || editData.brand || ''),
+        purchasePrice: editData.purchase_price?.toString() || '',
+        sellingPrice: editData.selling_price?.toString() || '',
+        quantity: editData.quantity?.toString() || '',
+        alertQuantity: editData.alert_quantity?.toString() || '',
+        tax: editData.tax?.toString() || '',
         description: editData.description || '',
       }));
     }
   }, [isEdit, editData]);
+
+  useEffect(() => {
+    getBrands().then(r => setBrands(r.data.data)).catch(() => {});
+    categoryService.getCategories().then(r => setCategories(r.data.data)).catch(() => {});
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -48,8 +60,38 @@ const AddProduct = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    showToast({ type: 'success', title: 'Success', message: isEdit ? 'Product updated successfully!' : 'Product added successfully!' });
-    navigate('/products');
+    const payload = new FormData();
+    payload.append('name', formData.name);
+    payload.append('sku', formData.sku);
+    // backend expects `category` and `brand` fields (IDs), include both variants for compatibility
+    payload.append('category_id', formData.category);
+    payload.append('brand_id', formData.brand);
+    payload.append('category', formData.category);
+    payload.append('brand', formData.brand);
+    payload.append('unit', formData.unit);
+    payload.append('purchase_price', formData.purchasePrice);
+    payload.append('selling_price', formData.sellingPrice);
+    payload.append('quantity', formData.quantity);
+    payload.append('alert_quantity', formData.alertQuantity);
+    payload.append('tax', formData.tax);
+    payload.append('description', formData.description);
+    if (formData.image) payload.append('image', formData.image);
+
+    if (isEdit && id) {
+      productService.updateProduct(Number(id), payload)
+        .then(() => {
+          showToast({ type: 'success', title: 'Success', message: 'Product updated successfully!' });
+          navigate('/products');
+        })
+        .catch(() => showToast({ type: 'error', title: 'Error', message: 'Update failed!' }));
+    } else {
+      productService.createProduct(payload)
+        .then(() => {
+          showToast({ type: 'success', title: 'Success', message: 'Product added successfully!' });
+          navigate('/products');
+        })
+        .catch(() => showToast({ type: 'error', title: 'Error', message: 'Create failed!' }));
+    }
   };
 
   return (
@@ -113,11 +155,7 @@ const AddProduct = () => {
                       required
                     >
                       <option value="">Select Category</option>
-                      <option value="electronics">Electronics</option>
-                      <option value="laptops">Laptops</option>
-                      <option value="audio">Audio</option>
-                      <option value="accessories">Accessories</option>
-                      <option value="wearables">Wearables</option>
+                      {categories.map(c => <option key={c.id} value={String(c.id)}>{c.name}</option>)}
                     </select>
                   </div>
                 </div>
@@ -131,11 +169,7 @@ const AddProduct = () => {
                       onChange={handleChange}
                     >
                       <option value="">Select Brand</option>
-                      <option value="apple">Apple</option>
-                      <option value="samsung">Samsung</option>
-                      <option value="sony">Sony</option>
-                      <option value="dell">Dell</option>
-                      <option value="logitech">Logitech</option>
+                      {brands.map(b => <option key={b.id} value={String(b.id)}>{b.name}</option>)}
                     </select>
                   </div>
                 </div>

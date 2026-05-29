@@ -1,54 +1,58 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FiDownload, FiFilter, FiFileText, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiDownload, FiFilter } from 'react-icons/fi';
+import { useSettings } from '../../contexts/SettingsContext';
+import { getInventoryReport } from '../../services/reportService';
+
+interface Product { id: number; sku: string; name: string; category: string; brand: string; quantity: number; purchase_price: number; selling_price: number; total_sold?: number; stock_value?: number; }
+interface Summary { total_products: number; total_stock_value: number; total_sold: number; low_stock_items: number; out_of_stock: number; }
 
 const InventoryReport = () => {
+  const { currencySymbol } = useSettings();
+  const [category, setCategory] = useState('');
+  const [brand, setBrand] = useState('');
+  const [stockStatus, setStockStatus] = useState('');
+  const [products, setProducts] = useState<Product[]>([]);
+  const [summary, setSummary] = useState<Summary>({ total_products: 0, total_stock_value: 0, total_sold: 0, low_stock_items: 0, out_of_stock: 0 });
+  const [categories, setCategories] = useState<string[]>([]);
+  const [brands, setBrands] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
-  const [categoryFilter, setCategoryFilter] = useState('');
-  const [brandFilter, setBrandFilter] = useState('');
-  const [stockFilter, setStockFilter] = useState('');
-
-  const inventoryData = [
-    { sku: 'SKU001', product: 'iPhone 14 Pro', category: 'electronics', brand: 'apple', inStock: 120, sold: 45, purchasePrice: 800, sellingPrice: 999 },
-    { sku: 'SKU002', product: 'Samsung Galaxy S23', category: 'electronics', brand: 'samsung', inStock: 85, sold: 38, purchasePrice: 700, sellingPrice: 899 },
-    { sku: 'SKU003', product: 'MacBook Pro M2', category: 'laptops', brand: 'apple', inStock: 42, sold: 32, purchasePrice: 1600, sellingPrice: 1999 },
-    { sku: 'SKU004', product: 'Sony Headphones', category: 'audio', brand: 'sony', inStock: 156, sold: 28, purchasePrice: 250, sellingPrice: 349 },
-    { sku: 'SKU005', product: 'Apple Watch', category: 'wearables', brand: 'apple', inStock: 68, sold: 25, purchasePrice: 300, sellingPrice: 399 },
-    { sku: 'SKU006', product: 'Dell Monitor 27"', category: 'electronics', brand: 'dell', inStock: 5, sold: 15, purchasePrice: 250, sellingPrice: 349 }
-  ];
-
-  const filteredData = inventoryData.filter((item) => {
-    const matchCategory =
-      !categoryFilter || item.category === categoryFilter;
-
-    const matchBrand =
-      !brandFilter || item.brand === brandFilter;
-
-    const matchStock =
-      !stockFilter ||
-      (stockFilter === 'in-stock' && item.inStock > 50) ||
-      (stockFilter === 'low-stock' && item.inStock <= 50 && item.inStock > 10) ||
-      (stockFilter === 'out-of-stock' && item.inStock <= 10);
-
-    return matchCategory && matchBrand && matchStock;
-  });
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedData = filteredData.slice(
-    startIndex,
-    startIndex + itemsPerPage
-  );
 
   useEffect(() => {
-    setCurrentPage(1);
-  }, [categoryFilter, brandFilter, stockFilter]);
+    fetchReport();
+  }, []);
+
+  const fetchReport = (params?: object) => {
+    getInventoryReport(params).then(r => {
+      const data: Product[] = r.data.data;
+      setProducts(data);
+      setSummary(r.data.summary);
+      setCategories([...new Set(data.map(p => p.category).filter(Boolean))]);
+      setBrands([...new Set(data.map(p => p.brand).filter(Boolean))]);
+      setCurrentPage(1);
+    }).catch(() => {});
+  };
+
+  const handleFilter = () => {
+    const params: any = {};
+    if (category) params.category = category;
+    if (brand) params.brand = brand;
+    if (stockStatus) params.stock_status = stockStatus;
+    fetchReport(params);
+  };
+
+  const totalPages = Math.ceil(products.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedData = products.slice(startIndex, startIndex + itemsPerPage);
+
+  const stockBadge = (qty: number) => qty === 0 ? 'badge-danger' : qty <= 10 ? 'badge-warning' : 'badge-success';
 
   return (
     <div className="inventory-report-page">
       <div className="page-header">
         <h4>Inventory Report</h4>
-        <div className="breadcrumb-wrapper"><Link to="/">Home</Link><span>/</span><Link to="/reports/inventory">Reports</Link><span>/</span><span>Inventory Report</span></div>
+        <div className="breadcrumb-wrapper"><Link to="/">Home</Link><span>/</span><span>Inventory Report</span></div>
       </div>
 
       <div className="data-card mb-4">
@@ -56,119 +60,81 @@ const InventoryReport = () => {
           <div className="row g-3 align-items-end">
             <div className="col-12 col-md-3">
               <label className="form-label">Category</label>
-              <select className="form-select"
-                value={categoryFilter}
-                onChange={e => setCategoryFilter(e.target.value)}
-              >
+              <select className="form-select" value={category} onChange={e => setCategory(e.target.value)}>
                 <option value="">All Categories</option>
-                <option value="electronics">Electronics</option>
-                <option value="laptops">Laptops</option>
-                <option value="audio">Audio</option>
+                {categories.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
             <div className="col-12 col-md-3">
               <label className="form-label">Brand</label>
-              <select
-                className="form-select"
-                value={brandFilter}
-                onChange={(e) => setBrandFilter(e.target.value)}
-              >
+              <select className="form-select" value={brand} onChange={e => setBrand(e.target.value)}>
                 <option value="">All Brands</option>
-                <option value="apple">Apple</option>
-                <option value="samsung">Samsung</option>
+                {brands.map(b => <option key={b} value={b}>{b}</option>)}
               </select>
             </div>
             <div className="col-12 col-md-3">
               <label className="form-label">Stock Status</label>
-              <select
-                className="form-select"
-                value={stockFilter}
-                onChange={(e) => setStockFilter(e.target.value)}
-              >
+              <select className="form-select" value={stockStatus} onChange={e => setStockStatus(e.target.value)}>
                 <option value="">All</option>
                 <option value="in-stock">In Stock</option>
                 <option value="low-stock">Low Stock</option>
                 <option value="out-of-stock">Out of Stock</option>
               </select>
             </div>
-            <div className="col-12 col-md-3 d-flex align-items-end gap-2 justify-content-end">
-              <button className="btn btn-primary-custom d-flex align-items-center"><FiFilter className="me-1" /> Filter</button>
+            <div className="col-12 col-md-3 d-flex align-items-end">
+              <button className="btn btn-primary-custom w-100 d-flex align-items-center justify-content-center" onClick={handleFilter}>
+                <FiFilter className="me-1" /> Filter
+              </button>
             </div>
           </div>
         </div>
       </div>
 
       <div className="row g-4 mb-4">
-        <div className="col-12 col-md-3"><div className="stat-card"><div className="stat-content"><h3>476</h3><p>Total Products</p></div></div></div>
-        <div className="col-12 col-md-3"><div className="stat-card"><div className="stat-content"><h3>$245,800</h3><p>Stock Value</p></div></div></div>
-        <div className="col-12 col-md-3"><div className="stat-card"><div className="stat-content"><h3>183</h3><p>Total Sold</p></div></div></div>
-        <div className="col-12 col-md-3"><div className="stat-card"><div className="stat-content"><h3 style={{ color: '#dc2626' }}>5</h3><p>Low Stock Items</p></div></div></div>
+        <div className="col-12 col-md-3"><div className="stat-card"><div className="stat-content"><h3>{summary.total_products}</h3><p>Total Products</p></div></div></div>
+        <div className="col-12 col-md-3"><div className="stat-card"><div className="stat-content"><h3>{currencySymbol}{Number(summary.total_stock_value).toLocaleString()}</h3><p>Stock Value</p></div></div></div>
+        <div className="col-12 col-md-3"><div className="stat-card"><div className="stat-content"><h3>{summary.total_sold}</h3><p>Total Sold</p></div></div></div>
+        <div className="col-12 col-md-3"><div className="stat-card"><div className="stat-content"><h3 style={{ color: '#dc2626' }}>{summary.low_stock_items}</h3><p>Low Stock Items</p></div></div></div>
       </div>
 
       <div className="data-card">
         <div className="data-card-header d-flex justify-content-between align-items-center">
           <h5>Inventory Details</h5>
-          <div className="col-12 col-md-3 d-flex align-items-end gap-2 justify-content-end">
-            <button className="btn btn-outline-secondary d-flex align-items-center"><FiDownload className="me-1" /> Excel</button>
-            <button className="btn btn-outline-secondary d-flex align-items-center"><FiFileText className="me-1" /> PDF</button>
-          </div>
+          <button className="btn btn-outline-secondary d-flex align-items-center"><FiDownload className="me-1" /> Export</button>
         </div>
         <div className="data-card-body">
           <div className="table-responsive">
             <table className="data-table">
-              <thead><tr><th>SKU</th><th>Product</th><th>Category</th><th>In Stock</th><th>Sold</th><th>Purchase Price</th><th>Selling Price</th><th>Stock Value</th></tr></thead>
+              <thead><tr><th>SKU</th><th>Product</th><th>Category</th><th>Brand</th><th>In Stock</th><th>Sold</th><th>Purchase Price</th><th>Selling Price</th><th>Stock Value</th></tr></thead>
               <tbody>
-                {paginatedData.map((item, index) => (
-                  <tr key={index}>
-                    <td>{item.sku}</td><td><strong>{item.product}</strong></td><td>{item.category}</td>
-                    <td><span className={`badge ${item.inStock > 50 ? 'badge-success' : item.inStock > 10 ? 'badge-warning' : 'badge-danger'}`}>{item.inStock}</span></td>
-                    <td>{item.sold}</td><td>${item.purchasePrice}</td><td>${item.sellingPrice}</td><td><strong>${(item.inStock * item.purchasePrice).toLocaleString()}</strong></td>
+                {paginatedData.length === 0 ? (
+                  <tr><td colSpan={9} className="text-center py-4 text-muted">No data found</td></tr>
+                ) : paginatedData.map(item => (
+                  <tr key={item.id}>
+                    <td>{item.sku}</td>
+                    <td><strong>{item.name}</strong></td>
+                    <td>{item.category || '-'}</td>
+                    <td>{item.brand || '-'}</td>
+                    <td><span className={`badge ${stockBadge(item.quantity)}`}>{item.quantity}</span></td>
+                    <td>{item.total_sold ?? 0}</td>
+                    <td>{currencySymbol}{Number(item.purchase_price).toFixed(2)}</td>
+                    <td>{currencySymbol}{Number(item.selling_price).toFixed(2)}</td>
+                    <td><strong>{currencySymbol}{Number(item.stock_value ?? item.quantity * item.purchase_price).toLocaleString()}</strong></td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
           <div className="d-flex justify-content-between align-items-center mt-4">
-            <div className="text-muted">Showing {inventoryData.length === 0 ? 0 : startIndex + 1} to {Math.min(startIndex + itemsPerPage, inventoryData.length)} of {inventoryData.length} entries</div>
-            <nav>
-              <ul className="pagination mb-0">
-                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                  <button
-                    className="page-link"
-                    onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                    disabled={currentPage === 1}
-                  >
-                    Previous
-                  </button>
-                </li>
-                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                  let page: number;
-                  if (totalPages <= 5) {
-                    page = i + 1;
-                  } else if (currentPage <= 3) {
-                    page = i + 1;
-                  } else if (currentPage >= totalPages - 2) {
-                    page = totalPages - 4 + i;
-                  } else {
-                    page = currentPage - 2 + i;
-                  }
-                  return (
-                    <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
-                      <button className="page-link" onClick={() => setCurrentPage(page)}>{page}</button>
-                    </li>
-                  );
-                })}
-                <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                  <button
-                    className="page-link"
-                    onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                    disabled={currentPage === totalPages}
-                  >
-                    Next
-                  </button>
-                </li>
-              </ul>
-            </nav>
+            <div className="text-muted">Showing {products.length === 0 ? 0 : startIndex + 1} to {Math.min(startIndex + itemsPerPage, products.length)} of {products.length} entries</div>
+            <nav><ul className="pagination mb-0">
+              <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}><button className="page-link" onClick={() => setCurrentPage(p => Math.max(1, p - 1))}>Previous</button></li>
+              {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                const page = totalPages <= 5 ? i + 1 : currentPage <= 3 ? i + 1 : currentPage >= totalPages - 2 ? totalPages - 4 + i : currentPage - 2 + i;
+                return <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}><button className="page-link" onClick={() => setCurrentPage(page)}>{page}</button></li>;
+              })}
+              <li className={`page-item ${currentPage === totalPages || totalPages === 0 ? 'disabled' : ''}`}><button className="page-link" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}>Next</button></li>
+            </ul></nav>
           </div>
         </div>
       </div>

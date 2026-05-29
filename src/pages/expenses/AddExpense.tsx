@@ -1,6 +1,11 @@
 import { Link, useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useToast } from '@/components/common/Toast';
+import { getStores } from '../../services/commonService';
+import * as expenseService from '../../services/expenseService';
+
+interface ExpenseCategory { id: number; name: string; }
+interface Store { id: number; name: string; }
 
 const AddExpense = () => {
   const navigate = useNavigate();
@@ -10,68 +15,85 @@ const AddExpense = () => {
   const isEdit = !!id;
   const editData = state?.expense;
 
+  const [categories, setCategories] = useState<ExpenseCategory[]>([]);
+  const [stores, setStores] = useState<Store[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const [formData, setFormData] = useState({
-    category: '',
+    expense_category_id: '',
     date: new Date().toISOString().split('T')[0],
-    store: '',
-    reference: '',
+    store_id: '',
     amount: '',
-    paymentMethod: 'cash',
+    payment_method: 'cash',
     note: '',
     attachment: null as File | null,
   });
 
   useEffect(() => {
+    expenseService.getExpenseCategories().then(r => setCategories(r.data.data)).catch(() => {});
+    getStores().then(r => setStores(r.data.data)).catch(() => {});
+  }, []);
+
+  useEffect(() => {
     if (isEdit && editData) {
       setFormData(prev => ({
         ...prev,
-        category: editData.category?.toLowerCase() || '',
+        expense_category_id: String(editData.expense_category_id || editData.category?.id || ''),
         date: editData.date || prev.date,
-        store: editData.store === 'Main Store' ? '1' : editData.store === 'Branch 1' ? '2' : editData.store === 'Branch 2' ? '3' : editData.store === 'All Stores' ? 'all' : '',
-        reference: editData.reference || '',
+        store_id: String(editData.store_id || editData.store?.id || ''),
         amount: editData.amount?.toString() || '',
+        payment_method: editData.payment_method || 'cash',
         note: editData.note || '',
       }));
     }
   }, [isEdit, editData]);
 
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, files } = e.target as HTMLInputElement;
     if (name === 'attachment' && files) {
-      setFormData({ ...formData, attachment: files[0] });
+      setFormData(prev => ({ ...prev, attachment: files[0] }));
     } else {
-      setFormData({ ...formData, [name]: value });
+      setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      showToast({ type: 'success', title: 'Success', message: isEdit ? 'Expense updated successfully!' : 'Expense added successfully!' });
+    const payload = new FormData();
+    payload.append('expense_category_id', formData.expense_category_id);
+    payload.append('date', formData.date);
+    if (formData.store_id) payload.append('store_id', formData.store_id);
+    payload.append('amount', formData.amount);
+    payload.append('payment_method', formData.payment_method);
+    if (formData.note) payload.append('note', formData.note);
+    if (formData.attachment) payload.append('attachment', formData.attachment);
+
+    try {
+      if (isEdit && id) {
+        await expenseService.updateExpense(Number(id), payload);
+        showToast({ type: 'success', title: 'Success', message: 'Expense updated successfully!' });
+      } else {
+        await expenseService.createExpense(payload);
+        showToast({ type: 'success', title: 'Success', message: 'Expense added successfully!' });
+      }
       navigate('/expenses');
-    }, 500);
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || 'Operation failed!';
+      showToast({ type: 'error', title: 'Error', message: msg });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="add-expense-page">
-      {/* Page Header */}
       <div className="page-header">
         <h4>{isEdit ? 'Edit Expense' : 'Add Expense'}</h4>
         <div className="breadcrumb-wrapper">
-          <Link to="/">Home</Link>
-          <span>/</span>
-          <Link to="/expenses">Expenses</Link>
-          <span>/</span>
-          <span>{isEdit ? 'Edit Expense' : 'Add Expense'}</span>
+          <Link to="/">Home</Link><span>/</span><Link to="/expenses">Expenses</Link><span>/</span><span>{isEdit ? 'Edit Expense' : 'Add Expense'}</span>
         </div>
       </div>
-
       <form onSubmit={handleSubmit}>
         <div className="row">
           <div className="col-12">
@@ -81,143 +103,59 @@ const AddExpense = () => {
                 <div className="col-12 col-md-6">
                   <div className="form-group mb-0">
                     <label>Category *</label>
-                    <select
-                      name="category"
-                      className="form-select"
-                      value={formData.category}
-                      onChange={handleChange}
-                      required
-                    >
+                    <select name="expense_category_id" className="form-select" value={formData.expense_category_id} onChange={handleChange} required>
                       <option value="">Select Category</option>
-                      <option value="rent">Rent</option>
-                      <option value="utilities">Utilities</option>
-                      <option value="salary">Salary</option>
-                      <option value="marketing">Marketing</option>
-                      <option value="maintenance">Maintenance</option>
-                      <option value="other">Other</option>
+                      {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                   </div>
                 </div>
-
                 <div className="col-12 col-md-6">
                   <div className="form-group mb-0">
                     <label>Date *</label>
-                    <input
-                      type="date"
-                      name="date"
-                      className="form-control"
-                      defaultValue={new Date().toISOString().split('T')[0]}
-                      value={formData.date}
-                      onChange={handleChange}
-                      required
-                    />
+                    <input type="date" name="date" className="form-control" value={formData.date} onChange={handleChange} required />
                   </div>
                 </div>
-
                 <div className="col-12 col-md-6">
                   <div className="form-group mb-0">
-                    <label>Store *</label>
-                    <select
-                      name="store"
-                      className="form-select"
-                      value={formData.store}
-                      onChange={handleChange}
-                      required
-                    >
+                    <label>Store</label>
+                    <select name="store_id" className="form-select" value={formData.store_id} onChange={handleChange}>
                       <option value="">Select Store</option>
-                      <option value="1">Main Store</option>
-                      <option value="2">Branch 1</option>
-                      <option value="3">Branch 2</option>
-                      <option value="all">All Stores</option>
+                      {stores.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
                     </select>
                   </div>
                 </div>
-
-                <div className="col-12 col-md-6">
-                  <div className="form-group mb-0">
-                    <label>Reference No</label>
-                    <input
-                      type="text"
-                      name="reference"
-                      className="form-control"
-                      placeholder="Auto-generated"
-                      value={formData.reference}
-                      onChange={handleChange}
-                      readOnly
-                    />
-                  </div>
-                </div>
-
                 <div className="col-12 col-md-6">
                   <div className="form-group mb-0">
                     <label>Amount *</label>
-                    <input
-                      type="number"
-                      name="amount"
-                      className="form-control"
-                      placeholder="0.00"
-                      value={formData.amount}
-                      onChange={handleChange}
-                      required
-                    />
+                    <input type="number" name="amount" className="form-control" placeholder="0.00" value={formData.amount} onChange={handleChange} required min="0" step="0.01" />
                   </div>
                 </div>
-
                 <div className="col-12 col-md-6">
                   <div className="form-group mb-0">
                     <label>Payment Method</label>
-                    <select
-                      name="paymentMethod"
-                      className="form-select"
-                      value={formData.paymentMethod}
-                      onChange={handleChange}
-                      required
-                    >
+                    <select name="payment_method" className="form-select" value={formData.payment_method} onChange={handleChange}>
                       <option value="cash">Cash</option>
                       <option value="card">Card</option>
                       <option value="bank">Bank Transfer</option>
                     </select>
                   </div>
                 </div>
-
                 <div className="col-12">
                   <div className="form-group mb-0">
                     <label>Note</label>
-                    <textarea
-                      className="form-control"
-                      name="note"
-                      rows={4}
-                      placeholder="Add a note..."
-                      value={formData.note}
-                      onChange={handleChange}
-                    ></textarea>
+                    <textarea className="form-control" name="note" rows={4} placeholder="Add a note..." value={formData.note} onChange={handleChange}></textarea>
                   </div>
                 </div>
-
                 <div className="col-12">
                   <div className="form-group mb-0">
                     <label>Attachment</label>
-                    <input
-                      type="file"
-                      name="attachment"
-                      className="form-control"
-                      onChange={handleChange}
-                      required
-                    />
+                    <input type="file" name="attachment" className="form-control" onChange={handleChange} accept=".jpg,.jpeg,.png,.pdf" />
                   </div>
                 </div>
-
-                {/* Buttons Inside Same Card */}
                 <div className="col-12 mt-4 d-flex justify-content-end">
                   <div className="d-flex gap-2">
-                    <Link to="/expenses" className="btn btn-secondary-custom d-flex align-items-center">
-                      Cancel
-                    </Link>
-                    <button
-                      type="submit"
-                      className="btn btn-primary-custom"
-                      disabled={isSubmitting}
-                    >
+                    <Link to="/expenses" className="btn btn-secondary-custom d-flex align-items-center">Cancel</Link>
+                    <button type="submit" className="btn btn-primary-custom" disabled={isSubmitting}>
                       {isSubmitting ? 'Saving...' : isEdit ? 'Update Expense' : 'Save Expense'}
                     </button>
                   </div>

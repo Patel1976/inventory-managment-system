@@ -4,6 +4,7 @@ import { FiPlus, FiEdit, FiTrash2, FiEye, FiChevronLeft, FiChevronRight } from '
 import { useAuth } from '../../contexts/AuthContext';
 import { ConfirmDialog, ViewModal, DetailRow } from '../../components/common';
 import { useToast } from '../../components/common/Toast';
+import * as categoryService from '../../services/categoryService';
 
 interface Category {
   id: number;
@@ -11,8 +12,10 @@ interface Category {
   slug: string;
   description?: string;
   products: number;
+  products_count?: number;
   status: 'Active' | 'Inactive';
   createdDate?: string;
+  created_at?: string;
 }
 
 const Categories = () => {
@@ -35,19 +38,15 @@ const Categories = () => {
     status: 'Active' as 'Active' | 'Inactive'
   });
 
-  const [categories, setCategories] = useState<Category[]>([
-    { id: 1, name: 'Electronics', slug: 'electronics', products: 45, status: 'Active', description: 'Electronic devices and gadgets', createdDate: '2024-01-15' },
-    { id: 2, name: 'Laptops', slug: 'laptops', products: 28, status: 'Active', description: 'Portable computers', createdDate: '2024-01-14' },
-    { id: 3, name: 'Audio', slug: 'audio', products: 32, status: 'Active', description: 'Audio equipment and accessories', createdDate: '2024-01-13' },
-    { id: 4, name: 'Accessories', slug: 'accessories', products: 67, status: 'Active', description: 'Various accessories', createdDate: '2024-01-12' },
-    { id: 5, name: 'Wearables', slug: 'wearables', products: 19, status: 'Active', description: 'Wearable technology', createdDate: '2024-01-11' },
-    { id: 6, name: 'Tablets', slug: 'tablets', products: 15, status: 'Active', description: 'Tablet devices', createdDate: '2024-01-10' },
-    { id: 7, name: 'Gaming', slug: 'gaming', products: 42, status: 'Inactive', description: 'Gaming equipment', createdDate: '2024-01-09' },
-  ]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   const totalPages = Math.ceil(categories.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedData = categories.slice(startIndex, startIndex + itemsPerPage);
+
+  useEffect(() => {
+    categoryService.getCategories().then(res => setCategories(res.data.data)).catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (currentPage > totalPages && totalPages > 0) setCurrentPage(totalPages);
@@ -73,43 +72,41 @@ const Categories = () => {
     setShowDeleteDialog(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
-    setTimeout(() => {
+    try {
       if (editingCategory) {
-        setCategories(prev => prev.map(c =>
-          c.id === editingCategory.id
-            ? { ...c, ...formData }
-            : c
-        ));
+        await categoryService.updateCategory(editingCategory.id, formData);
         showToast({ type: 'success', title: 'Success', message: 'Category updated successfully!' });
         setEditingCategory(null);
       } else {
-        const newCategory: Category = {
-          id: categories.length + 1,
-          ...formData,
-          products: 0,
-          createdDate: new Date().toISOString().split('T')[0]
-        };
-        setCategories(prev => [...prev, newCategory]);
+        await categoryService.createCategory(formData);
         showToast({ type: 'success', title: 'Success', message: 'Category added successfully!' });
       }
+      const res = await categoryService.getCategories();
+      setCategories(res.data.data);
       setFormData({ name: '', slug: '', description: '', status: 'Active' });
+    } catch {
+      showToast({ type: 'error', title: 'Error', message: 'Operation failed!' });
+    } finally {
       setIsLoading(false);
-    }, 500);
+    }
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
+    if (!selectedCategory) return;
     setIsLoading(true);
-
-    setTimeout(() => {
-      setCategories(prev => prev.filter(c => c.id !== selectedCategory?.id));
+    try {
+      await categoryService.deleteCategory(selectedCategory.id);
+      setCategories(prev => prev.filter(c => c.id !== selectedCategory.id));
+      showToast({ type: 'success', title: 'Deleted', message: 'Category deleted successfully!' });
+    } catch {
+      showToast({ type: 'error', title: 'Error', message: 'Delete failed!' });
+    } finally {
       setIsLoading(false);
       setShowDeleteDialog(false);
-      showToast({ type: 'success', title: 'Deleted', message: 'Category deleted successfully!' });
-    }, 500);
+    }
   };
 
   const handleCancelEdit = () => {
@@ -276,7 +273,7 @@ const Categories = () => {
             <DetailRow label="Products" value={selectedCategory.products} />
             <DetailRow label="Status" value={<span className={`badge ${selectedCategory.status === 'Active' ? 'badge-success' : 'badge-danger'}`}>{selectedCategory.status}</span>} />
             <DetailRow label="Description" value={selectedCategory.description || 'N/A'} />
-            <DetailRow label="Created Date" value={selectedCategory.createdDate || 'N/A'} />
+            <DetailRow label="Created Date" value={selectedCategory.created_at?.split('T')[0] || selectedCategory.createdDate || 'N/A'} />
           </div>
         )}
       </ViewModal>

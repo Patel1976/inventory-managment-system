@@ -1,10 +1,13 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiDownload } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 import { useSettings } from '../../contexts/SettingsContext';
 import { ConfirmDialog, ViewModal, DetailRow } from '../../components/common';
 import { useToast } from '../../components/common/Toast';
+import * as productService from '../../services/productService';
+import { getBrands } from '../../services/brandService';
+import * as categoryService from '../../services/categoryService';
 
 interface Product {
   id: number;
@@ -12,13 +15,13 @@ interface Product {
   sku: string;
   category: string;
   brand: string;
-  price: number;
-  stock: number;
+  selling_price: number;
+  purchase_price: number;
+  quantity: number;
   status: string;
   image: string;
   description?: string;
-  costPrice?: number;
-  createdDate?: string;
+  created_at?: string;
 }
 
 const ProductList = () => {
@@ -41,31 +44,42 @@ const ProductList = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const [products, setProducts] = useState<Product[]>([
-    { id: 1, name: 'iPhone 14 Pro', sku: 'SKU001', category: 'Electronics', brand: 'Apple', price: 999, costPrice: 850, stock: 120, status: 'Active', image: 'https://via.placeholder.com/40', description: 'Latest iPhone model with advanced features', createdDate: '2024-01-15' },
-    { id: 2, name: 'Samsung Galaxy S23', sku: 'SKU002', category: 'Electronics', brand: 'Samsung', price: 899, costPrice: 750, stock: 85, status: 'Active', image: 'https://via.placeholder.com/40', description: 'Flagship Samsung smartphone', createdDate: '2024-01-14' },
-    { id: 3, name: 'MacBook Pro M2', sku: 'SKU003', category: 'Laptops', brand: 'Apple', price: 1999, costPrice: 1700, stock: 42, status: 'Active', image: 'https://via.placeholder.com/40', description: 'Powerful laptop with M2 chip', createdDate: '2024-01-13' },
-    { id: 4, name: 'Sony Headphones WH-1000XM5', sku: 'SKU004', category: 'Audio', brand: 'Sony', price: 349, costPrice: 280, stock: 156, status: 'Active', image: 'https://via.placeholder.com/40', description: 'Premium noise-canceling headphones', createdDate: '2024-01-12' },
-    { id: 5, name: 'Apple Watch Series 8', sku: 'SKU005', category: 'Wearables', brand: 'Apple', price: 399, costPrice: 320, stock: 68, status: 'Active', image: 'https://via.placeholder.com/40', description: 'Advanced smartwatch with health features', createdDate: '2024-01-11' },
-    { id: 6, name: 'Dell Monitor 27"', sku: 'SKU006', category: 'Electronics', brand: 'Dell', price: 349, costPrice: 280, stock: 5, status: 'Low Stock', image: 'https://via.placeholder.com/40', description: '27-inch 4K monitor', createdDate: '2024-01-10' },
-    { id: 7, name: 'Logitech MX Master 3', sku: 'SKU007', category: 'Accessories', brand: 'Logitech', price: 99, costPrice: 70, stock: 8, status: 'Low Stock', image: 'https://via.placeholder.com/40', description: 'Ergonomic wireless mouse', createdDate: '2024-01-09' },
-    { id: 8, name: 'iPad Pro 12.9', sku: 'SKU008', category: 'Tablets', brand: 'Apple', price: 1099, costPrice: 900, stock: 35, status: 'Active', image: 'https://via.placeholder.com/40', description: 'Professional tablet with M2 chip', createdDate: '2024-01-08' },
-    { id: 9, name: 'AirPods Pro 2', sku: 'SKU009', category: 'Audio', brand: 'Apple', price: 249, costPrice: 180, stock: 92, status: 'Active', image: 'https://via.placeholder.com/40', description: 'Wireless earbuds with ANC', createdDate: '2024-01-07' },
-    { id: 10, name: 'ThinkPad X1 Carbon', sku: 'SKU010', category: 'Laptops', brand: 'Lenovo', price: 1599, costPrice: 1350, stock: 28, status: 'Active', image: 'https://via.placeholder.com/40', description: 'Business ultrabook', createdDate: '2024-01-06' },
-    { id: 11, name: 'USB-C Hub', sku: 'SKU011', category: 'Accessories', brand: 'Anker', price: 49, costPrice: 30, stock: 3, status: 'Low Stock', image: 'https://via.placeholder.com/40', description: 'Multi-port USB-C adapter', createdDate: '2024-01-05' },
-    { id: 12, name: 'Mechanical Keyboard', sku: 'SKU012', category: 'Accessories', brand: 'Keychron', price: 89, costPrice: 60, stock: 45, status: 'Active', image: 'https://via.placeholder.com/40', description: 'Wireless mechanical keyboard', createdDate: '2024-01-04' },
-  ]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [brands, setBrands] = useState<Array<{id:number;name:string}>>([]);
+  const [categoriesList, setCategoriesList] = useState<Array<{id:number;name:string}>>([]);
+
+  useEffect(() => {
+    productService.getProducts().then(res => setProducts(res.data.data)).catch(() => {});
+    getBrands().then(r => setBrands(r.data.data)).catch(() => {});
+    categoryService.getCategories().then(r => setCategoriesList(r.data.data)).catch(() => {});
+  }, []);
+
+  const resolveName = (val: any, list: Array<{id:number;name:string}>) => {
+    if (!val) return '-';
+    if (typeof val === 'object') return val.name || '-';
+    const id = Number(val);
+    const found = list.find(x => x.id === id);
+    return found ? found.name : String(val);
+  };
+
+  const productCategoryId = (product: Product) => {
+    // product.category may be id, name, or object
+    if ((product as any).category_id) return String((product as any).category_id);
+    if (typeof product.category === 'object') return String((product.category as any).id || '');
+    return String(product.category || '');
+  };
 
   // Filter products
   const filteredProducts = products.filter(product => {
+    const brandName = resolveName(product.brand, brands);
     const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       product.sku.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      product.brand.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = !categoryFilter || product.category === categoryFilter;
+      brandName.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = !categoryFilter || productCategoryId(product) === categoryFilter;
     const matchesStatus = !statusFilter ||
-      (statusFilter === 'low-stock' && product.stock <= stockAlertThreshold) ||
-      (statusFilter === 'active' && product.stock > stockAlertThreshold) ||
-      (statusFilter === product.status.toLowerCase());
+      (statusFilter === 'low-stock' && product.quantity <= stockAlertThreshold) ||
+      (statusFilter === 'active' && product.quantity > stockAlertThreshold) ||
+      (statusFilter === product.status?.toLowerCase());
     return matchesSearch && matchesCategory && matchesStatus;
   });
 
@@ -75,12 +89,12 @@ const ProductList = () => {
   const paginatedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
 
   const getStatus = (stock: number) => {
-    if (stock <= stockAlertThreshold) return { label: 'Low Stock', class: 'badge-warning' };
     if (stock === 0) return { label: 'Out of Stock', class: 'badge-danger' };
+    if (stock <= stockAlertThreshold) return { label: 'Low Stock', class: 'badge-warning' };
     return { label: 'Active', class: 'badge-success' };
   };
 
-  const categories = [...new Set(products.map(p => p.category))];
+  const categories = categoriesList;
 
   const handleView = (product: Product) => {
     setSelectedProduct(product);
@@ -96,16 +110,19 @@ const ProductList = () => {
     setShowDeleteDialog(true);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
+    if (!selectedProduct) return;
     setIsLoading(true);
-
-    // Simulate API call
-    setTimeout(() => {
-      setProducts(prev => prev.filter(p => p.id !== selectedProduct?.id));
+    try {
+      await productService.deleteProduct(selectedProduct.id);
+      setProducts(prev => prev.filter(p => p.id !== selectedProduct.id));
+      showToast({ type: 'success', title: 'Deleted', message: 'Product deleted successfully!' });
+    } catch {
+      showToast({ type: 'error', title: 'Error', message: 'Delete failed!' });
+    } finally {
       setIsLoading(false);
       setShowDeleteDialog(false);
-      showToast({ type: 'success', title: 'Deleted', message: 'Product deleted successfully!' });
-    }, 500);
+    }
   };
 
   return (
@@ -142,7 +159,7 @@ const ProductList = () => {
                 >
                   <option value="">All Categories</option>
                   {categories.map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
+                    <option key={cat.id} value={String(cat.id)}>{cat.name}</option>
                   ))}
                 </select>
               </div>
@@ -197,25 +214,26 @@ const ProductList = () => {
               </thead>
               <tbody>
                 {paginatedProducts.map((product) => {
-                  const status = getStatus(product.stock);
+                  const status = getStatus(product.quantity);
                   return (
                     <tr key={product.id}>
                       <td><input type="checkbox" /></td>
                       <td>
                         <div className="d-flex align-items-center gap-3">
                           <img
-                            src={product.image}
+                            src={product.image || 'https://placehold.co/40x40?text=N/A'}
                             alt={product.name}
                             className="product-img"
+                            onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/40x40?text=N/A'; }}
                           />
                           <span style={{ fontWeight: '500' }}>{product.name}</span>
                         </div>
                       </td>
                       <td>{product.sku}</td>
-                      <td>{product.category}</td>
-                      <td>{product.brand}</td>
-                      <td><strong>{currencySymbol}{product.price}</strong></td>
-                      <td>{product.stock}</td>
+                      <td>{resolveName(product.category, categories)}</td>
+                      <td>{resolveName(product.brand, brands)}</td>
+                      <td><strong>{currencySymbol}{product.selling_price}</strong></td>
+                      <td>{product.quantity}</td>
                       <td>
                         <span className={`badge ${status.class}`}>
                           {status.label}
@@ -301,29 +319,30 @@ const ProductList = () => {
           <div className="row">
             <div className="col-md-4 text-center mb-4">
               <img
-                src={selectedProduct.image}
+                src={selectedProduct.image || 'https://placehold.co/150x150?text=N/A'}
                 alt={selectedProduct.name}
                 style={{ width: '150px', height: '150px', objectFit: 'cover', borderRadius: '8px' }}
+                onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/150x150?text=N/A'; }}
               />
             </div>
             <div className="col-md-8">
               <DetailRow label="Name" value={<strong>{selectedProduct.name}</strong>} />
               <DetailRow label="SKU" value={selectedProduct.sku} />
-              <DetailRow label="Category" value={selectedProduct.category} />
-              <DetailRow label="Brand" value={selectedProduct.brand} />
-              <DetailRow label="Price" value={<strong>{currencySymbol}{selectedProduct.price}</strong>} />
-              <DetailRow label="Cost Price" value={`${currencySymbol}${selectedProduct.costPrice || 0}`} />
-              <DetailRow label="Stock" value={selectedProduct.stock} />
+              <DetailRow label="Category" value={resolveName(selectedProduct.category, categories)} />
+              <DetailRow label="Brand" value={resolveName(selectedProduct.brand, brands)} />
+              <DetailRow label="Price" value={<strong>{currencySymbol}{selectedProduct.selling_price}</strong>} />
+              <DetailRow label="Cost Price" value={`${currencySymbol}${selectedProduct.purchase_price || 0}`} />
+              <DetailRow label="Stock" value={selectedProduct.quantity} />
               <DetailRow
                 label="Status"
                 value={
-                  <span className={`badge ${getStatus(selectedProduct.stock).class}`}>
-                    {getStatus(selectedProduct.stock).label}
+                  <span className={`badge ${getStatus(selectedProduct.quantity).class}`}>
+                    {getStatus(selectedProduct.quantity).label}
                   </span>
                 }
               />
               <DetailRow label="Description" value={selectedProduct.description || 'N/A'} />
-              <DetailRow label="Created Date" value={selectedProduct.createdDate || 'N/A'} />
+              <DetailRow label="Created Date" value={selectedProduct.created_at?.split('T')[0] || 'N/A'} />
             </div>
           </div>
         )}

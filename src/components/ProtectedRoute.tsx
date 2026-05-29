@@ -17,8 +17,10 @@ const ProtectedRoute = ({
   requiredPermissions = [],
   requireAll = false
 }: ProtectedRouteProps) => {
-  const { isAuthenticated, isAdmin, hasPermission } = useAuth();
+  const { isAuthenticated, isAdmin, hasPermission, isLoading } = useAuth();
   const location = useLocation();
+
+  if (isLoading) return null;
 
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
