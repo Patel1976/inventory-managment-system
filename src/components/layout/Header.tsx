@@ -15,7 +15,7 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
   const notifRef = useRef<HTMLDivElement>(null);
   const userRef = useRef<HTMLDivElement>(null);
   
-  const { user, logout, isAdmin } = useAuth();
+  const { user, logout } = useAuth();
   const { mode, toggleMode, primaryColor, setPrimaryColor } = useTheme();
   const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
   const navigate = useNavigate();
@@ -167,7 +167,7 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
             />
             <div className="user-info d-none d-md-block">
               <div className="user-name">{user?.name || 'Guest'}</div>
-              <div className="user-role">{isAdmin ? 'Administrator' : 'Staff'}</div>
+              <div className="user-role">{user?.role || 'Staff'}</div>
             </div>
             <FiChevronDown className="d-none d-md-block" />
           </div>

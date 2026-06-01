@@ -43,7 +43,7 @@ const SaleReturnForm = () => {
       setFormData({
         sale_id: String(editData.sale_id || ''),
         product_id: String(editData.product_id || ''),
-        return_date: editData.date || new Date().toISOString().split('T')[0],
+        return_date: editData.return_date || editData.date || new Date().toISOString().split('T')[0],
         quantity: editData.quantity || 1,
         return_amount: editData.return_amount || 0,
         reason: editData.reason || '',

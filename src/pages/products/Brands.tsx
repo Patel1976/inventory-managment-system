@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FiPlus, FiEdit, FiTrash2, FiEye, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiPlus, FiEdit, FiTrash2, FiEye } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 import { ConfirmDialog, ViewModal, DetailRow } from '../../components/common';
 import { useToast } from '../../components/common/Toast';
@@ -235,7 +235,7 @@ const Brands = () => {
               <DetailRow label="Products" value={selectedBrand.products_count ?? 0} />
               <DetailRow label="Status" value={<span className={`badge ${selectedBrand.status === 'Active' ? 'badge-success' : 'badge-danger'}`}>{selectedBrand.status}</span>} />
               <DetailRow label="Description" value={selectedBrand.description || 'N/A'} />
-              <DetailRow label="Created Date" value={selectedBrand.created_at?.split('T')[0] || selectedBrand.createdDate || 'N/A'} />
+              <DetailRow label="Created Date" value={selectedBrand.created_at?.split('T')[0] || 'N/A'} />
             </div>
           </div>
         )}

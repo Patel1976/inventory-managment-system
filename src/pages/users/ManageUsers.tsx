@@ -19,7 +19,7 @@ interface User {
 
 // Map backend role → frontend UserRole
 const toFrontendRole = (role: string): UserRole => {
-  if (role === 'admin') return 'Admin';
+  if (role === 'admin' || role === 'super-admin') return 'Admin';
   if (role === 'manager') return 'Manager';
   return 'Staff';
 };
@@ -27,7 +27,7 @@ const toFrontendRole = (role: string): UserRole => {
 // Map frontend UserRole → backend role
 const toBackendRole = (role: UserRole): string => {
   if (role === 'Admin') return 'admin';
-  if (role === 'Manager') return 'staff'; // backend has no manager, map to staff
+  if (role === 'Manager') return 'manager';
   return 'staff';
 };
 

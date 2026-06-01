@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate, useLocation, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { FiSave, FiX, FiUpload } from 'react-icons/fi';
 import { useToast } from '@/components/common/Toast';
 import { getBrands } from '../../services/brandService';
@@ -10,9 +10,7 @@ const AddProduct = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
   const { id } = useParams();
-  const { state } = useLocation();
   const isEdit = !!id;
-  const editData = state?.product;
   const [formData, setFormData] = useState({
     name: '',
     sku: '',
@@ -27,26 +25,37 @@ const AddProduct = () => {
     description: '',
     image: null as File | null,
   });
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [brands, setBrands] = useState<Array<{id:number;name:string}>>([]);
   const [categories, setCategories] = useState<Array<{id:number;name:string}>>([]);
+  const [loadingProduct, setLoadingProduct] = useState(isEdit);
 
+  // Fetch product from API on edit
   useEffect(() => {
-    if (isEdit && editData) {
-      setFormData(prev => ({
-        ...prev,
-        name: editData.name || '',
-        sku: editData.sku || '',
-        category: String(editData.category_id || editData.category?.id || editData.category || ''),
-        brand: String(editData.brand_id || editData.brand?.id || editData.brand || ''),
-        purchasePrice: editData.purchase_price?.toString() || '',
-        sellingPrice: editData.selling_price?.toString() || '',
-        quantity: editData.quantity?.toString() || '',
-        alertQuantity: editData.alert_quantity?.toString() || '',
-        tax: editData.tax?.toString() || '',
-        description: editData.description || '',
-      }));
-    }
-  }, [isEdit, editData]);
+    if (!isEdit) return;
+    setLoadingProduct(true);
+    productService.getProduct(Number(id))
+      .then(res => {
+        const p = res.data.data;
+        setFormData(prev => ({
+          ...prev,
+          name: p.name || '',
+          sku: p.sku || '',
+          category: String(p.category_id || ''),
+          brand: String(p.brand_id || ''),
+          unit: p.unit || '',
+          purchasePrice: p.purchase_price?.toString() || '',
+          sellingPrice: p.selling_price?.toString() || '',
+          quantity: p.quantity?.toString() || '',
+          alertQuantity: p.alert_quantity?.toString() || '',
+          tax: p.tax?.toString() || '',
+          description: p.description || '',
+        }));
+        if (p.image) setImagePreview(p.image);
+      })
+      .catch(() => showToast({ type: 'error', title: 'Error', message: 'Failed to load product!' }))
+      .finally(() => setLoadingProduct(false));
+  }, []);
 
   useEffect(() => {
     getBrands().then(r => setBrands(r.data.data)).catch(() => {});
@@ -66,8 +75,6 @@ const AddProduct = () => {
     // backend expects `category` and `brand` fields (IDs), include both variants for compatibility
     payload.append('category_id', formData.category);
     payload.append('brand_id', formData.brand);
-    payload.append('category', formData.category);
-    payload.append('brand', formData.brand);
     payload.append('unit', formData.unit);
     payload.append('purchase_price', formData.purchasePrice);
     payload.append('selling_price', formData.sellingPrice);
@@ -108,6 +115,11 @@ const AddProduct = () => {
         </div>
       </div>
 
+      {loadingProduct ? (
+        <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '300px' }}>
+          <div className="spinner-border text-primary" role="status" />
+        </div>
+      ) : (
       <form onSubmit={handleSubmit}>
         <div className="row g-4">
           {/* Product Information */}
@@ -299,23 +311,58 @@ const AddProduct = () => {
                   alignItems: 'center',
                 }}
               >
-                <FiUpload size={48} color="#888" />
-                <p className="mt-2 mb-2" style={{ color: '#555' }}>
-                  Drag and drop image here
-                </p>
-                <p className="text-muted small mb-2">or</p>
-                <label className="btn btn-outline-primary btn-sm align-items-center d-flex">
-                  Browse Files
-                  <input 
-                    type="file" 
-                    hidden 
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) setFormData(prev => ({ ...prev, image: file }));
-                    }}
-                  />
-                </label>
+                {imagePreview ? (
+                  <>
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      style={{ width: '100%', maxHeight: '180px', objectFit: 'contain', borderRadius: '8px', marginBottom: '10px' }}
+                    />
+                    <label className="btn btn-outline-secondary btn-sm d-flex align-items-center">
+                      Change Image
+                      <input
+                        type="file"
+                        hidden
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setFormData(prev => ({ ...prev, image: file }));
+                            setImagePreview(URL.createObjectURL(file));
+                          }
+                        }}
+                      />
+                    </label>
+                    <button
+                      type="button"
+                      className="btn btn-link btn-sm text-danger mt-1 p-0"
+                      onClick={() => { setImagePreview(null); setFormData(prev => ({ ...prev, image: null })); }}
+                    >
+                      Remove Image
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <FiUpload size={48} color="#888" />
+                    <p className="mt-2 mb-2" style={{ color: '#555' }}>Drag and drop image here</p>
+                    <p className="text-muted small mb-2">or</p>
+                    <label className="btn btn-outline-primary btn-sm align-items-center d-flex">
+                      Browse Files
+                      <input
+                        type="file"
+                        hidden
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            setFormData(prev => ({ ...prev, image: file }));
+                            setImagePreview(URL.createObjectURL(file));
+                          }
+                        }}
+                      />
+                    </label>
+                  </>
+                )}
               </div>
               
               <p className="text-muted small">
@@ -337,6 +384,7 @@ const AddProduct = () => {
           </div>
         </div>
       </form>
+      )}
     </div>
   );
 };

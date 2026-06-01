@@ -30,8 +30,8 @@ interface AuthContextType {
   isAdmin: boolean;
   isManager: boolean;
   isStaff: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
-  logout: () => void;
+  login: (identifier: string, password: string) => Promise<boolean>;
+  logout: () => Promise<void>;
   updateUser: (updates: Partial<User>) => void;
   hasPermission: (permission: Permission) => boolean;
   getPermissions: () => Permission[];
@@ -39,7 +39,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_URL = 'http://localhost/projects/inventory-management/public/api/admin';
+const API_URL = 'http://localhost:8000/api/admin';
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -62,9 +62,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(false);
   }, []);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (identifier: string, password: string): Promise<boolean> => {
     try {
-      const res = await axios.post(`${API_URL}/login`, { email, password });
+      const res = await axios.post(`${API_URL}/login`, { identifier, password });
       const { token, userData } = res.data.data;
       const roleMap: Record<string, UserRole> = {
         'super-admin': 'Admin',
@@ -80,7 +80,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         phone: userData.phone || '',
         role: roleMap[userData.role?.toLowerCase()] || 'Staff',
         avatar: userData.image
-          ? `http://localhost/projects/inventory-management/public/storage/${userData.image}`
+          ? `http://localhost:8000/storage/${userData.image}`
           : `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name)}&background=dc3545&color=fff`,
         image: userData.image || '',
       };
@@ -93,10 +93,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem('inventory_user');
-    localStorage.removeItem('token');
+  const logout = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (token) {
+        await axios.post(`${API_URL}/logout`, {}, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+      }
+    } catch {
+      // silently ignore — still clear local state
+    } finally {
+      setUser(null);
+      localStorage.removeItem('inventory_user');
+      localStorage.removeItem('token');
+    }
   };
 
   const updateUser = (updates: Partial<User>) => {

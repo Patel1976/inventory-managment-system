@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiDownload, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
+import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiDownload } from 'react-icons/fi';
 import { useAuth } from '../../contexts/AuthContext';
 import { useToast } from '../../components/common/Toast';
 import { useSettings } from '../../contexts/SettingsContext';
@@ -238,12 +238,13 @@ const SaleReturnList = () => {
 
       <ConfirmDialog
         isOpen={showDeleteDialog}
-        onClose={() => setShowDeleteDialog(false)}
+        onCancel={() => { setShowDeleteDialog(false); setSelectedReturn(null); }}
         onConfirm={confirmDelete}
         title="Confirm Delete"
         message={`Are you sure you want to delete this sale return? (${selectedReturn?.reference})`}
         isLoading={isLoading}
-        confirmText="Delete"
+        confirmLabel="Delete"
+        variant="danger"
       />
     </div>
   );

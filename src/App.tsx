@@ -92,8 +92,8 @@ const App = () => (
                   }>
                     <Route index element={<Dashboard />} />
                     <Route path="products" element={<ProductList />} />
-                    <Route path="products/add" element={<AddProduct />} />
-                    <Route path="products/edit/:id" element={<AddProduct />} />
+                    <Route path="products/add" element={<AddProduct key="add" />} />
+                    <Route path="products/edit/:id" element={<AddProduct key="edit" />} />
                     <Route path="products/categories" element={<Categories />} />
                     <Route path="products/brands" element={<Brands />} />
                     <Route path="sales" element={<SalesList />} />

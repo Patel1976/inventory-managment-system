@@ -4,7 +4,7 @@ import { FiMail, FiLock, FiLogIn } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 
 const Login = () => {
-  const [email, setEmail] = useState('');
+  const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -22,7 +22,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const success = await login(email, password);
+      const success = await login(identifier, password);
       if (success) {
         navigate(from, { replace: true });
       } else {
@@ -47,15 +47,15 @@ const Login = () => {
 
         <form className="login-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label>Email Address</label>
+            <label>Email or Username</label>
             <div className="input-icon-wrapper">
               <FiMail className="input-icon" />
               <input
-                type="email"
+                type="text"
                 className="form-control with-icon"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email or username"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
                 required
               />
             </div>
@@ -103,13 +103,6 @@ const Login = () => {
             )}
           </button>
         </form>
-
-        <div className="mt-4" style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
-          <p className="mb-1"><strong>Demo Accounts:</strong></p>
-          <p className="mb-0"><span className="fw-bold me-1" style={{ fontSize: '14px' }}>Admin :</span> admin@inventory.com / admin123</p>
-          <p className="mb-0"><span className="fw-bold me-1" style={{ fontSize: '14px' }}>Manager :</span> manager@inventory.com / manager123</p>
-          <p className="mb-0"><span className="fw-bold me-1" style={{ fontSize: '14px' }}>Staff :</span> staff@inventory.com / staff123</p>
-        </div>
       </div>
       <div className="login-image">
         <img src="public/image/login_background.svg" alt="Login Background" />
