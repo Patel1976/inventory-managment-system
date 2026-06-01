@@ -20,7 +20,7 @@ const SaleReturnForm = () => {
 
   const [sales, setSales] = useState<(Sale & { items: SaleItem[] })[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
-  const [selectedSale, setSelectedSale] = useState<Sale & { items: SaleItem[] } | null>(null);
+  // selectedSale is no longer used; remove to satisfy lint rules
   const [isLoading, setIsLoading] = useState(false);
 
   const [formData, setFormData] = useState({

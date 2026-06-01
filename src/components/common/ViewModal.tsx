@@ -1,5 +1,4 @@
 import { ReactNode, useEffect } from 'react';
-import { FiX } from 'react-icons/fi';
 
 interface ViewModalProps {
   isOpen: boolean;

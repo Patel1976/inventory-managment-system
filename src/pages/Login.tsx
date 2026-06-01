@@ -1,6 +1,6 @@
 import { useState, FormEvent } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { FiMail, FiLock, FiLogIn } from 'react-icons/fi';
+import { FiMail, FiLock } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 
 const Login = () => {
@@ -28,7 +28,7 @@ const Login = () => {
       } else {
         setError('Invalid email or password');
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred. Please try again.');
     } finally {
       setLoading(false);
@@ -105,7 +105,7 @@ const Login = () => {
         </form>
       </div>
       <div className="login-image">
-        <img src="public/image/login_background.svg" alt="Login Background" />
+        <img src="/image/login_background.svg" alt="Login Background" />
       </div>
     </div>
   );

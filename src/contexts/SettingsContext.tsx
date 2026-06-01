@@ -38,7 +38,6 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
     if (!token) return;
     getSettings().then((res) => {
       const d = res.data?.data;
-      const general = d?.general || {};
       const currency_tax = d?.currency_tax || {};
       const stock = d?.stock || {};
       const invoice = d?.invoice || {};

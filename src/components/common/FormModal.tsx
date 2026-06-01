@@ -1,5 +1,4 @@
 import { ReactNode, FormEvent } from 'react';
-import { FiX, FiSave } from 'react-icons/fi';
 
 interface FormModalProps {
   isOpen: boolean;

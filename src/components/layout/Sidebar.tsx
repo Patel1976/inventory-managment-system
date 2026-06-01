@@ -25,7 +25,7 @@ interface MenuItem {
 const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
   const location = useLocation();
   const [openMenu, setOpenMenu] = useState<string | null>(null);
-  const { isAdmin, hasPermission } = useAuth();
+  const { hasPermission } = useAuth();
   const [isHovered, setIsHovered] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 991);
   const isSidebarExpanded = isMobile ? !isCollapsed : (!isCollapsed || isHovered);
@@ -213,9 +213,9 @@ const Sidebar = ({ isCollapsed, setIsCollapsed }: SidebarProps) => {
     >
       <div className="sidebar-brand">
         {isSidebarExpanded ? (
-          <img src="inventory-logo.png" alt="Logo" />
+          <img src="/inventory-logo.png" alt="Logo" />
         ) : (
-          <img src="favicon.png" alt="Logo" />
+          <img src="/favicon.png" alt="Logo" />
         )}
       </div>
 

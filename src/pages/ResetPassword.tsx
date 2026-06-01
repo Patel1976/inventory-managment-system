@@ -1,6 +1,6 @@
 import { useState, useEffect, FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { FiLock, FiCheck, FiArrowLeft, FiEye, FiEyeOff } from 'react-icons/fi';
+import { FiLock, FiArrowLeft, FiEye, FiEyeOff } from 'react-icons/fi';
 import { validateResetToken, resetPassword } from '../services/authService';
 
 type LinkStatus = 'validating' | 'valid' | 'invalid';
@@ -77,7 +77,7 @@ const ResetPassword = () => {
           <p className="text-muted">Verifying reset link...</p>
         </div>
         <div className="login-image">
-          <img src="public/image/login_background.svg" alt="Login Background" />
+          <img src="/image/login_background.svg" alt="Login Background" />
         </div>
       </div>
     );
@@ -101,7 +101,7 @@ const ResetPassword = () => {
           </Link>
         </div>
         <div className="login-image">
-          <img src="public/image/login_background.svg" alt="Login Background" />
+          <img src="/image/login_background.svg" alt="Login Background" />
         </div>
       </div>
     );
@@ -199,7 +199,7 @@ const ResetPassword = () => {
         )}
       </div>
       <div className="login-image">
-        <img src="public/image/login_background.svg" alt="Login Background" />
+        <img src="/image/login_background.svg" alt="Login Background" />
       </div>
     </div>
   );

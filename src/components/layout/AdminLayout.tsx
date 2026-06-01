@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Header from './Header';
-import Footer from './Footer';
 
 const AdminLayout = () => {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -22,7 +21,7 @@ const AdminLayout = () => {
           <Outlet />
         </div>
         
-        {/* <Footer /> */}
+        {/* Footer intentionally omitted */}
       </div>
     </div>
   );
