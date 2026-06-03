@@ -321,7 +321,7 @@ const ProductList = () => {
               <img
                 src={selectedProduct.image || 'https://placehold.co/150x150?text=N/A'}
                 alt={selectedProduct.name}
-                style={{ width: '150px', height: '150px', objectFit: 'cover', borderRadius: '8px' }}
+                style={{ width: '100%', height: '150px', objectFit: 'contain' }}
                 onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/150x150?text=N/A'; }}
               />
             </div>

@@ -228,7 +228,7 @@ const Brands = () => {
         {selectedBrand && (
           <div className="row">
             <div className="col-md-3 text-center mb-3">
-              <img src={selectedBrand.logo || 'https://placehold.co/80x80?text=N/A'} alt={selectedBrand.name} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px' }} onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/80x80?text=N/A'; }} />
+              <img src={selectedBrand.logo || 'https://placehold.co/80x80?text=N/A'} alt={selectedBrand.name} style={{ width: '100%', height: '80px', objectFit: 'contain', borderRadius: '8px' }} onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/80x80?text=N/A'; }} />
             </div>
             <div className="col-md-9">
               <DetailRow label="Name" value={<strong>{selectedBrand.name}</strong>} />

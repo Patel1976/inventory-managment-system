@@ -5,7 +5,8 @@ import * as purchaseReturnService from '../../services/purchaseReturnService';
 import { getPurchases } from '../../services/purchaseService';
 import { getProducts } from '../../services/productService';
 
-interface Purchase { id: number; reference: string; }
+interface Supplier { id: number; name: string; }
+interface Purchase { id: number; reference: string; supplier?: Supplier; }
 interface Product { id: number; name: string; }
 
 const PurchaseReturnForm = () => {
@@ -19,6 +20,7 @@ const PurchaseReturnForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [purchases, setPurchases] = useState<Purchase[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [supplierName, setSupplierName] = useState('');
 
   const [formData, setFormData] = useState({
     purchase_id: '',
@@ -37,8 +39,9 @@ const PurchaseReturnForm = () => {
 
   useEffect(() => {
     if (isEdit && editData) {
+      const purchaseId = String(editData.purchase?.id || '');
       setFormData({
-        purchase_id: String(editData.purchase?.id || ''),
+        purchase_id: purchaseId,
         product_id: String(editData.product?.id || ''),
         quantity: editData.quantity || 1,
         return_amount: editData.return_amount || 0,
@@ -46,8 +49,23 @@ const PurchaseReturnForm = () => {
         reason: editData.reason || '',
         status: editData.status || 'Pending',
       });
+      setSupplierName(editData.purchase?.supplier?.name || '');
     }
   }, [isEdit, editData]);
+
+  const handlePurchaseChange = (purchaseId: string) => {
+    setFormData(prev => ({ ...prev, purchase_id: purchaseId }));
+    const purchase = purchases.find(p => String(p.id) === purchaseId);
+    setSupplierName(purchase?.supplier?.name || '');
+  };
+
+  // Also update supplier when purchases list loads in edit mode
+  useEffect(() => {
+    if (isEdit && formData.purchase_id && purchases.length > 0 && !supplierName) {
+      const purchase = purchases.find(p => String(p.id) === formData.purchase_id);
+      setSupplierName(purchase?.supplier?.name || '');
+    }
+  }, [purchases, isEdit, formData.purchase_id]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,10 +115,15 @@ const PurchaseReturnForm = () => {
           <div className="row g-3">
             <div className="col-12 col-md-6">
               <label className="form-label">Purchase Reference *</label>
-              <select className="form-select" value={formData.purchase_id} onChange={e => setFormData({ ...formData, purchase_id: e.target.value })} required>
+              <select className="form-select" value={formData.purchase_id} onChange={e => handlePurchaseChange(e.target.value)} required>
                 <option value="">Select Purchase</option>
                 {purchases.map(p => <option key={p.id} value={p.id}>{p.reference}</option>)}
               </select>
+            </div>
+
+            <div className="col-12 col-md-6">
+              <label className="form-label">Supplier</label>
+              <input type="text" className="form-control" value={supplierName} readOnly placeholder="Auto-filled from purchase" />
             </div>
 
             <div className="col-12 col-md-6">
