@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation, useParams } from 'react-router-dom';
 import { FiPlus, FiTrash2 } from 'react-icons/fi';
 import { useToast } from '@/components/common/Toast';
-import { useSettings } from '../../contexts/SettingsContext';
+import { useSettings } from '../../contexts/useSettings';
 import * as purchaseService from '../../services/purchaseService';
 import { getSuppliers, getStores } from '../../services/commonService';
 import { getProducts } from '../../services/productService';

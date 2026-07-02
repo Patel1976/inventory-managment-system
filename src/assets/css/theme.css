@@ -1,3 +1,8 @@
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
 /* ============================================
    Theme System - CSS Variables
    ============================================ */
@@ -700,15 +705,16 @@ a:hover {
 
 .notification-menu {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 8px);
   right: 0;
-  width: 320px;
+  width: 340px;
   background: var(--dropdown-bg);
   border: 1px solid var(--border-color);
   border-radius: 12px;
   box-shadow: 0 10px 40px var(--shadow-color);
   z-index: 1000;
   display: none;
+  overflow: hidden;
 }
 
 .notification-menu.show {
@@ -730,7 +736,7 @@ a:hover {
 }
 
 .notification-list {
-  max-height: 300px;
+  max-height: 360px;
   overflow-y: auto;
 }
 
@@ -739,9 +745,13 @@ a:hover {
   align-items: flex-start;
   gap: 12px;
   padding: 12px 15px;
-  border-bottom: 1px solid var(--border-color);
   cursor: pointer;
   transition: background 0.2s;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.notification-item:last-child {
+  border-bottom: none;
 }
 
 .notification-item:hover {
@@ -749,7 +759,7 @@ a:hover {
 }
 
 .notification-item.unread {
-  background: var(--primary-light);
+  background: rgba(var(--primary-rgb, 37,99,235), 0.05);
 }
 
 .notification-icon {
@@ -785,6 +795,7 @@ a:hover {
 
 .notification-content {
   flex: 1;
+  min-width: 0;
 }
 
 .notification-content p {
@@ -794,7 +805,14 @@ a:hover {
   line-height: 1.4;
 }
 
+.notification-content p + p {
+  margin-top: 2px;
+  color: var(--text-secondary);
+}
+
 .notification-content small {
+  display: block;
+  margin-top: 4px;
   color: var(--text-secondary);
   font-size: 11px;
 }
@@ -802,6 +820,7 @@ a:hover {
 .notification-footer {
   padding: 12px 15px;
   text-align: center;
+  border-top: 1px solid var(--border-color);
 }
 
 .notification-footer a {

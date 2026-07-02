@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiSave, FiSettings, FiMail, FiShield, FiDollarSign, FiPackage, FiFileText } from 'react-icons/fi';
-import { useSettings } from '../contexts/SettingsContext';
+import { useSettings } from '../contexts/useSettings';
 import { getSettings, updateSettings, testEmailConnection } from '../services/settingsService';
 
 const Settings = () => {

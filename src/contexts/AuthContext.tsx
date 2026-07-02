@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useState, useEffect, ReactNode } from 'react';
 import { UserRole, Permission, hasPermission as checkPermission, getPermissions } from '../config/permissions';
 import axios from 'axios';
 
@@ -39,7 +39,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_URL = 'http://localhost:8000/api/admin';
+const API_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -80,7 +80,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         phone: userData.phone || '',
         role: roleMap[userData.role?.toLowerCase()] || 'Staff',
         avatar: userData.image
-          ? `http://localhost:8000/storage/${userData.image}`
+          ? `${import.meta.env.VITE_STORAGE_BASE_URL}/${userData.image}`
           : `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name)}&background=dc3545&color=fff`,
         image: userData.image || '',
       };
@@ -150,10 +150,5 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-export const useAuth = (): AuthContextType => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export { AuthContext };
+export type { AuthContextType };

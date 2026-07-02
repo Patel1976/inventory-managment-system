@@ -5,7 +5,7 @@ import {
   FiDollarSign, FiBarChart2, FiSettings, FiChevronDown,
   FiChevronRight, FiLayers, FiFileText, FiActivity
 } from 'react-icons/fi';
-import { useAuth } from '../../contexts/AuthContext';
+import { useAuth } from '../../contexts/useAuth';
 import { Permission } from '../../config/permissions';
 
 interface SidebarProps {

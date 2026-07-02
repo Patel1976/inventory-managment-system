@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiDownload, FiFilter } from 'react-icons/fi';
-import { useSettings } from '../../contexts/SettingsContext';
+import { useSettings } from '../../contexts/useSettings';
 import { getSalesReport } from '../../services/reportService';
 import { getCustomers } from '../../services/commonService';
 

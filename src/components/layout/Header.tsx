@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FiMenu, FiBell, FiSearch, FiChevronDown, FiSun, FiMoon, FiLogOut, FiUser, FiSettings } from 'react-icons/fi';
-import { useAuth } from '../../contexts/AuthContext';
+import { FiMenu, FiBell, FiSearch, FiChevronDown, FiSun, FiMoon, FiLogOut, FiUser, FiSettings, FiAlertTriangle, FiCheckCircle, FiAlertCircle, FiInfo, FiRefreshCw } from 'react-icons/fi';
+import { useAuth } from '../../contexts/useAuth';
 import { useTheme } from '../../contexts/ThemeContext';
-import { useNotifications } from '../../contexts/NotificationContext';
+import { useNotifications } from '../../contexts/useNotifications';
 
 interface HeaderProps {
   onToggleSidebar: () => void;
@@ -17,7 +17,7 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
   
   const { user, logout } = useAuth();
   const { mode, toggleMode, primaryColor, setPrimaryColor } = useTheme();
-  const { notifications, unreadCount, markAsRead, markAllAsRead } = useNotifications();
+  const { notifications, unreadCount, markAsRead, markAllAsRead, refresh, isLoading } = useNotifications();
   const navigate = useNavigate();
 
   // Close dropdowns when clicking outside
@@ -39,13 +39,22 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
     navigate('/login');
   };
 
+  const getNotificationRoute = (id: string): string => {
+    if (id.startsWith('stock-'))    return '/products';
+    if (id.startsWith('sale-'))     return '/sales';
+    if (id.startsWith('purchase-')) return '/purchases';
+    if (id.startsWith('pr-'))       return '/purchases/returns';
+    if (id.startsWith('sr-'))       return '/sales/returns';
+    return '/';
+  };
+
   const getNotificationIcon = (type: string) => {
     switch (type) {
-      case 'warning': return 'notification-icon warning';
-      case 'success': return 'notification-icon success';
-      case 'danger': return 'notification-icon danger';
-      case 'info': return 'notification-icon info';
-      default: return 'notification-icon';
+      case 'warning': return { cls: 'notification-icon warning', icon: <FiAlertTriangle /> };
+      case 'success': return { cls: 'notification-icon success', icon: <FiCheckCircle /> };
+      case 'danger':  return { cls: 'notification-icon danger',  icon: <FiAlertCircle /> };
+      case 'info':    return { cls: 'notification-icon info',    icon: <FiInfo /> };
+      default:        return { cls: 'notification-icon info',    icon: <FiBell /> };
     }
   };
 
@@ -118,39 +127,55 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
           <div className={`notification-menu ${showNotifications ? 'show' : ''}`}>
             <div className="notification-header">
               <h6>Notifications</h6>
-              {unreadCount > 0 && (
-                <button 
+              <div className="d-flex gap-2 align-items-center">
+                <button
                   className="btn btn-sm btn-link text-decoration-none p-0"
-                  onClick={markAllAsRead}
-                  style={{ fontSize: '12px', color: 'var(--primary-color)' }}
+                  onClick={refresh}
+                  style={{ fontSize: '14px', color: 'var(--text-secondary)' }}
+                  title="Refresh"
                 >
-                  Mark all as read
+                  <FiRefreshCw style={{ animation: isLoading ? 'spin 1s linear infinite' : 'none' }} />
                 </button>
-              )}
+                {unreadCount > 0 && (
+                  <button
+                    className="btn btn-sm btn-link text-decoration-none p-0"
+                    onClick={markAllAsRead}
+                    style={{ fontSize: '12px', color: 'var(--primary-color)' }}
+                  >
+                    Mark all as read
+                  </button>
+                )}
+              </div>
             </div>
             <div className="notification-list">
-              {notifications.slice(0, 5).map(notif => (
-                <div 
-                  key={notif.id}
-                  className={`notification-item ${!notif.read ? 'unread' : ''}`}
-                  onClick={() => markAsRead(notif.id)}
-                >
-                  <div className={getNotificationIcon(notif.type)}>
-                    <FiBell />
+              {isLoading && notifications.length === 0 ? (
+                <div className="text-center py-3" style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Loading...</div>
+              ) : notifications.length === 0 ? (
+                <div className="text-center py-3" style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>No notifications</div>
+              ) : (
+                notifications.slice(0, 5).map(notif => (
+                  <div
+                    key={notif.id}
+                    className={`notification-item ${!notif.read ? 'unread' : ''}`}
+                    onClick={() => {
+                      markAsRead(notif.id);
+                      setShowNotifications(false);
+                      navigate(getNotificationRoute(notif.id));
+                    }}
+                  >
+                    <div className={getNotificationIcon(notif.type).cls}>
+                      {getNotificationIcon(notif.type).icon}
+                    </div>
+                    <div className="notification-content">
+                      <p><strong>{notif.title}</strong></p>
+                      <p>{notif.message}</p>
+                      <small>{notif.time}</small>
+                    </div>
                   </div>
-                  <div className="notification-content">
-                    <p><strong>{notif.title}</strong></p>
-                    <p>{notif.message}</p>
-                    <small>{notif.time}</small>
-                  </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
-            <div className="notification-footer">
-              <a href="#" onClick={(e) => { e.preventDefault(); setShowNotifications(false); }}>
-                View All Notifications
-              </a>
-            </div>
+
           </div>
         </div>
 

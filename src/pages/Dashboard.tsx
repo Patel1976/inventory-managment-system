@@ -5,7 +5,7 @@ import {
   FiTrendingUp, FiTrendingDown, FiAlertTriangle,
   FiPlus, FiPercent
 } from 'react-icons/fi';
-import { useSettings } from '../contexts/SettingsContext';
+import { useSettings } from '../contexts/useSettings';
 import { getDashboardData } from '../services/dashboardService';
 
 interface Trend { label: string; trend_up: boolean; }

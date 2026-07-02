@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiDownload, FiFilter } from 'react-icons/fi';
-import { useSettings } from '../../contexts/SettingsContext';
+import { useSettings } from '../../contexts/useSettings';
 import { getInventoryReport } from '../../services/reportService';
 
 interface Product { id: number; sku: string; name: string; category: string; brand: string; quantity: number; purchase_price: number; selling_price: number; total_sold?: number; stock_value?: number; }

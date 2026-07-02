@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useState, useEffect, ReactNode } from 'react';
+import { getNotifications, markNotificationRead, markAllNotificationsRead } from '../services/notificationService';
 
 export interface Notification {
   id: string;
@@ -9,103 +10,92 @@ export interface Notification {
   read: boolean;
 }
 
-interface NotificationContextType {
+export interface NotificationContextType {
   notifications: Notification[];
   unreadCount: number;
+  isLoading: boolean;
   markAsRead: (id: string) => void;
   markAllAsRead: () => void;
-  addNotification: (notification: Omit<Notification, 'id' | 'read'>) => void;
+  refresh: () => void;
 }
 
-// Mock notifications
-const initialNotifications: Notification[] = [
-  {
-    id: '1',
-    type: 'warning',
-    title: 'Low Stock Alert',
-    message: 'Dell Monitor 27" stock is below threshold (5 units left)',
-    time: '5 minutes ago',
-    read: false
-  },
-  {
-    id: '2',
-    type: 'success',
-    title: 'New Sale',
-    message: 'New sale #INV-001 worth $250.00 from John Doe',
-    time: '15 minutes ago',
-    read: false
-  },
-  {
-    id: '3',
-    type: 'warning',
-    title: 'Low Stock Alert',
-    message: 'USB-C Hub stock is critical (3 units left)',
-    time: '30 minutes ago',
-    read: false
-  },
-  {
-    id: '4',
-    type: 'success',
-    title: 'New Sale',
-    message: 'New sale #INV-002 worth $180.00 from Jane Smith',
-    time: '1 hour ago',
-    read: true
-  },
-  {
-    id: '5',
-    type: 'info',
-    title: 'Purchase Received',
-    message: 'Purchase order #PO-045 has been received',
-    time: '2 hours ago',
-    read: true
-  },
-];
+export const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
 
-const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
+const STORAGE_KEY = 'notif_read_ids';
+
+const getLocalReadIds = (): Set<string> => {
+  try { return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')); }
+  catch { return new Set(); }
+};
+
+const saveLocalReadIds = (ids: Set<string>) => {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify([...ids]));
+};
 
 export const NotificationProvider = ({ children }: { children: ReactNode }) => {
-  const [notifications, setNotifications] = useState<Notification[]>(initialNotifications);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const fetchNotifications = () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    setIsLoading(true);
+    getNotifications()
+      .then(res => {
+        // DB is source of truth — use read value directly from API
+        setNotifications(res.data.data || []);
+        // Sync localStorage to match DB state
+        const readIds = new Set<string>(
+          (res.data.data || []).filter((n: Notification) => n.read).map((n: Notification) => n.id)
+        );
+        saveLocalReadIds(readIds);
+      })
+      .catch(() => {})
+      .finally(() => setIsLoading(false));
+  };
+
+  useEffect(() => {
+    fetchNotifications();
+    const interval = setInterval(fetchNotifications, 2 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   const unreadCount = notifications.filter(n => !n.read).length;
 
   const markAsRead = (id: string) => {
-    setNotifications(prev => 
-      prev.map(n => n.id === id ? { ...n, read: true } : n)
-    );
+    // Optimistic update
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
+    // Persist to localStorage as fallback
+    const localIds = getLocalReadIds();
+    localIds.add(id);
+    saveLocalReadIds(localIds);
+    // Persist to DB
+    markNotificationRead(id).catch(() => {});
   };
 
   const markAllAsRead = () => {
+    const unreadIds = notifications.filter(n => !n.read).map(n => n.id);
+    if (unreadIds.length === 0) return;
+    // Optimistic update
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
-  };
-
-  const addNotification = (notification: Omit<Notification, 'id' | 'read'>) => {
-    const newNotification: Notification = {
-      ...notification,
-      id: Date.now().toString(),
-      read: false
-    };
-    setNotifications(prev => [newNotification, ...prev]);
+    // Persist to localStorage
+    const localIds = getLocalReadIds();
+    unreadIds.forEach(id => localIds.add(id));
+    saveLocalReadIds(localIds);
+    // Persist to DB
+    markAllNotificationsRead(unreadIds).catch(() => {});
   };
 
   return (
-    <NotificationContext.Provider 
-      value={{ 
-        notifications, 
-        unreadCount, 
-        markAsRead, 
-        markAllAsRead,
-        addNotification 
-      }}
-    >
+    <NotificationContext.Provider value={{
+      notifications,
+      unreadCount,
+      isLoading,
+      markAsRead,
+      markAllAsRead,
+      refresh: fetchNotifications,
+    }}>
       {children}
     </NotificationContext.Provider>
   );
-};
-
-export const useNotifications = (): NotificationContextType => {
-  const context = useContext(NotificationContext);
-  if (context === undefined) {
-    throw new Error('useNotifications must be used within a NotificationProvider');
-  }
-  return context;
 };
