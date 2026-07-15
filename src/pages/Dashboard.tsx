@@ -248,9 +248,10 @@ const Dashboard = () => {
                         <td>
                           <div className="d-flex align-items-center gap-3">
                             <img
-                              src={product.image || 'https://via.placeholder.com/40'}
+                              src={product.image || 'https://placehold.co/40x40?text=N/A'}
                               alt={product.name}
                               className="product-img"
+                              onError={(e) => { (e.target as HTMLImageElement).src = 'https://placehold.co/40x40?text=N/A'; }}
                             />
                             <span>{product.name}</span>
                           </div>

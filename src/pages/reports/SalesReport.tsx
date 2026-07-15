@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FiDownload, FiFilter } from 'react-icons/fi';
+import { FiFilter } from 'react-icons/fi';
 import { useSettings } from '../../contexts/useSettings';
 import { getSalesReport } from '../../services/reportService';
+import ExportDropdown from '../../components/common/ExportDropdown';
 import { getCustomers } from '../../services/commonService';
 
 interface Customer { id: number; name: string; }
@@ -93,7 +94,7 @@ const SalesReport = () => {
       <div className="data-card">
         <div className="data-card-header d-flex justify-content-between align-items-center">
           <h5>Sales Details</h5>
-          <button className="btn btn-outline-secondary d-flex align-items-center"><FiDownload className="me-1" /> Export</button>
+          <ExportDropdown filename="sales-report" rows={sales.map(s => ({ Date: s.date, Invoice: s.reference, Customer: s.customer?.name || '-', Items: s.items?.reduce((sum, i) => sum + i.quantity, 0) ?? 0, Total: Number(s.grand_total).toFixed(2), Profit: calcProfit(s).toFixed(2) }))} />
         </div>
         <div className="data-card-body">
           <div className="table-responsive">

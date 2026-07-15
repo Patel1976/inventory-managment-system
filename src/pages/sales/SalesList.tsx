@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiDownload } from 'react-icons/fi';
+import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2 } from 'react-icons/fi';
 import { useAuth } from '../../contexts/useAuth';
 import { ConfirmDialog, ViewModal, DetailRow } from '../../components/common';
 import { useToast } from '../../components/common/Toast';
 import { useSettings } from '../../contexts/useSettings';
 import * as saleService from '../../services/saleService';
+import ExportDropdown from '../../components/common/ExportDropdown';
 
 interface SaleItem {
   id: number;
@@ -111,7 +112,7 @@ const SalesList = () => {
               </select>
             </div>
             <div className="col-12 col-md-7 text-end d-flex justify-content-end align-items-center">
-              <button className="btn btn-outline-secondary me-2 d-flex align-items-center"><FiDownload className="me-1" /> Export</button>
+              <ExportDropdown filename="sales" rows={filtered.map(s => ({ Invoice: s.reference, Date: s.date, Customer: s.customer?.name || '-', Store: s.store?.name || '-', 'Grand Total': s.grand_total, Paid: s.paid, Due: s.due, Payment: s.payment_status, Status: s.status }))} />
               {canEdit && (
                 <Link to="/sales/add" className="btn btn-primary-custom d-flex align-items-center"><FiPlus className="me-1" /> Add Sale</Link>
               )}

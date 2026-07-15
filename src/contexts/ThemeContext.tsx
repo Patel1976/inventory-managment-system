@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 type ThemeMode = 'light' | 'dark';
-type PrimaryColor = 'green' | 'purple' | 'orange' | 'blue';
+type PrimaryColor = 'indigo' | 'violet' | 'rose' | 'cyan' | 'emerald' | 'amber' | 'sky' | 'fuchsia';
 
 interface ThemeContextType {
   mode: ThemeMode;
@@ -20,7 +20,7 @@ const initializeTheme = () => {
   
   // Apply immediately to prevent flash
   document.documentElement.setAttribute('data-theme', storedMode || 'light');
-  document.documentElement.setAttribute('data-primary', storedColor || 'blue');
+  document.documentElement.setAttribute('data-primary', storedColor || 'indigo');
 };
 
 // Run immediately
@@ -34,8 +34,7 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   
   const [primaryColor, setPrimaryColorState] = useState<PrimaryColor>(() => {
     const stored = localStorage.getItem('inventory_primary_color');
-    // Default to 'blue' for light mode to match original PHP design
-    return (stored as PrimaryColor) || 'blue';
+    return (stored as PrimaryColor) || 'indigo';
   });
 
   useEffect(() => {

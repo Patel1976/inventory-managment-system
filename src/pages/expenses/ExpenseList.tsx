@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiDownload } from 'react-icons/fi';
+import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2 } from 'react-icons/fi';
 import { useAuth } from '../../contexts/useAuth';
 import { ConfirmDialog, ViewModal, DetailRow } from '../../components/common';
 import { useToast } from '../../components/common/Toast';
 import { useSettings } from '../../contexts/useSettings';
 import * as expenseService from '../../services/expenseService';
+import ExportDropdown from '../../components/common/ExportDropdown';
 
 interface ExpenseCategory { id: number; name: string; }
 interface Store { id: number; name: string; }
@@ -91,7 +92,7 @@ const ExpenseList = () => {
               </select>
             </div>
             <div className="col-12 col-md-6 text-end d-flex justify-content-end">
-              <button className="btn btn-outline-secondary me-2 d-flex align-items-center"><FiDownload className="me-1" /> Export</button>
+              <ExportDropdown filename="expenses" rows={filtered.map(e => ({ Reference: e.reference, Date: e.date, Category: e.category?.name || '-', Store: e.store?.name || '-', Amount: e.amount, Payment: e.payment_method }))} />
               {canManage && <Link to="/expenses/add" className="btn btn-primary-custom d-flex align-items-center"><FiPlus className="me-1" /> Add Expense</Link>}
             </div>
           </div>

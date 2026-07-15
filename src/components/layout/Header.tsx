@@ -101,17 +101,7 @@ const Header = ({ onToggleSidebar }: HeaderProps) => {
             <FiMoon />
           </button>
           
-          {/* Color Selector */}
-          <div className="color-selector">
-            {(['green', 'purple', 'orange', 'blue'] as const).map(color => (
-              <button
-                key={color}
-                className={`color-btn ${color} ${primaryColor === color ? 'active' : ''}`}
-                onClick={() => setPrimaryColor(color)}
-                title={`${color.charAt(0).toUpperCase() + color.slice(1)} Theme`}
-              />
-            ))}
-          </div>
+          {/* Color Selector removed — moved to Settings page */}
         </div>
 
         {/* Notifications */}

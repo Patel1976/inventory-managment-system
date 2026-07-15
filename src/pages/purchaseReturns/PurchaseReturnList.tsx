@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiDownload } from 'react-icons/fi';
+import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2 } from 'react-icons/fi';
 import { useAuth } from '../../contexts/useAuth';
 import { useToast } from '../../components/common/Toast';
 import { useSettings } from '../../contexts/useSettings';
 import ViewModal from '../../components/common/ViewModal';
 import { ConfirmDialog } from '@/components/common';
 import * as purchaseReturnService from '../../services/purchaseReturnService';
+import ExportDropdown from '../../components/common/ExportDropdown';
 
 interface PurchaseReturn {
   id: number;
@@ -110,7 +111,7 @@ const PurchaseReturnList = () => {
               </select>
             </div>
             <div className="col-12 col-md-7 text-end d-flex justify-content-end">
-              <button className="btn btn-outline-secondary me-2 d-flex align-items-center"><FiDownload className="me-1" /> Export</button>
+              <ExportDropdown filename="purchase-returns" rows={filtered.map(r => ({ Reference: r.reference, Date: r.return_date, 'Purchase Ref': r.purchase?.reference || '-', Supplier: r.purchase?.supplier?.name || '-', Product: r.product?.name || '-', Quantity: r.quantity, 'Return Amount': r.return_amount, Status: r.status }))} />
               {isAdmin && (
                 <button className="btn btn-primary-custom d-flex align-items-center" onClick={() => navigate('/purchases/returns/add')}>
                   <FiPlus className="me-1" /> Add Return

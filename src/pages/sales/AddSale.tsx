@@ -9,8 +9,8 @@ import { getProducts } from '../../services/productService';
 
 interface Customer { id: number; name: string; }
 interface Store { id: number; name: string; }
-interface Product { id: number; name: string; selling_price: number; quantity: number; }
-interface Item { product_id: string; quantity: number; unit_price: number; }
+interface Product { id: number; name: string; selling_price: number; quantity: number; tax: number; }
+interface Item { product_id: string; quantity: number; unit_price: number; tax_percent: number; }
 
 const AddSale = () => {
   const navigate = useNavigate();
@@ -38,7 +38,7 @@ const AddSale = () => {
     note: '',
   });
 
-  const [items, setItems] = useState<Item[]>([{ product_id: '', quantity: 1, unit_price: 0 }]);
+  const [items, setItems] = useState<Item[]>([{ product_id: '', quantity: 1, unit_price: 0, tax_percent: 0 }]);
 
   useEffect(() => {
     getCustomers().then(r => setCustomers(r.data.data)).catch(() => {});
@@ -64,13 +64,15 @@ const AddSale = () => {
           product_id: String(i.product_id),
           quantity: i.quantity,
           unit_price: i.unit_price,
+          tax_percent: i.tax_percent || 0,
         })));
       }
     }
   }, [isEdit, editData]);
 
   const subtotal = items.reduce((sum, i) => sum + i.quantity * i.unit_price, 0);
-  const grandTotal = subtotal + Number(form.tax) - Number(form.discount);
+  const totalTax = items.reduce((sum, i) => sum + (i.quantity * i.unit_price * i.tax_percent / 100), 0);
+  const grandTotal = subtotal + totalTax - Number(form.discount);
 
   const addItem = () => setItems([...items, { product_id: '', quantity: 1, unit_price: 0 }]);
   const removeItem = (idx: number) => { if (items.length > 1) setItems(items.filter((_, i) => i !== idx)); };
@@ -80,7 +82,7 @@ const AddSale = () => {
     if (field === 'product_id') {
       updated[idx].product_id = String(value);
       const prod = products.find(p => p.id === Number(value));
-      if (prod) updated[idx].unit_price = prod.selling_price;
+      if (prod) { updated[idx].unit_price = prod.selling_price; updated[idx].tax_percent = prod.tax || 0; }
     } else {
       (updated[idx] as any)[field] = Number(value);
     }
@@ -97,7 +99,7 @@ const AddSale = () => {
       tax: Number(form.tax),
       discount: Number(form.discount),
       paid: Number(form.paid),
-      items: items.map(i => ({ ...i, product_id: Number(i.product_id) })),
+      items: items.map(i => ({ ...i, product_id: Number(i.product_id), tax_percent: i.tax_percent })),
     };
     try {
       if (isEdit) {
@@ -162,7 +164,7 @@ const AddSale = () => {
               <div className="table-responsive mb-3">
                 <table className="data-table">
                   <thead>
-                    <tr><th style={{ width: '45%' }}>Product</th><th>Quantity</th><th>Unit Price</th><th>Total</th><th>Action</th></tr>
+                    <tr><th style={{ width: '40%' }}>Product</th><th>Quantity</th><th>Unit Price</th><th>Tax (%)</th><th>Tax Amount</th><th>Total</th><th>Action</th></tr>
                   </thead>
                   <tbody>
                     {items.map((item, idx) => (
@@ -179,9 +181,14 @@ const AddSale = () => {
                           <input type="number" className="form-control form-control-sm" min="1" value={item.quantity} onChange={e => updateItem(idx, 'quantity', e.target.value)} style={{ width: '80px' }} required />
                         </td>
                         <td>
-                          <input type="number" className="form-control form-control-sm" min="0" step="0.01" value={item.unit_price} onChange={e => updateItem(idx, 'unit_price', e.target.value)} style={{ width: '110px' }} required />
+                          <div className="input-group input-group-sm" style={{ width: '130px' }}>
+                            <span className="input-group-text">{currencySymbol}</span>
+                            <input type="number" className="form-control" min="0" step="0.01" value={item.unit_price} onChange={e => updateItem(idx, 'unit_price', e.target.value)} required />
+                          </div>
                         </td>
-                        <td><strong>{currencySymbol}{(item.quantity * item.unit_price).toFixed(2)}</strong></td>
+                        <td><span className="text-muted">{item.tax_percent}%</span></td>
+                        <td><span className="text-warning">{currencySymbol}{(item.quantity * item.unit_price * item.tax_percent / 100).toFixed(2)}</span></td>
+                        <td><strong>{currencySymbol}{(item.quantity * item.unit_price + item.quantity * item.unit_price * item.tax_percent / 100).toFixed(2)}</strong></td>
                         <td>
                           <button type="button" className="btn-action delete" onClick={() => removeItem(idx)}><FiTrash2 /></button>
                         </td>
@@ -203,13 +210,16 @@ const AddSale = () => {
                 <div className="col-12 col-md-4">
                   <div className="summary-box p-3 rounded">
                     <div className="d-flex justify-content-between mb-2"><span>Subtotal:</span><strong>{currencySymbol}{subtotal.toFixed(2)}</strong></div>
-                    <div className="d-flex justify-content-between mb-2 align-items-center">
+                    <div className="d-flex justify-content-between mb-2">
                       <span>Tax:</span>
-                      <input type="number" className="form-control form-control-sm" min="0" step="0.01" value={form.tax} onChange={e => setForm({ ...form, tax: Number(e.target.value) })} style={{ width: '100px' }} />
+                      <strong className="text-warning">{currencySymbol}{totalTax.toFixed(2)}</strong>
                     </div>
                     <div className="d-flex justify-content-between mb-2 align-items-center">
                       <span>Discount:</span>
-                      <input type="number" className="form-control form-control-sm" min="0" step="0.01" value={form.discount} onChange={e => setForm({ ...form, discount: Number(e.target.value) })} style={{ width: '100px' }} />
+                      <div className="input-group input-group-sm" style={{ width: '120px' }}>
+                        <span className="input-group-text">{currencySymbol}</span>
+                        <input type="number" className="form-control" min="0" step="0.01" value={form.discount} onChange={e => setForm({ ...form, discount: Number(e.target.value) })} />
+                      </div>
                     </div>
                     <hr />
                     <div className="d-flex justify-content-between">
@@ -222,7 +232,10 @@ const AddSale = () => {
                 <div className="col-12 col-md-8">
                   <div className="form-group mb-3">
                     <label className="form-label">Amount Paid</label>
-                    <input type="number" className="form-control" min="0" step="0.01" value={form.paid} onChange={e => setForm({ ...form, paid: Number(e.target.value) })} />
+                    <div className="input-group">
+                      <span className="input-group-text">{currencySymbol}</span>
+                      <input type="number" className="form-control" min="0" step="0.01" value={form.paid} onChange={e => setForm({ ...form, paid: Number(e.target.value) })} />
+                    </div>
                   </div>
                   <div className="form-group mb-3">
                     <label className="form-label">Payment Status</label>

@@ -99,7 +99,7 @@ const ActivityLog = () => {
       <div className="data-card mb-4">
         <div className="data-card-body">
           <div className="row g-3 align-items-end">
-            <div className="col-12 col-md-3">
+            <div className="col-12 col-md-4">
               <label className="form-label">Search</label>
               <div className="input-group">
                 <span className="input-group-text bg-white border-end-0"><FiSearch /></span>
@@ -138,8 +138,8 @@ const ActivityLog = () => {
               <label className="form-label">To Date</label>
               <input type="date" className="form-control" value={toDate} onChange={e => setToDate(e.target.value)} />
             </div>
-            <div className="col-12 col-md-1 d-flex gap-2 align-items-end">
-              <button className="btn btn-primary-custom flex-fill d-flex align-items-center justify-content-center" onClick={handleFilter}>
+            <div className="col-12 d-flex gap-2 justify-content-end">
+              <button className="btn btn-primary-custom d-flex align-items-center" onClick={handleFilter}>
                 <FiFilter className="me-1" /> Filter
               </button>
               <button className="btn btn-outline-secondary d-flex align-items-center" onClick={handleClear} title="Reset filters">

@@ -1,6 +1,7 @@
 import { Link, useNavigate, useLocation, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { useToast } from '@/components/common/Toast';
+import { useSettings } from '../../contexts/useSettings';
 import { getStores } from '../../services/commonService';
 import * as expenseService from '../../services/expenseService';
 
@@ -10,6 +11,7 @@ interface Store { id: number; name: string; }
 const AddExpense = () => {
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { currencySymbol } = useSettings();
   const { id } = useParams();
   const { state } = useLocation();
   const isEdit = !!id;
@@ -127,7 +129,10 @@ const AddExpense = () => {
                 <div className="col-12 col-md-6">
                   <div className="form-group mb-0">
                     <label>Amount *</label>
-                    <input type="number" name="amount" className="form-control" placeholder="0.00" value={formData.amount} onChange={handleChange} required min="0" step="0.01" />
+                    <div className="input-group">
+                      <span className="input-group-text">{currencySymbol}</span>
+                      <input type="number" name="amount" className="form-control" placeholder="0.00" value={formData.amount} onChange={handleChange} required min="0" step="0.01" />
+                    </div>
                   </div>
                 </div>
                 <div className="col-12 col-md-6">

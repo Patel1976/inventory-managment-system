@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { useToast } from '../../components/common/Toast';
+import { useSettings } from '../../contexts/useSettings';
 import * as purchaseReturnService from '../../services/purchaseReturnService';
 import { getPurchases } from '../../services/purchaseService';
 import { getProducts } from '../../services/productService';
@@ -14,6 +15,7 @@ const PurchaseReturnForm = () => {
   const { id } = useParams();
   const { state } = useLocation();
   const { showToast } = useToast();
+  const { currencySymbol } = useSettings();
   const isEdit = Boolean(id);
   const editData = state?.returnData;
 
@@ -141,7 +143,10 @@ const PurchaseReturnForm = () => {
 
             <div className="col-12 col-md-6">
               <label className="form-label">Return Amount *</label>
-              <input type="number" className="form-control" min="0" step="0.01" value={formData.return_amount} onChange={e => setFormData({ ...formData, return_amount: Number(e.target.value) })} required />
+              <div className="input-group">
+                <span className="input-group-text">{currencySymbol}</span>
+                <input type="number" className="form-control" min="0" step="0.01" value={formData.return_amount} onChange={e => setFormData({ ...formData, return_amount: Number(e.target.value) })} required />
+              </div>
             </div>
 
             <div className="col-12 col-md-6">

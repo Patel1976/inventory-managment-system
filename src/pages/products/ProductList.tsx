@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiDownload } from 'react-icons/fi';
+import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2 } from 'react-icons/fi';
 import { useAuth } from '../../contexts/useAuth';
 import { useSettings } from '../../contexts/useSettings';
 import { ConfirmDialog, ViewModal, DetailRow } from '../../components/common';
 import { useToast } from '../../components/common/Toast';
 import * as productService from '../../services/productService';
+import ExportDropdown from '../../components/common/ExportDropdown';
 import { getBrands } from '../../services/brandService';
 import * as categoryService from '../../services/categoryService';
 
@@ -176,10 +177,7 @@ const ProductList = () => {
               </div>
             </div>
             <div className="col-12 col-md-4 text-end d-flex justify-content-end align-items-center">
-              <button className="btn btn-outline-secondary me-2 d-inline-flex align-items-center">
-                <FiDownload className="me-1" />
-                <span>Export</span>
-              </button>
+              <ExportDropdown filename="products" rows={filteredProducts.map(p => ({ Name: p.name, SKU: p.sku, Category: p.category, Brand: p.brand, 'Selling Price': p.selling_price, 'Purchase Price': p.purchase_price, Stock: p.quantity, Status: getStatus(p.quantity).label }))} />
               {canManage && (
                 <Link
                   to="/products/add"

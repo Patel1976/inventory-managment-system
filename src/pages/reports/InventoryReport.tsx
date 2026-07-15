@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FiDownload, FiFilter } from 'react-icons/fi';
+import { FiFilter } from 'react-icons/fi';
 import { useSettings } from '../../contexts/useSettings';
 import { getInventoryReport } from '../../services/reportService';
+import ExportDropdown from '../../components/common/ExportDropdown';
 
 interface Product { id: number; sku: string; name: string; category: string; brand: string; quantity: number; purchase_price: number; selling_price: number; total_sold?: number; stock_value?: number; }
 interface Summary { total_products: number; total_stock_value: number; total_sold: number; low_stock_items: number; out_of_stock: number; }
@@ -100,7 +101,7 @@ const InventoryReport = () => {
       <div className="data-card">
         <div className="data-card-header d-flex justify-content-between align-items-center">
           <h5>Inventory Details</h5>
-          <button className="btn btn-outline-secondary d-flex align-items-center"><FiDownload className="me-1" /> Export</button>
+          <ExportDropdown filename="inventory-report" rows={products.map(p => ({ SKU: p.sku, Product: p.name, Category: p.category || '-', Brand: p.brand || '-', 'In Stock': p.quantity, Sold: p.total_sold ?? 0, 'Purchase Price': Number(p.purchase_price).toFixed(2), 'Selling Price': Number(p.selling_price).toFixed(2), 'Stock Value': Number(p.stock_value ?? p.quantity * p.purchase_price).toFixed(2) }))} />
         </div>
         <div className="data-card-body">
           <div className="table-responsive">

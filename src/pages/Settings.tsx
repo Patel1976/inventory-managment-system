@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FiSave, FiSettings, FiMail, FiShield, FiDollarSign, FiPackage, FiFileText } from 'react-icons/fi';
+import { FiSave, FiSettings, FiMail, FiShield, FiDollarSign, FiPackage, FiFileText, FiDroplet } from 'react-icons/fi';
 import { useSettings } from '../contexts/useSettings';
+import { useTheme } from '../contexts/ThemeContext';
 import { getSettings, updateSettings, testEmailConnection } from '../services/settingsService';
 
 const Settings = () => {
   const { setCurrency, setTaxPercentage, setStockAlertThreshold, setInvoicePrefix } = useSettings();
+  const { primaryColor, setPrimaryColor } = useTheme();
 
   // General
   const [companyName, setCompanyName] = useState('');
@@ -88,7 +90,8 @@ const Settings = () => {
         smtp_encryption: smtpEncryption,
         smtp_username: smtpUsername,
         ...(smtpPassword ? { smtp_password: smtpPassword } : {}),
-        two_factor_auth: twoFactor,
+        primary_color: primaryColor,
+      two_factor_auth: twoFactor,
         session_timeout: sessionTimeout,
         login_notification: loginNotify,
       });
@@ -97,6 +100,7 @@ const Settings = () => {
       setTaxPercentage(taxPercentage);
       setStockAlertThreshold(stockAlertThreshold);
       setInvoicePrefix(invoicePrefix);
+      setPrimaryColor(primaryColor);
       setSavedMessage('Settings saved successfully!');
       setTimeout(() => setSavedMessage(''), 3000);
     } catch {
@@ -265,8 +269,45 @@ const Settings = () => {
           </div>
         </div>
 
-        {/* Security Settings */}
+        {/* Appearance + Security */}
         <div className="col-12 col-lg-6">
+          <div className="form-card mb-4">
+            <h5 className="mb-4 d-flex align-items-center"><FiDroplet className="me-2" />Appearance</h5>
+            <label className="form-label">Theme Color</label>
+            <div className="d-flex flex-wrap gap-3 mt-2">
+              {([
+                { key: 'indigo',  hex: '#6366f1', label: 'Indigo'  },
+                { key: 'violet',  hex: '#8b5cf6', label: 'Violet'  },
+                { key: 'rose',    hex: '#f43f5e', label: 'Rose'    },
+                { key: 'cyan',    hex: '#06b6d4', label: 'Cyan'    },
+                { key: 'emerald', hex: '#10b981', label: 'Emerald' },
+                { key: 'amber',   hex: '#f59e0b', label: 'Amber'   },
+                { key: 'sky',     hex: '#0ea5e9', label: 'Sky'     },
+                { key: 'fuchsia', hex: '#d946ef', label: 'Fuchsia' },
+              ] as const).map(({ key, hex, label }) => (
+                <button
+                  key={key}
+                  onClick={() => setPrimaryColor(key)}
+                  title={label}
+                  style={{
+                    width: 38,
+                    height: 38,
+                    borderRadius: '50%',
+                    background: hex,
+                    border: primaryColor === key ? '3px solid var(--text-primary)' : '3px solid transparent',
+                    outline: primaryColor === key ? `3px solid ${hex}` : 'none',
+                    outlineOffset: '2px',
+                    cursor: 'pointer',
+                    padding: 0,
+                    transition: 'transform 0.15s',
+                    transform: primaryColor === key ? 'scale(1.15)' : 'scale(1)',
+                  }}
+                />
+              ))}
+            </div>
+            <small className="text-muted mt-3 d-block">Current: <strong>{primaryColor.charAt(0).toUpperCase() + primaryColor.slice(1)}</strong></small>
+          </div>
+
           <div className="form-card">
             <h5 className="mb-4 d-flex align-items-center"><FiShield className="me-2" />Security Settings</h5>
             <div className="form-check form-switch mb-3">

@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { FiDownload, FiFilter, FiSearch } from 'react-icons/fi';
+import { FiFilter, FiSearch } from 'react-icons/fi';
 import { useSettings } from '../../contexts/useSettings';
 import { getSupplierReport } from '../../services/reportService';
+import ExportDropdown from '../../components/common/ExportDropdown';
 import { getSuppliers } from '../../services/commonService';
 
 interface Supplier { id: number; name: string; }
@@ -98,7 +99,7 @@ const SupplierReport = () => {
       <div className="data-card">
         <div className="data-card-header d-flex justify-content-between align-items-center">
           <h5>Supplier Details</h5>
-          <button className="btn btn-outline-secondary d-flex align-items-center"><FiDownload className="me-1" /> Export</button>
+          <ExportDropdown filename="supplier-report" rows={data.map(s => ({ Supplier: s.name, Email: s.email, Phone: s.phone || '-', Orders: s.total_orders, 'Total Purchases': Number(s.total_purchases).toFixed(2), 'Total Paid': Number(s.total_paid).toFixed(2), 'Total Due': Number(s.total_due).toFixed(2), Status: s.status }))} />
         </div>
         <div className="data-card-body">
           <div className="table-responsive">

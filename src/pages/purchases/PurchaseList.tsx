@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2, FiDownload } from 'react-icons/fi';
+import { FiPlus, FiSearch, FiEye, FiEdit, FiTrash2 } from 'react-icons/fi';
 import { useAuth } from '../../contexts/useAuth';
 import { ConfirmDialog, ViewModal, DetailRow } from '../../components/common';
 import { useToast } from '../../components/common/Toast';
 import { useSettings } from '../../contexts/useSettings';
 import * as purchaseService from '../../services/purchaseService';
+import ExportDropdown from '../../components/common/ExportDropdown';
 
 interface PurchaseItem {
   id: number;
@@ -127,7 +128,7 @@ const PurchaseList = () => {
               </select>
             </div>
             <div className="col-12 col-md-7 text-end d-flex justify-content-end align-items-center">
-              <button className="btn btn-outline-secondary me-2 d-flex align-items-center"><FiDownload className="me-1" /> Export</button>
+              <ExportDropdown filename="purchases" rows={filtered.map(p => ({ Reference: p.reference, Date: p.date, Supplier: p.supplier?.name || '-', Store: p.store?.name || '-', 'Grand Total': p.grand_total, Paid: p.paid, Due: p.due, Payment: p.payment_status, Status: p.status }))} />
               {canEdit && (
                 <Link to="/purchases/add" className="btn btn-primary-custom d-flex align-items-center"><FiPlus className="me-1" /> Add Purchase</Link>
               )}

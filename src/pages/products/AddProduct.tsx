@@ -2,14 +2,16 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { FiSave, FiX, FiUpload } from 'react-icons/fi';
 import { useToast } from '@/components/common/Toast';
+import { useSettings } from '../../contexts/useSettings';
 import { getBrands } from '../../services/brandService';
 import * as categoryService from '../../services/categoryService';
 import * as productService from '../../services/productService';
 
 const AddProduct = () => {
   const navigate = useNavigate();
-  const { showToast } = useToast();
   const { id } = useParams();
+  const { showToast } = useToast();
+  const { currencySymbol } = useSettings();
   const isEdit = !!id;
   const [formData, setFormData] = useState({
     name: '',
@@ -239,29 +241,35 @@ const AddProduct = () => {
                 <div className="col-12 col-md-6">
                   <div className="form-group mb-0">
                     <label>Purchase Price *</label>
-                    <input 
-                      type="number" 
-                      className="form-control"
-                      name="purchasePrice"
-                      value={formData.purchasePrice}
-                      onChange={handleChange}
-                      placeholder="0.00"
-                      required
-                    />
+                    <div className="input-group">
+                      <span className="input-group-text">{currencySymbol}</span>
+                      <input
+                        type="number"
+                        className="form-control"
+                        name="purchasePrice"
+                        value={formData.purchasePrice}
+                        onChange={handleChange}
+                        placeholder="0.00"
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
                 <div className="col-12 col-md-6">
                   <div className="form-group mb-0">
                     <label>Selling Price *</label>
-                    <input 
-                      type="number" 
-                      className="form-control"
-                      name="sellingPrice"
-                      value={formData.sellingPrice}
-                      onChange={handleChange}
-                      placeholder="0.00"
-                      required
-                    />
+                    <div className="input-group">
+                      <span className="input-group-text">{currencySymbol}</span>
+                      <input
+                        type="number"
+                        className="form-control"
+                        name="sellingPrice"
+                        value={formData.sellingPrice}
+                        onChange={handleChange}
+                        placeholder="0.00"
+                        required
+                      />
+                    </div>
                   </div>
                 </div>
                 <div className="col-12 col-md-6">

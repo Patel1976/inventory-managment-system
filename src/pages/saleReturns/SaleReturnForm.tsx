@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useNavigate, useParams, useLocation } from 'react-router-dom';
 import { FiSave, FiX } from 'react-icons/fi';
 import { useToast } from '../../components/common/Toast';
+import { useSettings } from '../../contexts/useSettings';
 import * as saleReturnService from '../../services/saleReturnService';
 import * as saleService from '../../services/saleService';
 import { getProducts } from '../../services/productService';
@@ -15,6 +16,7 @@ const SaleReturnForm = () => {
   const { id } = useParams();
   const { state } = useLocation();
   const { showToast } = useToast();
+  const { currencySymbol } = useSettings();
   const isEdit = Boolean(id);
   const editData = state?.saleReturn;
 
@@ -145,7 +147,10 @@ const SaleReturnForm = () => {
 
             <div className="col-12 col-md-4">
               <label className="form-label">Return Amount *</label>
-              <input type="number" className="form-control" min="0" step="0.01" value={formData.return_amount} onChange={e => setFormData({ ...formData, return_amount: parseFloat(e.target.value) })} required />
+              <div className="input-group">
+                <span className="input-group-text">{currencySymbol}</span>
+                <input type="number" className="form-control" min="0" step="0.01" value={formData.return_amount} onChange={e => setFormData({ ...formData, return_amount: parseFloat(e.target.value) })} required />
+              </div>
             </div>
 
             <div className="col-12 col-md-4">

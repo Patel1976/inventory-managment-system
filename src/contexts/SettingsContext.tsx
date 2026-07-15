@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect, ReactNode } from 'react';
 import { getSettings } from '../services/settingsService';
+import { useTheme } from './ThemeContext';
 
 interface SettingsContextType {
   currency: string;
@@ -20,6 +21,7 @@ const currencySymbols: Record<string, string> = {
 const SettingsContext = createContext<SettingsContextType | undefined>(undefined);
 
 export const SettingsProvider = ({ children }: { children: ReactNode }) => {
+  const { setPrimaryColor } = useTheme();
   const [currency, setCurrencyState] = useState(
     () => localStorage.getItem('inventory_currency') || 'USD'
   );
@@ -46,6 +48,8 @@ export const SettingsProvider = ({ children }: { children: ReactNode }) => {
       if (currency_tax.tax_percentage) setTaxPercentageState(Number(currency_tax.tax_percentage));
       if (stock.stock_alert_threshold) setStockAlertThresholdState(Number(stock.stock_alert_threshold));
       if (invoice.invoice_prefix) setInvoicePrefixState(invoice.invoice_prefix);
+      const appearance = d?.appearance || {};
+      if (appearance.primary_color) setPrimaryColor(appearance.primary_color);
     }).catch(() => {});
   }, []);
 
